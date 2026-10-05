@@ -9,7 +9,10 @@ const CACHE_VERSION = 2;
 const TTL_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 4_000;
 const home = homedir();
-const cachePath = join(tmpdir(), `terminal-usage-${Buffer.from(home).toString("base64url")}-v${CACHE_VERSION}.json`);
+const cachePath = join(
+  tmpdir(),
+  `terminal-usage-${Buffer.from(home).toString("base64url")}-v${CACHE_VERSION}.json`,
+);
 const lockPath = `${cachePath}.lock`;
 
 const ansi = (code, text) => `\u001b[${code}m${text}\u001b[0m`;
@@ -44,7 +47,12 @@ function glmLimits(payload) {
 
   return limits
     .map((item) => ({
-      kind: item.type === "TOKENS_LIMIT" ? "5h" : item.type === "TIME_LIMIT" ? "mo" : item.type,
+      kind:
+        item.type === "TOKENS_LIMIT"
+          ? "5h"
+          : item.type === "TIME_LIMIT"
+            ? "mo"
+            : item.type,
       value: Number.parseFloat(item.percentage),
     }))
     .filter((item) => item.kind && Number.isFinite(item.value));
@@ -96,7 +104,10 @@ function codexUsage() {
       fn(value);
     };
 
-    const timer = setTimeout(() => finish(reject, new Error("Codex status timed out")), REQUEST_TIMEOUT_MS);
+    const timer = setTimeout(
+      () => finish(reject, new Error("Codex status timed out")),
+      REQUEST_TIMEOUT_MS,
+    );
 
     child.stdout.setEncoding("utf8");
     child.stdout.on("data", (chunk) => {
@@ -116,40 +127,57 @@ function codexUsage() {
 
         if (message.id === 2 && message.result) {
           const snapshot = message.result.rateLimits ?? {};
-          const buckets = [codexWindow(snapshot.primary), codexWindow(snapshot.secondary)].filter(Boolean);
+          const buckets = [
+            codexWindow(snapshot.primary),
+            codexWindow(snapshot.secondary),
+          ].filter(Boolean);
           finish(resolve, buckets);
         } else if (message.id === 2 && message.error) {
-          finish(reject, new Error(message.error.message ?? "Codex status failed"));
+          finish(
+            reject,
+            new Error(message.error.message ?? "Codex status failed"),
+          );
         }
       }
     });
 
     child.on("error", (error) => finish(reject, error));
-    child.on("exit", () => finish(reject, new Error("Codex status exited early")));
+    child.on("exit", () =>
+      finish(reject, new Error("Codex status exited early")),
+    );
 
-    child.stdin.write(`${JSON.stringify({
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: { clientInfo: { name: "terminal-usage", version: "1.0" } },
-    })}\\n`);
-    child.stdin.write(`${JSON.stringify({
-      jsonrpc: "2.0",
-      method: "initialized",
-      params: {},
-    })}\\n`);
-    child.stdin.write(`${JSON.stringify({
-      jsonrpc: "2.0",
-      id: 2,
-      method: "account/rateLimits/read",
-      params: { excludeResetCreditDetails: true },
-    })}\\n`);
+    child.stdin.write(
+      `${JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: { clientInfo: { name: "terminal-usage", version: "1.0" } },
+      })}\\n`,
+    );
+    child.stdin.write(
+      `${JSON.stringify({
+        jsonrpc: "2.0",
+        method: "initialized",
+        params: {},
+      })}\\n`,
+    );
+    child.stdin.write(
+      `${JSON.stringify({
+        jsonrpc: "2.0",
+        id: 2,
+        method: "account/rateLimits/read",
+        params: { excludeResetCreditDetails: true },
+      })}\\n`,
+    );
     child.stdin.end();
   });
 }
 
 async function fetchUsage() {
-  const [glmResult, codexResult] = await Promise.allSettled([glmUsage(), codexUsage()]);
+  const [glmResult, codexResult] = await Promise.allSettled([
+    glmUsage(),
+    codexUsage(),
+  ]);
   return {
     version: CACHE_VERSION,
     fetchedAt: Date.now(),
@@ -162,7 +190,12 @@ function usagePart(label, items, color) {
   if (!items?.length) return `${color(label)} ${dim("--")}`;
   const rendered = items.map((item) => {
     const value = `${Math.round(item.value)}%`;
-    const colored = item.value >= 85 ? red(value) : item.value >= 65 ? yellow(value) : green(value);
+    const colored =
+      item.value >= 85
+        ? red(value)
+        : item.value >= 65
+          ? yellow(value)
+          : green(value);
     return `${dim(item.label ?? "usage")} ${colored}`;
   });
   return `${color(label)} ${rendered.join(dim(" / "))}`;
@@ -204,7 +237,8 @@ function startRefresh() {
 
 function clearLock() {
   try {
-    if (statSync(lockPath).mtimeMs < Date.now() - 15_000) writeFileSync(lockPath, "");
+    if (statSync(lockPath).mtimeMs < Date.now() - 15_000)
+      writeFileSync(lockPath, "");
   } catch {
     // No stale lock.
   }
@@ -215,7 +249,8 @@ if (process.argv.includes("--fetch")) {
     writeCache(await fetchUsage());
   } finally {
     try {
-      if (readFileSync(lockPath, "utf8") === process.pid.toString()) writeFileSync(lockPath, "");
+      if (readFileSync(lockPath, "utf8") === process.pid.toString())
+        writeFileSync(lockPath, "");
     } catch {
       // Lock already removed.
     }
