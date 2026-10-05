@@ -1,0 +1,95 @@
+import type { Listing } from "../types/listing";
+
+export const mockListings: Listing[] = [
+  {
+    id: "adventurer-frigate",
+    title: "Adventurer Frigate",
+    category: "ships",
+    price: 48_000_000,
+    currency: "gold",
+    description:
+      "A well-balanced adventure frigate with strong cargo capacity and dependable ocean handling.",
+    seller: "PortRoyalShipwright",
+    location: "Port Royal",
+    imageEmoji: "🚢",
+    createdAt: "2026-10-04T14:00:00Z",
+  },
+  {
+    id: "armed-merchant-galleon",
+    title: "Armed Merchant Galleon",
+    category: "ships",
+    price: 82_500_000,
+    currency: "gold",
+    description:
+      "Heavy trading hull fitted for long routes and hostile waters. Crew ready, sails inspected.",
+    seller: "LisbonBroker",
+    location: "Lisbon",
+    imageEmoji: "⛵",
+    createdAt: "2026-10-03T10:30:00Z",
+  },
+  {
+    id: "fast-raiding-cutter",
+    title: "Fast Raiding Cutter",
+    category: "ships",
+    price: 27_750_000,
+    currency: "gold",
+    description:
+      "Compact, quick, and ideal for coastal raids or urgent courier contracts.",
+    seller: "TortugaRunner",
+    location: "Tortuga",
+    imageEmoji: "🛥️",
+    createdAt: "2026-10-02T18:45:00Z",
+  },
+  {
+    id: "seville-townhouse",
+    title: "Seville Townhouse",
+    category: "property",
+    price: 125_000_000,
+    currency: "gold",
+    description:
+      "A prestigious residence near the trading district with secure storage access.",
+    seller: "SevilleEstate",
+    location: "Seville",
+    imageEmoji: "🏘️",
+    createdAt: "2026-09-29T09:00:00Z",
+  },
+  {
+    id: "master-cannon-set",
+    title: "Master Cannon Set",
+    category: "equipment",
+    price: 16_400_000,
+    currency: "gold",
+    description:
+      "Matched set of master cannons, cleaned and tested before listing.",
+    seller: "GunsmithOfGenoa",
+    location: "Genoa",
+    imageEmoji: "💣",
+    createdAt: "2026-10-01T12:15:00Z",
+  },
+  {
+    id: "spice-market-haul",
+    title: "Spice Market Haul",
+    category: "resources",
+    price: 8_900_000,
+    currency: "gold",
+    description:
+      "Cinnamon, pepper, and cloves packed for immediate resale in European ports.",
+    seller: "AlexandriaTrader",
+    location: "Alexandria",
+    imageEmoji: "🧺",
+    createdAt: "2026-09-28T16:20:00Z",
+  },
+  {
+    id: "escort-contract",
+    title: "Trading Convoy Escort",
+    category: "services",
+    price: 5_200_000,
+    currency: "gold",
+    description:
+      "Experienced escort crew available for multi-port convoys and pirate-heavy routes.",
+    seller: "BlueWaveFleet",
+    location: "London",
+    imageEmoji: "🛡️",
+    createdAt: "2026-10-04T08:10:00Z",
+  },
+];
