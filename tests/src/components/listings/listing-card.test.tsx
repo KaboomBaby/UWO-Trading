@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { ListingCard } from "../../../../src/components/listings/listing-card";
 import type { Listing } from "../../../../src/types/listing";
@@ -19,6 +19,8 @@ const listing: Listing = {
 };
 
 describe("ListingCard", () => {
+  afterEach(cleanup);
+
   it("renders listing details with a link to the listing", () => {
     render(
       <MemoryRouter>
@@ -34,5 +36,15 @@ describe("ListingCard", () => {
     expect(link).toHaveTextContent("PortRoyalShipwright");
     expect(link).toHaveTextContent("Port Royal");
     expect(link).toHaveTextContent("🚢");
+  });
+
+  it("marks legacy listings", () => {
+    render(
+      <MemoryRouter>
+        <ListingCard listing={{ ...listing, collection: "legacy" }} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Legacy")).toBeInTheDocument();
   });
 });

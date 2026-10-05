@@ -40,14 +40,14 @@ The signed-in map identifies the Account section, but its individual desktop fra
 | Home — market              | `/`                                      | Implemented in Milestone 1 |
 | Browse listings — Default  | `/browse`                                | Implemented in Milestone 1 |
 | Browse listings — Ships    | `/browse?category=ships`                 | Implemented in Milestone 1 |
-| Browse listings — Legacy   | `/browse?collection=legacy`              | Planned                    |
+| Browse listings — Legacy   | `/browse?collection=legacy`              | Implemented in Milestone 2 |
 | Listing detail — Default   | `/listings/:listingId`                   | Implemented in Milestone 1 |
-| Listing detail — Legacy    | `/listings/:listingId?variant=legacy`    | Planned                    |
-| Listing detail — Equipment | `/listings/:listingId?variant=equipment` | Planned                    |
-| Listing detail — Trade     | `/listings/:listingId?variant=trade`     | Planned                    |
-| Port directory             | `/ports`                                 | Planned                    |
-| Component items            | `/components`                            | Planned                    |
-| Search results             | `/search`                                | Planned                    |
+| Listing detail — Legacy    | `/listings/:listingId?variant=legacy`    | Implemented in Milestone 2 |
+| Listing detail — Equipment | `/listings/:listingId?variant=equipment` | Implemented in Milestone 2 |
+| Listing detail — Trade     | `/listings/:listingId?variant=trade`     | Implemented in Milestone 2 |
+| Port directory             | `/ports`                                 | Implemented in Milestone 2 |
+| Component items            | `/components`                            | Implemented in Milestone 2 |
+| Search results             | `/search`                                | Implemented in Milestone 2 |
 | Price alerts manager       | `/trading/price-alerts`                  | Planned                    |
 | Leaderboards               | `/trading/leaderboards`                  | Planned                    |
 | Wishlist and Watchlists    | `/account/wishlist-watchlists`           | Planned                    |
@@ -60,7 +60,7 @@ Route paths are a local application contract. They preserve the Figma frame inte
 ## Build sequencing
 
 1. **Milestone 1 — Core marketplace:** Home, Default Browse, Ships Browse, Default Listing Detail, Post a Listing, and repository-backed local data. Complete.
-2. **Milestone 2 — Marketplace depth:** Search results, Legacy browse/detail variants, Port directory, and Component items.
+2. **Milestone 2 — Marketplace depth:** Search results, Legacy browse/detail variants, Port directory, and Component items. Complete.
 3. **Milestone 3 — Trading intelligence:** Market price index, Price alerts manager, Leaderboards, and detail Trade variant.
 4. **Milestone 4 — Account and commerce:** Wishlist/Watchlists, Guild storefront, Shop catalog, Equipment detail variant, and the remaining Account surfaces once their signed-in frame names are available.
 

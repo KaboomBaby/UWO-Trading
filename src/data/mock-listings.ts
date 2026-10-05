@@ -13,6 +13,7 @@ export const mockListings: Listing[] = [
     location: "Port Royal",
     imageEmoji: "🚢",
     createdAt: "2026-10-04T14:00:00Z",
+    collection: "current",
   },
   {
     id: "armed-merchant-galleon",
@@ -26,6 +27,7 @@ export const mockListings: Listing[] = [
     location: "Lisbon",
     imageEmoji: "⛵",
     createdAt: "2026-10-03T10:30:00Z",
+    collection: "current",
   },
   {
     id: "fast-raiding-cutter",
@@ -39,6 +41,7 @@ export const mockListings: Listing[] = [
     location: "Tortuga",
     imageEmoji: "🛥️",
     createdAt: "2026-10-02T18:45:00Z",
+    collection: "current",
   },
   {
     id: "seville-townhouse",
@@ -52,6 +55,7 @@ export const mockListings: Listing[] = [
     location: "Seville",
     imageEmoji: "🏘️",
     createdAt: "2026-09-29T09:00:00Z",
+    collection: "current",
   },
   {
     id: "master-cannon-set",
@@ -65,6 +69,7 @@ export const mockListings: Listing[] = [
     location: "Genoa",
     imageEmoji: "💣",
     createdAt: "2026-10-01T12:15:00Z",
+    collection: "current",
   },
   {
     id: "spice-market-haul",
@@ -78,6 +83,7 @@ export const mockListings: Listing[] = [
     location: "Alexandria",
     imageEmoji: "🧺",
     createdAt: "2026-09-28T16:20:00Z",
+    collection: "current",
   },
   {
     id: "escort-contract",
@@ -91,5 +97,34 @@ export const mockListings: Listing[] = [
     location: "London",
     imageEmoji: "🛡️",
     createdAt: "2026-10-04T08:10:00Z",
+    collection: "current",
+  },
+  {
+    id: "legacy-grand-voyager",
+    title: "Legacy Grand Voyager",
+    category: "ships",
+    price: 64_000_000,
+    currency: "gold",
+    description:
+      "A classic long-route vessel preserved in near-original condition for collectors and legacy traders.",
+    seller: "VeniceArchiveFleet",
+    location: "Venice",
+    imageEmoji: "⛴️",
+    createdAt: "2026-09-24T11:00:00Z",
+    collection: "legacy",
+  },
+  {
+    id: "legacy-merchant-caravel",
+    title: "Legacy Merchant Caravel",
+    category: "ships",
+    price: 21_500_000,
+    currency: "gold",
+    description:
+      "A compact historical caravel suited to legacy exhibition routes and coastal trading.",
+    seller: "SevilleHarborKeeper",
+    location: "Seville",
+    imageEmoji: "🪝",
+    createdAt: "2026-09-21T13:30:00Z",
+    collection: "legacy",
   },
 ];

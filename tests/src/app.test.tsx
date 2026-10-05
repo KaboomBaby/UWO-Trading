@@ -44,4 +44,23 @@ describe("application routes", () => {
       ).toBeInTheDocument(),
     );
   });
+
+  it("renders the Milestone 2 directory routes", () => {
+    renderApp("/search");
+    expect(
+      screen.getByRole("heading", { name: /search results/i }),
+    ).toBeInTheDocument();
+    cleanup();
+
+    renderApp("/ports");
+    expect(
+      screen.getByRole("heading", { name: /port directory/i }),
+    ).toBeInTheDocument();
+    cleanup();
+
+    renderApp("/components");
+    expect(
+      screen.getByRole("heading", { name: /component items/i }),
+    ).toBeInTheDocument();
+  });
 });

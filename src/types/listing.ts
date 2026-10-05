@@ -9,9 +9,11 @@ export const LISTING_CATEGORIES = [
 export type ListingCategory = (typeof LISTING_CATEGORIES)[number];
 
 export type ListingSort = "newest" | "price-asc" | "price-desc";
+export type ListingCollection = "current" | "legacy";
 
 export type ListingQuery = {
   category?: ListingCategory | "all";
+  collection?: ListingCollection | "all";
   search?: string;
   sort?: ListingSort;
 };
@@ -27,6 +29,7 @@ export type Listing = {
   location: string;
   imageEmoji: string;
   createdAt: string;
+  collection?: ListingCollection;
 };
 
 export type CreateListingInput = {
@@ -37,4 +40,5 @@ export type CreateListingInput = {
   seller: string;
   location: string;
   imageEmoji?: string;
+  collection?: ListingCollection;
 };

@@ -3,6 +3,7 @@ import type {
   CreateListingInput,
   Listing,
   ListingCategory,
+  ListingCollection,
   ListingQuery,
 } from "../types/listing";
 
@@ -14,6 +15,12 @@ export interface ListingRepository {
 
 export function normalizeCategory(value: string): ListingCategory | "all" {
   return value === "all" ? "all" : (value as ListingCategory);
+}
+
+export function normalizeCollection(
+  value: string | null,
+): ListingCollection | "all" {
+  return value === "legacy" || value === "current" ? value : "all";
 }
 
 function matchesQuery(listing: Listing, search?: string) {
@@ -57,9 +64,12 @@ export function createLocalListingRepository(
   return {
     async list(query: ListingQuery = {}) {
       const category = query.category ?? "all";
+      const collection = query.collection ?? "all";
       let results = listings.filter(
         (listing) =>
           (category === "all" || listing.category === category) &&
+          (collection === "all" ||
+            (listing.collection ?? "current") === collection) &&
           matchesQuery(listing, query.search),
       );
 
@@ -95,6 +105,7 @@ export function createLocalListingRepository(
             : `listing-${Date.now()}`,
         currency: "gold",
         imageEmoji: input.imageEmoji ?? "📦",
+        collection: input.collection ?? "current",
         createdAt: new Date().toISOString(),
       };
       listings.unshift(listing);

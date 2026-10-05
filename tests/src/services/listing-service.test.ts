@@ -34,6 +34,20 @@ describe("local listing repository", () => {
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
   });
 
+  it("filters by current and legacy collections", async () => {
+    const repository = createLocalListingRepository();
+    const legacy = await repository.list({ collection: "legacy" });
+    const current = await repository.list({ collection: "current" });
+
+    expect(legacy.map((listing) => listing.id)).toEqual([
+      "legacy-grand-voyager",
+      "legacy-merchant-caravel",
+    ]);
+    expect(current).not.toContainEqual(
+      expect.objectContaining({ collection: "legacy" }),
+    );
+  });
+
   it("finds a listing by id", async () => {
     const repository = createLocalListingRepository();
     expect(await repository.get("adventurer-frigate")).toMatchObject({
@@ -44,10 +58,14 @@ describe("local listing repository", () => {
 
   it("creates a valid listing in local memory", async () => {
     const repository = createLocalListingRepository([]);
-    const created = await repository.create(validInput);
+    const created = await repository.create({
+      ...validInput,
+      collection: "legacy",
+    });
     expect(await repository.list()).toHaveLength(1);
     expect(await repository.get(created.id)).toMatchObject({
       title: "Trading Schooner",
+      collection: "legacy",
     });
   });
 

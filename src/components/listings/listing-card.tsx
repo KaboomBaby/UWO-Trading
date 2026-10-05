@@ -18,8 +18,15 @@ export function ListingCard({ listing }: { listing: Listing }) {
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-lg font-semibold text-white">{listing.title}</h3>
-          <span className="rounded-full bg-sea-blue/25 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200">
-            {listing.category}
+          <span className="flex flex-wrap justify-end gap-2">
+            {listing.collection === "legacy" && (
+              <span className="rounded-full bg-amber-glow/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-glow">
+                Legacy
+              </span>
+            )}
+            <span className="rounded-full bg-sea-blue/25 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200">
+              {listing.category}
+            </span>
           </span>
         </div>
         <p className="text-xl font-semibold text-amber-glow">

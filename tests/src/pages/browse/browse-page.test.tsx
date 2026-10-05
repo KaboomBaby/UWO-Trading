@@ -115,6 +115,7 @@ describe("BrowsePage", () => {
     await waitFor(() =>
       expect(mockRepository.list).toHaveBeenLastCalledWith({
         category: "all",
+        collection: "current",
         search: "frigate",
         sort: "newest",
       }),
@@ -124,6 +125,7 @@ describe("BrowsePage", () => {
     await waitFor(() =>
       expect(mockRepository.list).toHaveBeenLastCalledWith({
         category: "all",
+        collection: "current",
         search: "frigate",
         sort: "price-desc",
       }),
@@ -137,6 +139,7 @@ describe("BrowsePage", () => {
     expect(await screen.findByText("0 listings")).toBeInTheDocument();
     expect(mockRepository.list).toHaveBeenCalledWith({
       category: "ships",
+      collection: "current",
       search: undefined,
       sort: "newest",
     });
@@ -198,5 +201,100 @@ describe("BrowsePage", () => {
       await screen.findByRole("heading", { name: "Adventurer Frigate" }),
     ).toBeInTheDocument();
     expect(screen.getByText("1 listing")).toBeInTheDocument();
+  });
+
+  it("defaults to Current and passes that collection to the repository", async () => {
+    mockRepository.list.mockResolvedValue([]);
+    renderBrowse("/browse");
+
+    expect(await screen.findByText("0 listings")).toBeInTheDocument();
+    expect(mockRepository.list).toHaveBeenCalledWith({
+      category: "all",
+      collection: "current",
+      search: undefined,
+      sort: "newest",
+    });
+    expect(screen.getByRole("link", { name: "Current" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(screen.getByText("/browse")).toBeInTheDocument();
+  });
+
+  it("initializes Legacy from the URL and passes collection to the repository", async () => {
+    mockRepository.list.mockResolvedValue([listing]);
+    renderBrowse("/browse?collection=legacy");
+
+    expect(mockRepository.list).toHaveBeenCalledWith({
+      category: "all",
+      collection: "legacy",
+      search: undefined,
+      sort: "newest",
+    });
+    expect(
+      await screen.findByRole("link", { name: /adventurer frigate/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Legacy" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(screen.getByText("/browse?collection=legacy")).toBeInTheDocument();
+  });
+
+  it("canonicalizes invalid and unsupported Browse URL parameters", async () => {
+    mockRepository.list.mockResolvedValue([]);
+    renderBrowse("/browse?category=invalid&collection=current&source=figma");
+
+    expect(await screen.findByText("/browse")).toBeInTheDocument();
+    expect(mockRepository.list).toHaveBeenCalledWith({
+      category: "all",
+      collection: "current",
+      search: undefined,
+      sort: "newest",
+    });
+  });
+
+  it("switches collections through shareable links while preserving active filters", async () => {
+    const user = userEvent.setup();
+    mockRepository.list.mockResolvedValue([]);
+    renderBrowse("/browse?category=ships&collection=legacy");
+    await screen.findByText("0 listings");
+
+    await user.type(screen.getByLabelText("Search"), "frigate");
+    await user.selectOptions(screen.getByLabelText("Sort by"), "price-desc");
+    await waitFor(() =>
+      expect(mockRepository.list).toHaveBeenLastCalledWith({
+        category: "ships",
+        collection: "legacy",
+        search: "frigate",
+        sort: "price-desc",
+      }),
+    );
+
+    await user.click(screen.getByRole("link", { name: "Current" }));
+    expect(
+      await screen.findByText("/browse?category=ships"),
+    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockRepository.list).toHaveBeenLastCalledWith({
+        category: "ships",
+        collection: "current",
+        search: "frigate",
+        sort: "price-desc",
+      }),
+    );
+
+    await user.click(screen.getByRole("link", { name: "Legacy" }));
+    expect(
+      await screen.findByText("/browse?category=ships&collection=legacy"),
+    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockRepository.list).toHaveBeenLastCalledWith({
+        category: "ships",
+        collection: "legacy",
+        search: "frigate",
+        sort: "price-desc",
+      }),
+    );
   });
 });

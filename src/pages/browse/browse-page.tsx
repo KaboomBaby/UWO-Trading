@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { ListingGrid } from "../../components/listings/listing-grid";
 import { useListingRepository } from "../../lib/listing-repository-context";
@@ -7,11 +7,13 @@ import {
   LISTING_CATEGORIES,
   type Listing,
   type ListingCategory,
+  type ListingCollection,
   type ListingQuery,
   type ListingSort,
 } from "../../types/listing";
 
 type BrowseCategory = ListingCategory | "all";
+type BrowseCollection = ListingCollection;
 type ListingResult =
   | {
       query: ListingQuery;
@@ -42,24 +44,53 @@ const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
   { value: "price-desc", label: "Price high-to-low" },
 ];
 
+const COLLECTION_FILTERS: Array<{
+  value: BrowseCollection;
+  label: string;
+  description: string;
+}> = [
+  { value: "current", label: "Current", description: "Active market" },
+  { value: "legacy", label: "Legacy", description: "Classic collection" },
+];
+
 function parseCategory(value: string | null): BrowseCategory {
   return LISTING_CATEGORIES.includes(value as ListingCategory)
     ? (value as ListingCategory)
     : "all";
 }
 
+function parseCollection(value: string | null): BrowseCollection {
+  return value === "legacy" ? "legacy" : "current";
+}
+
+function createBrowseParams(
+  category: BrowseCategory,
+  collection: BrowseCollection,
+) {
+  const params = new URLSearchParams();
+  if (category !== "all") params.set("category", category);
+  if (collection === "legacy") params.set("collection", collection);
+  return params;
+}
+
 export function BrowsePage() {
   const repository = useListingRepository();
   const [searchParams, setSearchParams] = useSearchParams();
   const category = parseCategory(searchParams.get("category"));
+  const collection = parseCollection(searchParams.get("collection"));
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<ListingSort>("newest");
   const [result, setResult] = useState<ListingResult | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
   const query = useMemo(
-    () => ({ category, search: search.trim() || undefined, sort }),
-    [category, search, sort],
+    () => ({
+      category,
+      collection,
+      search: search.trim() || undefined,
+      sort,
+    }),
+    [category, collection, search, sort],
   );
   const currentResult =
     result?.query === query && result.reloadToken === reloadToken
@@ -69,6 +100,13 @@ export function BrowsePage() {
     currentResult?.status === "success" ? currentResult.listings : [];
   const isLoading = !currentResult;
   const error = currentResult?.status === "error";
+
+  useEffect(() => {
+    const canonicalParams = createBrowseParams(category, collection);
+    if (searchParams.toString() !== canonicalParams.toString()) {
+      setSearchParams(canonicalParams, { replace: true });
+    }
+  }, [category, collection, searchParams, setSearchParams]);
 
   useEffect(() => {
     let isActive = true;
@@ -98,26 +136,32 @@ export function BrowsePage() {
 
   const selectCategory = useCallback(
     (nextCategory: BrowseCategory) => {
-      const nextParams = new URLSearchParams(searchParams);
-      if (nextCategory === "all") {
-        nextParams.delete("category");
-      } else {
-        nextParams.set("category", nextCategory);
-      }
-      setSearchParams(nextParams);
+      setSearchParams(createBrowseParams(nextCategory, collection));
     },
-    [searchParams, setSearchParams],
+    [collection, setSearchParams],
+  );
+
+  const collectionPath = useCallback(
+    (nextCollection: BrowseCollection) => {
+      const nextParams = createBrowseParams(category, nextCollection);
+      const nextSearch = nextParams.toString();
+      return nextSearch ? `/browse?${nextSearch}` : "/browse";
+    },
+    [category],
   );
 
   const clearFilters = () => {
     setSearch("");
     setSort("newest");
-    selectCategory("all");
+    setSearchParams(new URLSearchParams());
     setReloadToken((token) => token + 1);
   };
 
   const hasActiveFilters =
-    category !== "all" || search.trim().length > 0 || sort !== "newest";
+    category !== "all" ||
+    collection === "legacy" ||
+    search.trim().length > 0 ||
+    sort !== "newest";
   const resultLabel = listings.length === 1 ? "listing" : "listings";
 
   return (
@@ -143,6 +187,37 @@ export function BrowsePage() {
       </div>
 
       <div className="mt-8 rounded-2xl border border-white/10 bg-ink/60 p-4 sm:p-5">
+        <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
+              Collection
+            </h2>
+            <p className="mt-1 text-xs text-slate-400">
+              Switch between active listings and classic legacy inventory.
+            </p>
+          </div>
+          <div
+            className="flex gap-1 rounded-xl border border-white/10 bg-ink/70 p-1"
+            role="group"
+            aria-label="Filter by collection"
+          >
+            {COLLECTION_FILTERS.map((filter) => (
+              <Link
+                key={filter.value}
+                to={collectionPath(filter.value)}
+                aria-current={collection === filter.value ? "true" : undefined}
+                title={filter.description}
+                className={
+                  collection === filter.value
+                    ? "rounded-lg bg-amber-glow px-4 py-2 text-sm font-semibold text-ink"
+                    : "rounded-lg px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10 hover:text-white"
+                }
+              >
+                {filter.label}
+              </Link>
+            ))}
+          </div>
+        </div>
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
