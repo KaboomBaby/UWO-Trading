@@ -1,0 +1,123 @@
+import type {
+  LeaderboardEntry,
+  MarketPrice,
+  PriceAlert,
+} from "../types/trading";
+
+export const mockMarketPrices: MarketPrice[] = [
+  {
+    id: "pepper-lisbon",
+    itemName: "Pepper",
+    category: "commodities",
+    port: "Lisbon",
+    price: 4_250,
+    changePercent: 6.4,
+    trend: "rising",
+    updatedAt: "2026-10-05T01:00:00Z",
+  },
+  {
+    id: "cinnamon-amsterdam",
+    itemName: "Cinnamon",
+    category: "commodities",
+    port: "Amsterdam",
+    price: 5_120,
+    changePercent: -2.8,
+    trend: "falling",
+    updatedAt: "2026-10-05T01:05:00Z",
+  },
+  {
+    id: "master-culverin-genoa",
+    itemName: "Master Culverin",
+    category: "equipment",
+    port: "Genoa",
+    price: 12_600_000,
+    changePercent: 1.2,
+    trend: "rising",
+    updatedAt: "2026-10-05T00:50:00Z",
+  },
+  {
+    id: "adventurer-frigate-port-royal",
+    itemName: "Adventurer Frigate",
+    category: "ships",
+    port: "Port Royal",
+    price: 48_000_000,
+    changePercent: 0,
+    trend: "stable",
+    updatedAt: "2026-10-04T23:40:00Z",
+  },
+  {
+    id: "seville-townhouse",
+    itemName: "Seville Townhouse",
+    category: "property",
+    port: "Seville",
+    price: 125_000_000,
+    changePercent: -4.1,
+    trend: "falling",
+    updatedAt: "2026-10-04T22:30:00Z",
+  },
+];
+
+export const mockPriceAlerts: PriceAlert[] = [
+  {
+    id: "pepper-below-4k",
+    itemName: "Pepper",
+    targetPrice: 4_000,
+    direction: "below",
+    status: "active",
+    note: "Buy for the Lisbon export run.",
+    createdAt: "2026-10-03T10:00:00Z",
+  },
+  {
+    id: "cinnamon-above-5k",
+    itemName: "Cinnamon",
+    targetPrice: 5_000,
+    direction: "above",
+    status: "triggered",
+    note: "Sell remaining Amsterdam inventory.",
+    createdAt: "2026-10-02T08:30:00Z",
+  },
+  {
+    id: "culverin-below-12m",
+    itemName: "Master Culverin",
+    targetPrice: 12_000_000,
+    direction: "below",
+    status: "paused",
+    note: "Wait for the next Genoa refit cycle.",
+    createdAt: "2026-09-30T14:15:00Z",
+  },
+];
+
+export const mockLeaderboardEntries: LeaderboardEntry[] = [
+  {
+    id: "captain-alvares",
+    trader: "Captain Alvares",
+    port: "Lisbon",
+    profit: 842_000_000,
+    volume: 2_140_000_000,
+    trades: 418,
+  },
+  {
+    id: "port-royal-marta",
+    trader: "Port Royal Marta",
+    port: "Port Royal",
+    profit: 731_000_000,
+    volume: 1_860_000_000,
+    trades: 502,
+  },
+  {
+    id: "amsterdam-jan",
+    trader: "Amsterdam Jan",
+    port: "Amsterdam",
+    profit: 614_000_000,
+    volume: 2_520_000_000,
+    trades: 367,
+  },
+  {
+    id: "venice-lucia",
+    trader: "Venice Lucia",
+    port: "Venice",
+    profit: 588_000_000,
+    volume: 1_120_000_000,
+    trades: 289,
+  },
+];
