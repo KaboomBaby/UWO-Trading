@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { App } from "../../src/app";
 
@@ -12,11 +12,13 @@ function renderApp(path: string) {
   );
 }
 
+afterEach(cleanup);
+
 describe("application routes", () => {
   it("renders the home route", () => {
     renderApp("/");
     expect(
-      screen.getByRole("heading", { name: /trade ships/i }),
+      screen.getByRole("heading", { name: /open-sea marketplace/i }),
     ).toBeInTheDocument();
   });
 
@@ -32,5 +34,14 @@ describe("application routes", () => {
     expect(
       screen.getByRole("heading", { name: /post a listing/i }),
     ).toBeInTheDocument();
+  });
+
+  it("renders a known listing detail route", async () => {
+    renderApp("/listings/adventurer-frigate");
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: /adventurer frigate/i }),
+      ).toBeInTheDocument(),
+    );
   });
 });

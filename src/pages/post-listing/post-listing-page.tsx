@@ -1,10 +1,442 @@
-export function PostListingPage() {
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { useListingRepository } from "../../lib/listing-repository-context";
+import {
+  LISTING_CATEGORIES,
+  type Listing,
+  type ListingCategory,
+} from "../../types/listing";
+
+type FormState = {
+  title: string;
+  category: ListingCategory | "";
+  price: string;
+  description: string;
+  seller: string;
+  location: string;
+  emoji: string;
+};
+
+const emptyForm: FormState = {
+  title: "",
+  category: "",
+  price: "",
+  description: "",
+  seller: "",
+  location: "",
+  emoji: "",
+};
+
+function formatCategory(category: ListingCategory) {
+  return category.charAt(0).toUpperCase() + category.slice(1);
+}
+
+function validate(form: FormState) {
+  const errors: Partial<Record<keyof FormState, string>> = {};
+  const title = form.title.trim();
+  const price = Number(form.price.trim());
+  const description = form.description.trim();
+  const seller = form.seller.trim();
+  const location = form.location.trim();
+
+  if (title.length < 3) {
+    errors.title = "Title must be at least 3 characters.";
+  }
+  if (!form.category) {
+    errors.category = "Category is required.";
+  }
+  if (!form.price.trim()) {
+    errors.price = "Price is required.";
+  } else if (!Number.isFinite(price) || price <= 0) {
+    errors.price = "Price must be a number greater than zero.";
+  }
+  if (description.length < 10) {
+    errors.description = "Description must be at least 10 characters.";
+  }
+  if (!seller) {
+    errors.seller = "Seller is required.";
+  }
+  if (!location) {
+    errors.location = "Location is required.";
+  }
+
+  return errors;
+}
+
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-semibold text-white">Post a listing</h1>
-      <p className="mt-3 text-slate-300">
-        Posting implementation dispatched to AGENT BOTTOM RIGHT.
-      </p>
+    <p className="mt-2 text-sm text-red-200" id={id}>
+      {message}
+    </p>
+  );
+}
+
+const inputClassName =
+  "mt-2 w-full rounded-lg border border-white/15 bg-ink px-3 py-2 text-white placeholder:text-slate-500 focus:border-amber-glow focus:outline-none focus:ring-2 focus:ring-amber-glow/30";
+
+export function PostListingPage() {
+  const repository = useListingRepository();
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof FormState, string>>
+  >({});
+  const [errorAnnouncementId, setErrorAnnouncementId] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdListing, setCreatedListing] = useState<Listing | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const errorSummaryRef = useRef<HTMLParagraphElement | null>(null);
+  const successHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const formHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const shouldFocusFormRef = useRef(false);
+  const errorCount = Object.values(errors).filter(Boolean).length;
+
+  useEffect(() => {
+    if (errorAnnouncementId > 0) {
+      errorSummaryRef.current?.focus();
+    }
+  }, [errorAnnouncementId]);
+
+  useEffect(() => {
+    if (createdListing) {
+      successHeadingRef.current?.focus();
+      return;
+    }
+
+    if (shouldFocusFormRef.current) {
+      shouldFocusFormRef.current = false;
+      formHeadingRef.current?.focus();
+    }
+  }, [createdListing]);
+
+  function updateField<K extends keyof FormState>(
+    field: K,
+    value: FormState[K],
+  ) {
+    setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
+    setSubmitError(null);
+    if (Object.values(nextErrors).some(Boolean)) {
+      setErrorAnnouncementId((id) => id + 1);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const emoji = form.emoji.trim();
+      const listing = await repository.create({
+        title: form.title.trim(),
+        category: form.category as ListingCategory,
+        price: Number(form.price.trim()),
+        description: form.description.trim(),
+        seller: form.seller.trim(),
+        location: form.location.trim(),
+        ...(emoji ? { imageEmoji: emoji } : {}),
+      });
+      setCreatedListing(listing);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create this listing.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  function resetForm() {
+    shouldFocusFormRef.current = true;
+    setCreatedListing(null);
+    setForm(emptyForm);
+    setErrors({});
+    setSubmitError(null);
+  }
+
+  if (createdListing) {
+    return (
+      <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
+        <div
+          className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-6 sm:p-8"
+          role="status"
+        >
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-emerald-200">
+            Listing posted
+          </p>
+          <h1
+            className="mt-3 text-3xl font-semibold text-white"
+            ref={successHeadingRef}
+            tabIndex={-1}
+          >
+            {createdListing.title} is ready
+          </h1>
+          <p className="mt-3 text-slate-200">
+            It is available in this browser session’s local marketplace memory.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              to={`/listings/${createdListing.id}`}
+              className="rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90"
+            >
+              View posted listing
+            </Link>
+            <button
+              className="rounded-lg border border-white/20 px-4 py-2 font-semibold text-white transition hover:bg-white/10"
+              onClick={resetForm}
+              type="button"
+            >
+              Post another listing
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-glow">
+          Local marketplace
+        </p>
+        <h1
+          className="mt-4 text-3xl font-semibold text-white"
+          ref={formHeadingRef}
+          tabIndex={-1}
+        >
+          Post a listing
+        </h1>
+        <p className="mt-3 text-slate-300">
+          Listings are stored in this browser session’s local memory only. No
+          account or Supabase connection is required.
+        </p>
+
+        <form className="mt-8 space-y-6" noValidate onSubmit={handleSubmit}>
+          {errorCount > 0 ? (
+            <p
+              className="rounded-lg border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-100"
+              ref={errorSummaryRef}
+              role="alert"
+              tabIndex={-1}
+            >
+              Please fix {errorCount} {errorCount === 1 ? "field" : "fields"}{" "}
+              below before publishing this listing.
+            </p>
+          ) : null}
+
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="title"
+            >
+              Title
+            </label>
+            <input
+              aria-describedby={errors.title ? "title-error" : undefined}
+              aria-invalid={Boolean(errors.title)}
+              className={inputClassName}
+              id="title"
+              name="title"
+              onChange={(event) => updateField("title", event.target.value)}
+              placeholder="Adventurer Frigate"
+              required
+              type="text"
+              value={form.title}
+            />
+            <FieldError id="title-error" message={errors.title} />
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div>
+              <label
+                className="text-sm font-semibold text-slate-200"
+                htmlFor="category"
+              >
+                Category
+              </label>
+              <select
+                aria-describedby={
+                  errors.category ? "category-error" : undefined
+                }
+                aria-invalid={Boolean(errors.category)}
+                className={inputClassName}
+                id="category"
+                name="category"
+                onChange={(event) =>
+                  updateField(
+                    "category",
+                    event.target.value as ListingCategory | "",
+                  )
+                }
+                required
+                value={form.category}
+              >
+                <option value="">Select a category</option>
+                {LISTING_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {formatCategory(category)}
+                  </option>
+                ))}
+              </select>
+              <FieldError id="category-error" message={errors.category} />
+            </div>
+            <div>
+              <label
+                className="text-sm font-semibold text-slate-200"
+                htmlFor="price"
+              >
+                Price (gold)
+              </label>
+              <input
+                aria-describedby={errors.price ? "price-error" : undefined}
+                aria-invalid={Boolean(errors.price)}
+                className={inputClassName}
+                id="price"
+                inputMode="decimal"
+                min="0.01"
+                name="price"
+                onChange={(event) => updateField("price", event.target.value)}
+                placeholder="48000000"
+                required
+                step="any"
+                type="number"
+                value={form.price}
+              />
+              <FieldError id="price-error" message={errors.price} />
+            </div>
+          </div>
+
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="description"
+            >
+              Description
+            </label>
+            <textarea
+              aria-describedby={
+                errors.description ? "description-error" : undefined
+              }
+              aria-invalid={Boolean(errors.description)}
+              className={`${inputClassName} min-h-32 resize-y`}
+              id="description"
+              name="description"
+              onChange={(event) =>
+                updateField("description", event.target.value)
+              }
+              placeholder="Describe the ship, cargo, property, or service."
+              required
+              rows={5}
+              value={form.description}
+            />
+            <FieldError id="description-error" message={errors.description} />
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div>
+              <label
+                className="text-sm font-semibold text-slate-200"
+                htmlFor="seller"
+              >
+                Seller
+              </label>
+              <input
+                aria-describedby={errors.seller ? "seller-error" : undefined}
+                aria-invalid={Boolean(errors.seller)}
+                className={inputClassName}
+                id="seller"
+                name="seller"
+                onChange={(event) => updateField("seller", event.target.value)}
+                placeholder="PortRoyalShipwright"
+                required
+                type="text"
+                value={form.seller}
+              />
+              <FieldError id="seller-error" message={errors.seller} />
+            </div>
+            <div>
+              <label
+                className="text-sm font-semibold text-slate-200"
+                htmlFor="location"
+              >
+                Location
+              </label>
+              <input
+                aria-describedby={
+                  errors.location ? "location-error" : undefined
+                }
+                aria-invalid={Boolean(errors.location)}
+                className={inputClassName}
+                id="location"
+                name="location"
+                onChange={(event) =>
+                  updateField("location", event.target.value)
+                }
+                placeholder="Port Royal"
+                required
+                type="text"
+                value={form.location}
+              />
+              <FieldError id="location-error" message={errors.location} />
+            </div>
+          </div>
+
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="emoji"
+            >
+              Emoji visual{" "}
+              <span className="font-normal text-slate-400">(optional)</span>
+            </label>
+            <input
+              className={inputClassName}
+              id="emoji"
+              maxLength={8}
+              name="emoji"
+              onChange={(event) => updateField("emoji", event.target.value)}
+              placeholder="🚢"
+              type="text"
+              value={form.emoji}
+            />
+          </div>
+
+          {submitError ? (
+            <p
+              className="rounded-lg border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-100"
+              role="alert"
+            >
+              {submitError}
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              className="rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSubmitting}
+              type="submit"
+            >
+              {isSubmitting ? "Posting…" : "Publish listing"}
+            </button>
+            <Link
+              className="text-sm font-semibold text-slate-300 transition hover:text-white"
+              to="/browse"
+            >
+              Browse instead
+            </Link>
+          </div>
+        </form>
+      </div>
     </section>
   );
 }
