@@ -22,7 +22,7 @@ No build system, dependency manifest, or runtime command is configured yet. Do n
 - **Supabase project:** `https://vfpuqvghkrkcecnowjzq.supabase.co`
 - **GitHub remote:** `https://github.com/KaboomBaby/UWO-Trading.git`
 
-The Figma link is viewable in a browser, but the guest canvas may restrict inspection/editing and expose limited accessibility data. Supabase credentials have not been provided; do not invent keys or claim backend integration until the required key and schema are available. Do not push to GitHub until implementation is verified and the user requests publication.
+The canonical page scope and route mapping are recorded in [`docs/design/page-map.md`](docs/design/page-map.md). The owner-supplied signed-in Figma labels in that document take precedence over labels inferred from the restricted guest canvas. Supabase credentials have not been provided; do not invent keys or claim backend integration until the required key and schema are available. Do not push to GitHub until implementation is verified and the user requests publication.
 
 ## CMux Pane Workflow
 
