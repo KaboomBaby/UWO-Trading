@@ -10,15 +10,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-amber-glow/70 hover:bg-white/10"
     >
       <div className="flex h-36 items-center justify-center bg-gradient-to-br from-sea-blue/25 to-ink/90 text-5xl">
-        {listing.imageUrl ? (
-          <img
-            alt={`${listing.title} listing image`}
-            className="h-36 w-full object-cover"
-            src={listing.imageUrl}
-          />
-        ) : (
-          <span aria-hidden="true">{listing.imageEmoji}</span>
-        )}
+        <span aria-hidden="true">{listing.imageEmoji}</span>
       </div>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-3">

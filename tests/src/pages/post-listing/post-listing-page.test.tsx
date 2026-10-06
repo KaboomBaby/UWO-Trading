@@ -1,27 +1,9 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  within,
-} from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-  type Mock,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "../../../../src/app";
-import {
-  uploadListingImage,
-  validateListingImage,
-} from "../../../../src/lib/listing-images";
 import type { CreatedListing } from "../../../../src/types/listing";
 
 const repository = vi.hoisted(() => ({
@@ -36,12 +18,6 @@ const repository = vi.hoisted(() => ({
 
 vi.mock("../../../../src/services/listing-service", () => ({
   createLocalListingRepository: () => repository,
-}));
-
-vi.mock("../../../../src/lib/listing-images", () => ({
-  LISTING_IMAGE_MIME_TYPES: ["image/png", "image/jpeg", "image/webp"],
-  validateListingImage: vi.fn(),
-  uploadListingImage: vi.fn(),
 }));
 
 const createdListing: CreatedListing = {
@@ -68,11 +44,6 @@ function renderPostPage() {
     </MemoryRouter>,
   );
 }
-
-let revokeObjectURL: Mock;
-const imageFile = new File(["image-bytes"], "schooner.png", {
-  type: "image/png",
-});
 
 async function fillCommonFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Title"), "Trading Schooner");
@@ -104,19 +75,10 @@ describe("post listing page", () => {
     repository.countOffers.mockResolvedValue(0);
     repository.createOffer.mockResolvedValue(undefined);
     repository.report.mockResolvedValue(undefined);
-    vi.mocked(validateListingImage).mockReturnValue(null);
-    vi.mocked(uploadListingImage).mockResolvedValue("blob:listing-image");
-    revokeObjectURL = vi.fn();
-    Object.defineProperty(URL, "revokeObjectURL", {
-      configurable: true,
-      writable: true,
-      value: revokeObjectURL,
-    });
   });
 
   afterEach(() => {
     cleanup();
-    Reflect.deleteProperty(URL, "revokeObjectURL");
   });
 
   it("describes the active repository persistence behavior accurately", () => {
@@ -283,150 +245,27 @@ describe("post listing page", () => {
     }
   });
 
-  it("validates and previews an image selected with the file picker", async () => {
-    const user = userEvent.setup();
-    renderPostPage();
-
-    const input = screen.getByLabelText(/listing image/i);
-    expect(input).toHaveAttribute("accept", "image/png,image/jpeg,image/webp");
-    await user.upload(input, imageFile);
-
-    expect(validateListingImage).toHaveBeenCalledWith(imageFile);
-    expect(uploadListingImage).toHaveBeenCalledWith(imageFile);
-    expect(input).toHaveValue("");
-    expect(
-      await screen.findByRole("img", {
-        name: "Selected listing image for a new listing: schooner.png",
-      }),
-    ).toHaveAttribute("src", "blob:listing-image");
-  });
-
-  it("shows a picker validation error without uploading", async () => {
-    const user = userEvent.setup();
-    vi.mocked(validateListingImage).mockReturnValue(
-      "Images must be PNG, JPEG, or WebP.",
-    );
-    renderPostPage();
-
-    await user.upload(
-      screen.getByLabelText(/listing image/i),
-      new File(["not-an-image"], "listing.png", { type: "image/png" }),
-    );
-
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Images must be PNG, JPEG, or WebP.",
-    );
-    expect(screen.getByLabelText(/listing image/i)).toHaveAttribute(
-      "aria-invalid",
-      "true",
-    );
-    expect(uploadListingImage).not.toHaveBeenCalled();
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
-  });
-
-  it("tracks an in-flight upload and blocks publishing until it finishes", async () => {
-    const user = userEvent.setup();
-    let resolveUpload!: (url: string) => void;
-    vi.mocked(uploadListingImage).mockReturnValue(
-      new Promise<string>((resolve) => {
-        resolveUpload = resolve;
-      }),
-    );
-    renderPostPage();
-
-    await user.upload(screen.getByLabelText(/listing image/i), imageFile);
-
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Uploading schooner.png…",
-    );
-    const publishButton = screen.getByRole("button", {
-      name: "Uploading image…",
-    });
-    expect(publishButton).toBeDisabled();
-
-    resolveUpload("blob:listing-image");
-    expect(
-      await screen.findByRole("img", {
-        name: "Selected listing image for a new listing: schooner.png",
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Publish listing" }),
-    ).toBeEnabled();
-  });
-
-  it("accepts an image dropped anywhere on the form", async () => {
-    const { container } = renderPostPage();
-    const form = container.querySelector("form");
-    expect(form).not.toBeNull();
-    if (!form) return;
-
-    fireEvent.drop(form, { dataTransfer: { files: [imageFile] } });
-
-    expect(validateListingImage).toHaveBeenCalledWith(imageFile);
-    expect(await screen.findByRole("img")).toHaveAttribute(
-      "src",
-      "blob:listing-image",
-    );
-  });
-
-  it("accepts a pasted image from anywhere in the form", async () => {
-    renderPostPage();
-
-    fireEvent.paste(screen.getByLabelText("Title"), {
-      clipboardData: { files: [imageFile] },
-    });
-
-    expect(validateListingImage).toHaveBeenCalledWith(imageFile);
-    expect(await screen.findByRole("img")).toHaveAttribute(
-      "src",
-      "blob:listing-image",
-    );
-  });
-
-  it("removes a pending image, clears the picker, and revokes blob URLs", async () => {
-    const user = userEvent.setup();
-    renderPostPage();
-
-    await user.upload(screen.getByLabelText(/listing image/i), imageFile);
-    expect(
-      await screen.findByRole("img", {
-        name: "Selected listing image for a new listing: schooner.png",
-      }),
-    ).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Remove image" }));
-
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
-    expect(screen.getByLabelText(/listing image/i)).toHaveValue("");
-    expect(revokeObjectURL).toHaveBeenCalledWith("blob:listing-image");
-    expect(repository.create).not.toHaveBeenCalled();
-  });
-
-  it("includes the uploaded image URL and keeps emoji as fallback input", async () => {
+  it("does not expose any listing image upload control", async () => {
     const user = userEvent.setup();
     renderPostPage();
     await fillValidForm(user);
-    await user.type(screen.getByLabelText(/emoji visual/i), "⛵");
-    await user.upload(screen.getByLabelText(/listing image/i), imageFile);
-    expect(await screen.findByRole("img")).toBeInTheDocument();
+
+    expect(screen.queryByLabelText(/listing image/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /upload/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        /choose a png|drag it onto|paste it from your clipboard/i,
+      ),
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Publish listing" }));
 
     expect(await screen.findByRole("status")).toBeInTheDocument();
-    expect(repository.create).toHaveBeenCalledWith({
-      title: "Trading Schooner",
-      category: "ships",
-      currency: "ducats",
-      price: 32_000_000,
-      description: "A swift schooner suitable for regional trade routes.",
-      seller: "AmsterdamShipyard",
-      location: "Amsterdam",
-      server: "Maris",
-      contactNote: "In-game mail preferred.",
-      imageUrl: "blob:listing-image",
-      imageEmoji: "⛵",
-    });
+    expect(repository.create).toHaveBeenCalledWith(
+      expect.not.objectContaining({ imageUrl: expect.anything() }),
+    );
   });
 
   it("hides the price field and sends null for trade listings", async () => {

@@ -144,28 +144,6 @@ describe("listing detail page", () => {
     ).toHaveAttribute("href", "/post");
   });
 
-  it("renders a responsive image in place of the emoji when available", async () => {
-    repository.get.mockResolvedValue({
-      ...knownListing,
-      imageUrl: "https://example.com/listings/frigate.webp",
-    });
-    renderApp("/listings/adventurer-frigate");
-
-    const image = await screen.findByRole("img", {
-      name: "Adventurer Frigate listing image",
-    });
-    expect(image).toHaveAttribute(
-      "src",
-      "https://example.com/listings/frigate.webp",
-    );
-    expect(image.className).toContain("max-h-96");
-    expect(image.className).toContain("w-full");
-    expect(image.className).toContain("object-contain");
-    expect(
-      screen.queryByRole("img", { name: "Adventurer Frigate visual" }),
-    ).not.toBeInTheDocument();
-  });
-
   it("shows a clear not-found state for an unknown listing id", async () => {
     repository.get.mockResolvedValue(undefined);
     renderApp("/listings/missing-listing");

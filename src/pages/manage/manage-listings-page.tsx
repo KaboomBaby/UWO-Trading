@@ -119,10 +119,7 @@ function validate(form: FormState) {
   return errors;
 }
 
-function updateInputFromForm(
-  form: FormState,
-  listing: Listing,
-): UpdateListingInput {
+function updateInputFromForm(form: FormState): UpdateListingInput {
   const emoji = form.emoji.trim();
   return {
     title: form.title.trim(),
@@ -136,7 +133,6 @@ function updateInputFromForm(
     location: form.location.trim(),
     server: form.server.trim(),
     contactNote: form.contactNote.trim(),
-    ...(listing.imageUrl ? { imageUrl: listing.imageUrl } : {}),
     imageEmoji: emoji || "📦",
     collection: form.collection,
   };
@@ -369,7 +365,7 @@ export function ManageListingsPage() {
     try {
       const updatedListing = await repository.update(
         activeEditCode,
-        updateInputFromForm(form, listing),
+        updateInputFromForm(form),
       );
       listingActionDidSucceed(updatedListing, "Changes saved.");
     } catch (error) {

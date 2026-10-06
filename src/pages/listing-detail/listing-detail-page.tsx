@@ -1174,21 +1174,13 @@ export function ListingDetailPage() {
       ) : null}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-          {listing.imageUrl ? (
-            <img
-              alt={`${listing.title} listing image`}
-              className="max-h-96 w-full rounded-xl object-contain"
-              src={listing.imageUrl}
-            />
-          ) : (
-            <span
-              aria-label={`${listing.title} visual`}
-              className="text-7xl sm:text-8xl"
-              role="img"
-            >
-              {listing.imageEmoji}
-            </span>
-          )}
+          <span
+            aria-label={`${listing.title} visual`}
+            className="text-7xl sm:text-8xl"
+            role="img"
+          >
+            {listing.imageEmoji}
+          </span>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-3 text-sm">

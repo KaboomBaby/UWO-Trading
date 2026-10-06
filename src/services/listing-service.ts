@@ -167,7 +167,6 @@ type ListingRow = {
   location: string;
   server: string;
   contact_note: string;
-  image_url: string | null;
   image_emoji: string | null;
   created_at: string;
   expires_at: string;
@@ -213,7 +212,6 @@ function mapListingRow(row: ListingRow): Listing {
     location: row.location,
     server: row.server,
     contactNote: row.contact_note,
-    imageUrl: row.image_url,
     imageEmoji: row.image_emoji ?? "📦",
     createdAt: row.created_at,
     expiresAt: row.expires_at,
@@ -270,7 +268,6 @@ function listingRpcArguments(editCode: string, input: CreateListingInput) {
     location: input.location.trim(),
     server_name: input.server.trim(),
     contact_note: input.contactNote?.trim() ?? "",
-    image_url: input.imageUrl ?? null,
     image_emoji: input.imageEmoji ?? "📦",
     collection: input.collection ?? "current",
   };
@@ -531,7 +528,6 @@ export function createLocalListingRepository(
             ? crypto.randomUUID()
             : `listing-${Date.now()}`,
         currency: input.currency,
-        ...(input.imageUrl ? { imageUrl: input.imageUrl } : {}),
         imageEmoji: input.imageEmoji ?? "📦",
         server: input.server.trim(),
         contactNote: input.contactNote?.trim() ?? "",

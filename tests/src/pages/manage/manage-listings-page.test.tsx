@@ -38,7 +38,6 @@ const expiredListing: Listing = {
   location: "Port Royal",
   server: "Maris",
   contactNote: "In-game mail preferred.",
-  imageUrl: "https://example.com/listings/frigate.webp",
   imageEmoji: "🚢",
   createdAt: "2026-09-20T12:00:00Z",
   expiresAt: "2026-10-04T12:00:00Z",
@@ -217,7 +216,6 @@ describe("manage listings page", () => {
       location: updatedListing.location,
       server: updatedListing.server,
       contactNote: updatedListing.contactNote,
-      imageUrl: expiredListing.imageUrl,
       imageEmoji: "⛵",
       collection: "legacy",
     });
