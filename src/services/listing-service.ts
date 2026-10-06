@@ -1,19 +1,26 @@
 import { mockListings } from "../data/mock-listings";
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import type {
+  CreatedListing,
   CreateListingInput,
   Listing,
   ListingCategory,
   ListingCollection,
   ListingCurrency,
   ListingQuery,
+  UpdateListingInput,
 } from "../types/listing";
 import { isNumericListingCurrency } from "../types/listing";
 
 export interface ListingRepository {
   list(query?: ListingQuery): Promise<Listing[]>;
   get(id: string): Promise<Listing | undefined>;
-  create(input: CreateListingInput): Promise<Listing>;
+  create(input: CreateListingInput): Promise<CreatedListing>;
+  findByEditCode(editCode: string): Promise<Listing | undefined>;
+  update(editCode: string, input: UpdateListingInput): Promise<Listing>;
+  markSold(editCode: string): Promise<Listing>;
+  renew(editCode: string): Promise<Listing>;
+  delete(editCode: string): Promise<void>;
 }
 
 export function normalizeCategory(value: string): ListingCategory | "all" {
@@ -45,6 +52,14 @@ function comparePrices(
   if (a === null) return 1;
   if (b === null) return -1;
   return ascending ? a - b : b - a;
+}
+
+function generateListingEditCode() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join(
+    "",
+  );
 }
 
 export function validateListingInput(input: CreateListingInput) {
@@ -114,7 +129,14 @@ type ListingRow = {
   image_url: string | null;
   image_emoji: string | null;
   created_at: string;
+  expires_at: string;
+  sold_at: string | null;
   collection: ListingCollection | null;
+};
+
+type CreateListingRpcResult = {
+  listing: ListingRow;
+  edit_code: string;
 };
 
 function assertSuccessfulResponse(
@@ -141,6 +163,8 @@ function mapListingRow(row: ListingRow): Listing {
     imageUrl: row.image_url,
     imageEmoji: row.image_emoji ?? "📦",
     createdAt: row.created_at,
+    expiresAt: row.expires_at,
+    soldAt: row.sold_at,
     collection: row.collection ?? "current",
   };
 }
@@ -167,12 +191,33 @@ function searchFilter(search: string) {
   ].join(",");
 }
 
+function listingRpcArguments(editCode: string, input: CreateListingInput) {
+  return {
+    edit_code: editCode,
+    title: input.title.trim(),
+    category: input.category,
+    currency: input.currency,
+    price: input.price,
+    description: input.description.trim(),
+    seller: input.seller.trim(),
+    location: input.location.trim(),
+    server_name: input.server.trim(),
+    contact_note: input.contactNote?.trim() ?? "",
+    image_url: input.imageUrl ?? null,
+    image_emoji: input.imageEmoji ?? "📦",
+    collection: input.collection ?? "current",
+  };
+}
+
 export function createSupabaseListingRepository(
   client: SupabaseClient,
 ): ListingRepository {
   return {
     async list(query: ListingQuery = {}) {
       let request = client.from("listings").select("*");
+      if (!query.includeExpired) {
+        request = request.gt("expires_at", new Date().toISOString());
+      }
 
       const category = query.category ?? "all";
       if (category !== "all") {
@@ -218,7 +263,7 @@ export function createSupabaseListingRepository(
         .maybeSingle();
 
       assertSuccessfulResponse("load listing", error);
-      return data ? mapListingRow(data) : undefined;
+      return data ? mapListingRow(data as ListingRow) : undefined;
     },
 
     async create(input: CreateListingInput) {
@@ -227,27 +272,64 @@ export function createSupabaseListingRepository(
         throw new ListingValidationError(errors);
       }
 
+      const editCode = generateListingEditCode();
       const { data, error } = await client
-        .from("listings")
-        .insert({
-          title: input.title,
-          category: input.category,
-          price: input.price,
-          currency: input.currency,
-          description: input.description,
-          seller: input.seller,
-          location: input.location,
-          server: input.server.trim(),
-          contact_note: input.contactNote?.trim() ?? "",
-          image_url: input.imageUrl ?? null,
-          image_emoji: input.imageEmoji ?? "📦",
-          collection: input.collection ?? "current",
-        })
-        .select("*")
+        .rpc("create_listing", listingRpcArguments(editCode, input))
         .single();
 
       assertSuccessfulResponse("create listing", error);
-      return mapListingRow(data);
+      const result = data as CreateListingRpcResult;
+      return { ...mapListingRow(result.listing), editCode: result.edit_code };
+    },
+
+    async findByEditCode(editCode: string) {
+      const { data, error } = await client
+        .rpc("get_listing_by_edit_code", { edit_code: editCode })
+        .maybeSingle();
+
+      assertSuccessfulResponse("load listing with edit code", error);
+      return data ? mapListingRow(data as ListingRow) : undefined;
+    },
+
+    async update(editCode: string, input: UpdateListingInput) {
+      const errors = validateListingInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+
+      const { data, error } = await client
+        .rpc("update_listing", listingRpcArguments(editCode, input))
+        .single();
+
+      assertSuccessfulResponse("update listing", error);
+      return mapListingRow(data as ListingRow);
+    },
+
+    async markSold(editCode: string) {
+      const { data, error } = await client
+        .rpc("mark_listing_sold", { edit_code: editCode })
+        .single();
+
+      assertSuccessfulResponse("mark listing sold", error);
+      return mapListingRow(data as ListingRow);
+    },
+
+    async renew(editCode: string) {
+      const { data, error } = await client
+        .rpc("renew_listing", { edit_code: editCode })
+        .single();
+
+      assertSuccessfulResponse("renew listing", error);
+      return mapListingRow(data as ListingRow);
+    },
+
+    async delete(editCode: string) {
+      const { data, error } = await client
+        .rpc("delete_listing", { edit_code: editCode })
+        .single();
+
+      assertSuccessfulResponse("delete listing", error);
+      if (!data) throw new Error("Listing edit code not found.");
     },
   };
 }
@@ -256,6 +338,7 @@ export function createLocalListingRepository(
   initialListings: Listing[] = mockListings,
 ): ListingRepository {
   const listings = [...initialListings];
+  const editCodes = new Map<string, string>();
 
   return {
     async list(query: ListingQuery = {}) {
@@ -263,6 +346,8 @@ export function createLocalListingRepository(
       const collection = query.collection ?? "all";
       let results = listings.filter(
         (listing) =>
+          (query.includeExpired ||
+            new Date(listing.expiresAt).getTime() > Date.now()) &&
           (category === "all" || listing.category === category) &&
           (collection === "all" ||
             (listing.collection ?? "current") === collection) &&
@@ -310,9 +395,87 @@ export function createLocalListingRepository(
         contactNote: input.contactNote?.trim() ?? "",
         collection: input.collection ?? "current",
         createdAt: new Date().toISOString(),
+        expiresAt: new Date(
+          Date.now() + 14 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
       };
+      const editCode = generateListingEditCode();
       listings.unshift(listing);
-      return { ...listing };
+      editCodes.set(listing.id, editCode);
+      return { ...listing, editCode };
+    },
+
+    async findByEditCode(editCode: string) {
+      const listing = listings.find(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      return listing ? { ...listing } : undefined;
+    },
+
+    async update(editCode: string, input: UpdateListingInput) {
+      const errors = validateListingInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+
+      const index = listings.findIndex(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      if (index === -1) throw new Error("Listing edit code not found.");
+
+      listings[index] = {
+        ...listings[index],
+        ...input,
+        price: input.price,
+        currency: input.currency,
+        title: input.title.trim(),
+        description: input.description.trim(),
+        seller: input.seller.trim(),
+        location: input.location.trim(),
+        server: input.server.trim(),
+        contactNote: input.contactNote?.trim() ?? "",
+        imageEmoji: input.imageEmoji ?? "📦",
+        collection: input.collection ?? "current",
+      };
+      return { ...listings[index] };
+    },
+
+    async markSold(editCode: string) {
+      const index = listings.findIndex(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      if (index === -1) throw new Error("Listing edit code not found.");
+
+      listings[index] = {
+        ...listings[index],
+        soldAt: listings[index].soldAt ?? new Date().toISOString(),
+      };
+      return { ...listings[index] };
+    },
+
+    async renew(editCode: string) {
+      const index = listings.findIndex(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      if (index === -1) throw new Error("Listing edit code not found.");
+
+      listings[index] = {
+        ...listings[index],
+        expiresAt: new Date(
+          Date.now() + 14 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+      };
+      return { ...listings[index] };
+    },
+
+    async delete(editCode: string) {
+      const index = listings.findIndex(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      if (index === -1) throw new Error("Listing edit code not found.");
+
+      const [listing] = listings.splice(index, 1);
+      editCodes.delete(listing.id);
     },
   };
 }

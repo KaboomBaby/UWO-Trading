@@ -22,7 +22,7 @@ import {
   uploadListingImage,
   validateListingImage,
 } from "../../../../src/lib/listing-images";
-import type { Listing } from "../../../../src/types/listing";
+import type { CreatedListing } from "../../../../src/types/listing";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -40,7 +40,7 @@ vi.mock("../../../../src/lib/listing-images", () => ({
   uploadListingImage: vi.fn(),
 }));
 
-const createdListing: Listing = {
+const createdListing: CreatedListing = {
   id: "new-trading-schooner",
   title: "Trading Schooner",
   category: "ships",
@@ -53,6 +53,8 @@ const createdListing: Listing = {
   contactNote: "In-game mail preferred.",
   imageEmoji: "🚢",
   createdAt: "2026-10-05T00:00:00Z",
+  expiresAt: "2026-10-19T00:00:00Z",
+  editCode: "UWO-EDIT-7F2K",
 };
 
 function renderPostPage() {
@@ -225,6 +227,53 @@ describe("post listing page", () => {
     expect(
       await screen.findByRole("heading", { name: "Trading Schooner" }),
     ).toBeInTheDocument();
+  });
+
+  it("shows the edit code once with a recovery warning and copy support", async () => {
+    const user = userEvent.setup();
+    const clipboardWriteText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: clipboardWriteText },
+    });
+
+    try {
+      renderPostPage();
+      await fillValidForm(user);
+      await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+      expect(screen.getAllByText("UWO-EDIT-7F2K")).toHaveLength(1);
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        /cannot be recovered.*manage, renew, or delete/i,
+      );
+      expect(
+        screen.getByRole("button", { name: "Copy code" }),
+      ).toBeInTheDocument();
+      expect(
+        Array.from(localStorage).some(
+          ([key, value]) =>
+            key.includes("UWO-EDIT-7F2K") || value.includes("UWO-EDIT-7F2K"),
+        ),
+      ).toBe(false);
+      expect(
+        Array.from(sessionStorage).some(
+          ([key, value]) =>
+            key.includes("UWO-EDIT-7F2K") || value.includes("UWO-EDIT-7F2K"),
+        ),
+      ).toBe(false);
+
+      await user.click(screen.getByRole("button", { name: "Copy code" }));
+
+      expect(clipboardWriteText).toHaveBeenCalledWith("UWO-EDIT-7F2K");
+      expect(await screen.findByText("Edit code copied.")).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole("button", { name: "Post another listing" }),
+      );
+      expect(screen.queryByText("UWO-EDIT-7F2K")).not.toBeInTheDocument();
+    } finally {
+      Reflect.deleteProperty(navigator, "clipboard");
+    }
   });
 
   it("validates and previews an image selected with the file picker", async () => {

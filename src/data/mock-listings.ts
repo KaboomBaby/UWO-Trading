@@ -15,6 +15,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "🚢",
     createdAt: "2026-10-04T14:00:00Z",
+    expiresAt: "2026-10-18T14:00:00Z",
     collection: "current",
   },
   {
@@ -31,6 +32,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "⛵",
     createdAt: "2026-10-03T10:30:00Z",
+    expiresAt: "2026-10-17T10:30:00Z",
     collection: "current",
   },
   {
@@ -47,6 +49,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "🛥️",
     createdAt: "2026-10-02T18:45:00Z",
+    expiresAt: "2026-10-16T18:45:00Z",
     collection: "current",
   },
   {
@@ -63,6 +66,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "🏘️",
     createdAt: "2026-09-29T09:00:00Z",
+    expiresAt: "2026-10-13T09:00:00Z",
     collection: "current",
   },
   {
@@ -79,6 +83,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "💣",
     createdAt: "2026-10-01T12:15:00Z",
+    expiresAt: "2026-10-15T12:15:00Z",
     collection: "current",
   },
   {
@@ -95,6 +100,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "🧺",
     createdAt: "2026-09-28T16:20:00Z",
+    expiresAt: "2026-10-12T16:20:00Z",
     collection: "current",
   },
   {
@@ -111,6 +117,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "🛡️",
     createdAt: "2026-10-04T08:10:00Z",
+    expiresAt: "2026-10-18T08:10:00Z",
     collection: "current",
   },
   {
@@ -127,6 +134,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "⛴️",
     createdAt: "2026-09-24T11:00:00Z",
+    expiresAt: "2026-10-08T11:00:00Z",
     collection: "legacy",
   },
   {
@@ -143,6 +151,7 @@ export const mockListings: Listing[] = [
     contactNote: "Contact in game.",
     imageEmoji: "🪝",
     createdAt: "2026-09-21T13:30:00Z",
+    expiresAt: "2026-10-05T13:30:00Z",
     collection: "legacy",
   },
 ];

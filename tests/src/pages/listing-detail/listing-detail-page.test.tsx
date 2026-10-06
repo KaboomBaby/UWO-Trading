@@ -30,6 +30,7 @@ const knownListing: Listing = {
   contactNote: "Message through the harbor office.",
   imageEmoji: "🚢",
   createdAt: "2026-10-04T14:00:00Z",
+  expiresAt: "2026-10-18T14:00:00Z",
 };
 
 function renderApp(path: string) {
@@ -45,10 +46,14 @@ function renderApp(path: string) {
 }
 
 describe("listing detail page", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.setSystemTime(new Date("2026-10-05T12:00:00Z"));
     repository.get.mockResolvedValue(knownListing);
   });
 
@@ -142,6 +147,37 @@ describe("listing detail page", () => {
     expect(
       screen.getByRole("link", { name: "Post your own listing" }),
     ).toBeInTheDocument();
+  });
+
+  it("shows an expired notice while retaining the listing", async () => {
+    repository.get.mockResolvedValue({
+      ...knownListing,
+      expiresAt: "2026-10-04T14:00:00Z",
+    });
+    renderApp("/listings/adventurer-frigate");
+
+    expect(
+      await screen.findByRole("heading", { name: "Adventurer Frigate" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("This listing has expired")).toBeInTheDocument();
+    expect(
+      screen.getByText(/It expired on October 4, 2026/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(knownListing.description)).toBeInTheDocument();
+    expect(screen.getByText("48,000,000 ducats")).toBeInTheDocument();
+  });
+
+  it("shows a SOLD badge when the listing has sold", async () => {
+    repository.get.mockResolvedValue({
+      ...knownListing,
+      soldAt: "2026-10-05T10:00:00Z",
+    });
+    renderApp("/listings/adventurer-frigate");
+
+    expect(
+      await screen.findByRole("heading", { name: "Adventurer Frigate" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("SOLD")).toBeInTheDocument();
   });
 
   it("renders the legacy heritage and provenance presentation", async () => {

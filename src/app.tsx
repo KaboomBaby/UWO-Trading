@@ -9,6 +9,7 @@ import { BrowsePage } from "./pages/browse/browse-page";
 import { ComponentsPage } from "./pages/components/components-page";
 import { HomePage } from "./pages/home/home-page";
 import { ListingDetailPage } from "./pages/listing-detail/listing-detail-page";
+import { ManageListingsPage } from "./pages/manage/manage-listings-page";
 import { PortsPage } from "./pages/ports/ports-page";
 import { PostListingPage } from "./pages/post-listing/post-listing-page";
 import { SearchPage } from "./pages/search/search-page";
@@ -34,6 +35,7 @@ export function App() {
                   element={<ListingDetailPage />}
                 />
                 <Route path="/post" element={<PostListingPage />} />
+                <Route path="/manage" element={<ManageListingsPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/ports" element={<PortsPage />} />
                 <Route path="/components" element={<ComponentsPage />} />

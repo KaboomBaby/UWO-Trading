@@ -8,6 +8,7 @@ const navigation = [
   { label: "Home", to: "/" },
   { label: "Browse", to: "/browse" },
   { label: "Post a listing", to: "/post" },
+  { label: "My listings", to: "/manage" },
 ];
 
 export function AppShell({ children }: AppShellProps) {

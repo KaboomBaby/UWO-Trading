@@ -54,6 +54,7 @@ export function formatListingPrice(
 export type ListingQuery = {
   category?: ListingCategory | "all";
   collection?: ListingCollection | "all";
+  includeExpired?: boolean;
   search?: string;
   sort?: ListingSort;
 };
@@ -72,6 +73,8 @@ export type Listing = {
   imageUrl?: string | null;
   imageEmoji: string;
   createdAt: string;
+  expiresAt: string;
+  soldAt?: string | null;
   collection?: ListingCollection;
 };
 
@@ -89,3 +92,6 @@ export type CreateListingInput = {
   imageEmoji?: string;
   collection?: ListingCollection;
 };
+
+export type UpdateListingInput = CreateListingInput;
+export type CreatedListing = Listing & { editCode: string };

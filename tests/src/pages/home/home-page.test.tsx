@@ -33,6 +33,7 @@ function createListing(
     contactNote: "Contact in game.",
     imageEmoji: "⛵",
     createdAt: "2026-01-01T12:00:00.000Z",
+    expiresAt: "2026-01-15T12:00:00Z",
     ...overrides,
   };
 }

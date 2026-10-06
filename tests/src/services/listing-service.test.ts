@@ -46,6 +46,8 @@ type ListingRow = {
   image_url: string | null;
   image_emoji: string | null;
   created_at: string;
+  expires_at: string;
+  sold_at: string | null;
   collection: "current" | "legacy" | null;
 };
 
@@ -57,9 +59,14 @@ type SupabaseResponse = {
 };
 
 type CapturedRequest = {
-  table: string;
+  table: string | null;
   select: string | null;
-  filters: Array<{ type: "eq" | "or"; column?: string; value?: unknown }>;
+  rpc: { functionName: string; args: Record<string, unknown> } | null;
+  filters: Array<{
+    type: "eq" | "gt" | "or";
+    column?: string;
+    value?: unknown;
+  }>;
   order: { column: string; options: { ascending: boolean } } | null;
   singleMode: "single" | "maybeSingle" | null;
   insert: Record<string, unknown> | null;
@@ -67,6 +74,7 @@ type CapturedRequest = {
 
 type QueryChain = {
   eq(column: string, value: unknown): QueryChain;
+  gt(column: string, value: unknown): QueryChain;
   or(filter: string): QueryChain;
   order(
     column: string,
@@ -92,6 +100,10 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
     const filter: QueryChain = {
       eq(column, value) {
         request.filters.push({ type: "eq", column, value });
+        return filter;
+      },
+      gt(column, value) {
+        request.filters.push({ type: "gt", column, value });
         return filter;
       },
       or(orFilter) {
@@ -123,6 +135,7 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
       const request: CapturedRequest = {
         table,
         select: null,
+        rpc: null,
         filters: [],
         order: null,
         singleMode: null,
@@ -148,8 +161,34 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
     },
   };
 
+  const rpcClient = {
+    ...client,
+    rpc(functionName: string, args: Record<string, unknown>) {
+      const request: CapturedRequest = {
+        table: null,
+        select: null,
+        rpc: { functionName, args },
+        filters: [],
+        order: null,
+        singleMode: null,
+        insert: null,
+      };
+      requests.push(request);
+      return {
+        single() {
+          request.singleMode = "single";
+          return Promise.resolve(currentResponse());
+        },
+        maybeSingle() {
+          request.singleMode = "maybeSingle";
+          return Promise.resolve(currentResponse());
+        },
+      };
+    },
+  };
+
   return {
-    client: client as unknown as SupabaseClient,
+    client: rpcClient as unknown as SupabaseClient,
     requests,
     respond(nextResponse: SupabaseResponse) {
       response = nextResponse;
@@ -171,6 +210,8 @@ const dbListing: ListingRow = {
   image_url: null,
   image_emoji: "🚢",
   created_at: "2026-10-01T12:00:00.000Z",
+  expires_at: "2026-10-15T12:00:00Z",
+  sold_at: null,
   collection: "legacy",
 };
 
@@ -188,6 +229,8 @@ const expectedListing = {
   imageUrl: null,
   imageEmoji: "🚢",
   createdAt: "2026-10-01T12:00:00.000Z",
+  expiresAt: "2026-10-15T12:00:00Z",
+  soldAt: null,
   collection: "legacy",
 } as const;
 
@@ -220,8 +263,12 @@ describe("local listing repository", () => {
 
     expect(legacy.map((listing) => listing.id)).toEqual([
       "legacy-grand-voyager",
-      "legacy-merchant-caravel",
     ]);
+    expect(
+      (
+        await repository.list({ collection: "legacy", includeExpired: true })
+      ).map((listing) => listing.id),
+    ).toEqual(["legacy-grand-voyager", "legacy-merchant-caravel"]);
     expect(current).not.toContainEqual(
       expect.objectContaining({ collection: "legacy" }),
     );
@@ -262,6 +309,35 @@ describe("local listing repository", () => {
       server: "Maris",
       contactNote: "Mail me at the Amsterdam dock.",
     });
+  });
+
+  it("manages a local listing through its private edit code", async () => {
+    const repository = createLocalListingRepository([]);
+    const created = await repository.create(validInput);
+
+    expect(created.editCode).toMatch(/^[a-f0-9]{32}$/);
+    expect(await repository.findByEditCode(created.editCode)).toMatchObject({
+      id: created.id,
+    });
+    expect(await repository.findByEditCode("wrong-code")).toBeUndefined();
+
+    const updated = await repository.update(created.editCode, {
+      ...validInput,
+      title: "Updated Schooner",
+    });
+    expect(updated.title).toBe("Updated Schooner");
+
+    const sold = await repository.markSold(created.editCode);
+    expect(sold.soldAt).toEqual(expect.any(String));
+
+    const renewed = await repository.renew(created.editCode);
+    expect(new Date(renewed.expiresAt).getTime()).toBeGreaterThan(Date.now());
+
+    await repository.delete(created.editCode);
+    expect(await repository.get(created.id)).toBeUndefined();
+    await expect(repository.delete(created.editCode)).rejects.toThrow(
+      "Listing edit code not found.",
+    );
   });
 
   it("validates currency-specific prices", () => {
@@ -332,6 +408,7 @@ describe("Supabase listing repository", () => {
       table: "listings",
       select: "*",
       filters: [
+        { type: "gt", column: "expires_at", value: expect.any(String) },
         { type: "eq", column: "category", value: "ships" },
         {
           type: "or",
@@ -409,7 +486,10 @@ describe("Supabase listing repository", () => {
   it("validates before inserting, then maps the created row", async () => {
     const imageUrl = "https://example.test/schooner.webp";
     const mock = createMockSupabaseClient({
-      data: { ...dbListing, image_url: imageUrl },
+      data: {
+        listing: { ...dbListing, image_url: imageUrl },
+        edit_code: expect.any(String),
+      },
       error: null,
       status: 201,
       statusText: "Created",
@@ -421,26 +501,85 @@ describe("Supabase listing repository", () => {
     ).rejects.toBeInstanceOf(ListingValidationError);
     expect(mock.requests).toHaveLength(0);
 
-    await expect(
-      repository.create({ ...validInput, imageUrl }),
-    ).resolves.toEqual({ ...expectedListing, imageUrl });
+    const created = await repository.create({ ...validInput, imageUrl });
+    expect(created).toEqual({
+      ...expectedListing,
+      imageUrl,
+      editCode: expect.any(String),
+    });
 
     expect(mock.requests).toHaveLength(1);
-    expect(mock.requests[0]?.insert).toEqual({
+    expect(mock.requests[0]?.rpc).toMatchObject({
+      functionName: "create_listing",
+      args: {
+        edit_code: expect.any(String),
+        title: validInput.title,
+        category: validInput.category,
+        price: validInput.price,
+        currency: "ducats",
+        description: validInput.description,
+        seller: validInput.seller,
+        location: validInput.location,
+        server_name: validInput.server,
+        contact_note: validInput.contactNote,
+        image_url: imageUrl,
+        image_emoji: "📦",
+        collection: "current",
+      },
+    });
+    expect(mock.requests[0]?.singleMode).toBe("single");
+  });
+
+  it("manages a listing through verified edit-code RPCs", async () => {
+    const mock = createMockSupabaseClient({
+      data: dbListing,
+      error: null,
+      status: 200,
+      statusText: "OK",
+    });
+    const repository = createSupabaseListingRepository(mock.client);
+
+    expect(await repository.findByEditCode("test-edit-code")).toEqual(
+      expectedListing,
+    );
+
+    const updated = await repository.update("test-edit-code", validInput);
+    expect(updated.id).toBe(dbListing.id);
+
+    await expect(repository.markSold("test-edit-code")).resolves.toEqual(
+      expectedListing,
+    );
+    await expect(repository.renew("test-edit-code")).resolves.toEqual(
+      expectedListing,
+    );
+
+    mock.respond({
+      data: true,
+      error: null,
+      status: 200,
+      statusText: "OK",
+    });
+    await expect(repository.delete("test-edit-code")).resolves.toBeUndefined();
+
+    expect(mock.requests.map((request) => request.rpc?.functionName)).toEqual([
+      "get_listing_by_edit_code",
+      "update_listing",
+      "mark_listing_sold",
+      "renew_listing",
+      "delete_listing",
+    ]);
+    expect(mock.requests[1]?.rpc?.args).toMatchObject({
+      edit_code: "test-edit-code",
       title: validInput.title,
       category: validInput.category,
+      currency: validInput.currency,
       price: validInput.price,
-      currency: "ducats",
       description: validInput.description,
       seller: validInput.seller,
       location: validInput.location,
-      server: validInput.server,
+      server_name: validInput.server,
       contact_note: validInput.contactNote,
-      image_url: imageUrl,
-      image_emoji: "📦",
-      collection: "current",
     });
-    expect(mock.requests[0]?.singleMode).toBe("single");
   });
 
   it("wraps Supabase errors with operation and PostgREST context", async () => {

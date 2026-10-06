@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { useListingRepository } from "../../lib/listing-repository-context";
+import { isExpiredAt, useCurrentTime } from "../../lib/use-current-time";
 import type { Listing } from "../../types/listing";
 import { formatListingPrice } from "../../types/listing";
 
@@ -41,6 +42,16 @@ const listingVariants: Array<{
 
 function formatCategory(category: Listing["category"]) {
   return category.charAt(0).toUpperCase() + category.slice(1);
+}
+
+function formatExpirationDate(value: Listing["expiresAt"]) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(date);
 }
 
 function parseVariant(value: string | null) {
@@ -408,6 +419,7 @@ export function ListingDetailPage() {
   const [searchParams] = useSearchParams();
   const repository = useListingRepository();
   const [state, setState] = useState<DetailState | null>(null);
+  const currentTime = useCurrentTime();
   const requestedId = listingId ?? "";
   const { variant, isValid } = parseVariant(searchParams.get("variant"));
 
@@ -513,6 +525,7 @@ export function ListingDetailPage() {
   }
 
   const { listing } = state;
+  const isExpired = isExpiredAt(listing.expiresAt, currentTime);
 
   return (
     <section
@@ -520,6 +533,20 @@ export function ListingDetailPage() {
       className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6"
     >
       <VariantNavigation listingId={listing.id} selectedVariant={variant} />
+      {isExpired ? (
+        <div
+          className="mb-6 rounded-xl border border-amber-glow/50 bg-amber-glow/10 p-4"
+          role="status"
+        >
+          <p className="font-semibold text-amber-glow">
+            This listing has expired
+          </p>
+          <p className="mt-2 text-amber-100">
+            It expired on {formatExpirationDate(listing.expiresAt)} and is kept
+            here for reference. It is no longer included in browse results.
+          </p>
+        </div>
+      ) : null}
       {!isValid ? (
         <p
           className="mb-6 rounded-xl border border-amber-glow/40 bg-amber-glow/10 p-4 text-sm text-amber-100"
@@ -549,6 +576,11 @@ export function ListingDetailPage() {
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-3 text-sm">
+            {listing.soldAt ? (
+              <span className="rounded-full bg-red-500/20 px-3 py-1 font-semibold uppercase tracking-wide text-red-100">
+                SOLD
+              </span>
+            ) : null}
             <span className="rounded-full bg-amber-glow/15 px-3 py-1 font-semibold text-amber-glow">
               {formatCategory(listing.category)}
             </span>

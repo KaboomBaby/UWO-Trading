@@ -11,6 +11,7 @@ import {
   LISTING_CATEGORIES,
   LISTING_CURRENCIES,
   isNumericListingCurrency,
+  type CreatedListing,
   type Listing,
   type ListingCategory,
 } from "../../types/listing";
@@ -45,6 +46,8 @@ const emptyForm: FormState = {
   contactNote: "",
   emoji: "",
 };
+
+type EditCodeCopyState = "idle" | "copied" | "error";
 
 const currencyLabels = {
   ducats: "Ducats",
@@ -130,7 +133,11 @@ export function PostListingPage() {
   >({});
   const [errorAnnouncementId, setErrorAnnouncementId] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createdListing, setCreatedListing] = useState<Listing | null>(null);
+  const [createdListing, setCreatedListing] = useState<CreatedListing | null>(
+    null,
+  );
+  const [editCodeCopyState, setEditCodeCopyState] =
+    useState<EditCodeCopyState>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] =
     useState<UploadedListingImage | null>(null);
@@ -301,6 +308,7 @@ export function PostListingPage() {
         ...(emoji ? { imageEmoji: emoji } : {}),
       });
       setCreatedListing(listing);
+      setEditCodeCopyState("idle");
     } catch (error) {
       setSubmitError(
         error instanceof Error
@@ -315,6 +323,7 @@ export function PostListingPage() {
   function resetForm() {
     shouldFocusFormRef.current = true;
     setCreatedListing(null);
+    setEditCodeCopyState("idle");
     setForm(emptyForm);
     setErrors({});
     setSubmitError(null);
@@ -323,6 +332,20 @@ export function PostListingPage() {
     setImageError(null);
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
+    }
+  }
+
+  async function copyEditCode() {
+    if (!createdListing) return;
+
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard is unavailable.");
+      }
+      await navigator.clipboard.writeText(createdListing.editCode);
+      setEditCodeCopyState("copied");
+    } catch {
+      setEditCodeCopyState("error");
     }
   }
 
@@ -347,6 +370,35 @@ export function PostListingPage() {
             It was saved through the active listing repository and is ready to
             browse.
           </p>
+          <div className="mt-6 rounded-xl border border-amber-glow/60 bg-amber-glow/10 p-4">
+            <p className="text-sm font-semibold uppercase tracking-wide text-amber-glow">
+              Save this edit code now
+            </p>
+            <p className="mt-2 text-sm text-amber-100" role="alert">
+              This code is shown only here and cannot be recovered. Keep a safe
+              copy because it is required to manage, renew, or delete this
+              listing.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <code className="rounded-lg border border-white/20 bg-ink px-3 py-2 font-mono text-lg tracking-wider text-white">
+                {createdListing.editCode}
+              </code>
+              <button
+                className="rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90"
+                onClick={copyEditCode}
+                type="button"
+              >
+                Copy code
+              </button>
+            </div>
+            {editCodeCopyState !== "idle" ? (
+              <p className="mt-3 text-sm" role="status">
+                {editCodeCopyState === "copied"
+                  ? "Edit code copied."
+                  : "Unable to copy the edit code. Select and copy it manually."}
+              </p>
+            ) : null}
+          </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               to={`/listings/${createdListing.id}`}

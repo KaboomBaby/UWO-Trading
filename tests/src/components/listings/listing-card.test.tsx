@@ -18,6 +18,7 @@ const listing: Listing = {
   contactNote: "",
   imageEmoji: "🚢",
   createdAt: "2026-10-04T14:00:00Z",
+  expiresAt: "2026-10-18T14:00:00Z",
 };
 
 describe("ListingCard", () => {
@@ -73,6 +74,21 @@ describe("ListingCard", () => {
     );
 
     expect(screen.getByText("Legacy")).toBeInTheDocument();
+  });
+
+  it("shows a SOLD badge when the listing has sold", () => {
+    render(
+      <MemoryRouter>
+        <ListingCard
+          listing={{
+            ...listing,
+            soldAt: "2026-10-05T10:00:00Z",
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("SOLD")).toBeInTheDocument();
   });
 
   it("formats every supported listing currency without inventing numeric prices", () => {

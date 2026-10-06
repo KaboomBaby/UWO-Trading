@@ -51,6 +51,7 @@ const listing: Listing = {
   contactNote: "Mail at the Port Royal harbor office.",
   imageEmoji: "🚢",
   createdAt: "2026-10-04T14:00:00Z",
+  expiresAt: "2026-10-18T14:00:00Z",
 };
 
 describe("BrowsePage", () => {
