@@ -340,6 +340,40 @@ describe("local listing repository", () => {
     );
   });
 
+  it("creates and manages local offers and reports", async () => {
+    const repository = createLocalListingRepository([]);
+    const created = await repository.create(validInput);
+    const offerInput = {
+      offererName: "Captain Offer",
+      contact: "In-game mail",
+      currency: "CT" as const,
+      amount: 120,
+      offerText: "Twelve Captain Tickets and a fitted cannon set.",
+    };
+
+    await repository.createOffer(created.id, offerInput);
+    await expect(repository.countOffers(created.id)).resolves.toBe(1);
+
+    const [offer] = await repository.listOffers(created.editCode);
+    expect(offer).toMatchObject({
+      offererName: "Captain Offer",
+      status: "pending",
+    });
+
+    await expect(
+      repository.acceptOffer(created.editCode, offer.id),
+    ).resolves.toMatchObject({ status: "accepted" });
+    await expect(
+      repository.declineOffer(created.editCode, offer.id),
+    ).resolves.toMatchObject({ status: "declined" });
+
+    await repository.report(created.id, {
+      reporterName: "Port Observer",
+      reason: "spam",
+      details: "Duplicate posting.",
+    });
+  });
+
   it("validates currency-specific prices", () => {
     expect(
       validateListingInput({ ...validInput, currency: "negotiable" }),

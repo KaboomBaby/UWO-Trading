@@ -11,6 +11,7 @@ import {
   type ListingCategory,
   type ListingCollection,
   type ListingCurrency,
+  type Offer,
   type UpdateListingInput,
 } from "../../types/listing";
 
@@ -29,6 +30,11 @@ type FormState = {
 };
 
 type PendingAction = "save" | "mark-sold" | "renew" | "delete";
+
+type PendingOfferAction = {
+  offerId: string;
+  action: "accept" | "decline";
+};
 
 const currencyLabels = {
   ducats: "Ducats",
@@ -157,6 +163,10 @@ function formatListingDate(value: string) {
       }).format(date);
 }
 
+function formatOfferStatus(status: Offer["status"]) {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 function errorMessage(error: unknown, action: string) {
   return error instanceof Error
     ? `Unable to ${action}: ${error.message}`
@@ -170,6 +180,10 @@ export function ManageListingsPage() {
   const [activeEditCode, setActiveEditCode] = useState("");
   const [listing, setListing] = useState<Listing | null>(null);
   const [form, setForm] = useState<FormState | null>(null);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [isLoadingOffers, setIsLoadingOffers] = useState(false);
+  const [offersError, setOffersError] = useState<string | null>(null);
+  const [offerFeedback, setOfferFeedback] = useState<string | null>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [errors, setErrors] = useState<
@@ -179,6 +193,8 @@ export function ManageListingsPage() {
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(
     null,
   );
+  const [pendingOfferAction, setPendingOfferAction] =
+    useState<PendingOfferAction | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
@@ -216,6 +232,11 @@ export function ManageListingsPage() {
     setIsLookingUp(true);
     setLookupError(null);
     setDeletedEditCode(null);
+    setOffers([]);
+    setOffersError(null);
+    setOfferFeedback(null);
+    setIsLoadingOffers(false);
+    setPendingOfferAction(null);
     try {
       const nextListing = await repository.findByEditCode(nextEditCode);
       if (!nextListing) {
@@ -233,6 +254,15 @@ export function ManageListingsPage() {
       setActionError(null);
       setActionFeedback(null);
       setIsConfirmingDelete(false);
+
+      setIsLoadingOffers(true);
+      try {
+        setOffers(await repository.listOffers(nextEditCode));
+      } catch (error) {
+        setOffersError(errorMessage(error, "load offers"));
+      } finally {
+        setIsLoadingOffers(false);
+      }
     } catch (error) {
       setLookupError(errorMessage(error, "load this listing"));
     } finally {
@@ -274,6 +304,50 @@ export function ManageListingsPage() {
     setForm(formStateFromListing(listing));
     setActionError(null);
     setActionFeedback(message);
+  }
+
+  async function refreshOffers(): Promise<void> {
+    if (!activeEditCode || isLoadingOffers || pendingOfferAction) return;
+
+    setIsLoadingOffers(true);
+    setOffersError(null);
+    setOfferFeedback(null);
+    try {
+      setOffers(await repository.listOffers(activeEditCode));
+    } catch (error) {
+      setOffersError(errorMessage(error, "load offers"));
+    } finally {
+      setIsLoadingOffers(false);
+    }
+  }
+
+  async function updateOfferStatus(
+    offer: Offer,
+    action: PendingOfferAction["action"],
+  ): Promise<void> {
+    if (!activeEditCode || isLoadingOffers || pendingOfferAction) return;
+
+    setPendingOfferAction({ offerId: offer.id, action });
+    setOffersError(null);
+    setOfferFeedback(null);
+    try {
+      const updatedOffer =
+        action === "accept"
+          ? await repository.acceptOffer(activeEditCode, offer.id)
+          : await repository.declineOffer(activeEditCode, offer.id);
+      setOffers((current) =>
+        current.map((item) =>
+          item.id === updatedOffer.id ? updatedOffer : item,
+        ),
+      );
+      setOfferFeedback(
+        `Offer from ${updatedOffer.offererName} ${updatedOffer.status}.`,
+      );
+    } catch (error) {
+      setOffersError(errorMessage(error, `${action} this offer`));
+    } finally {
+      setPendingOfferAction(null);
+    }
   }
 
   async function handleSave(
@@ -349,6 +423,9 @@ export function ManageListingsPage() {
       await repository.delete(activeEditCode);
       setListing(null);
       setForm(null);
+      setOffers([]);
+      setOffersError(null);
+      setOfferFeedback(null);
       setActiveEditCode("");
       setEditCode("");
       setErrors({});
@@ -411,7 +488,7 @@ export function ManageListingsPage() {
           </button>
         </form>
 
-        {isLookingUp ? (
+        {isLookingUp && !listing ? (
           <p className="mt-3 text-sm text-slate-300" role="status">
             Finding your listing…
           </p>
@@ -520,6 +597,159 @@ export function ManageListingsPage() {
                   </dd>
                 </div>
               </dl>
+            </section>
+
+            <section
+              aria-labelledby="listing-offers-heading"
+              className="mt-6 rounded-2xl border border-white/10 bg-ink/70 p-5"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3
+                  className="text-xl font-semibold text-white"
+                  id="listing-offers-heading"
+                >
+                  Offers
+                </h3>
+                <button
+                  className={secondaryButtonClassName}
+                  disabled={isLoadingOffers || pendingOfferAction !== null}
+                  onClick={() => void refreshOffers()}
+                  type="button"
+                >
+                  {isLoadingOffers ? "Refreshing offers…" : "Refresh offers"}
+                </button>
+              </div>
+
+              {isLoadingOffers ? (
+                <p className="mt-4 text-sm text-slate-300" role="status">
+                  Loading offers…
+                </p>
+              ) : null}
+
+              {offersError ? (
+                <p
+                  className="mt-4 rounded-lg border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-100"
+                  role="alert"
+                >
+                  {offersError}
+                </p>
+              ) : null}
+
+              {offerFeedback ? (
+                <p
+                  className="mt-4 rounded-lg border border-emerald-400/40 bg-emerald-500/10 p-3 text-sm text-emerald-100"
+                  role="status"
+                >
+                  {offerFeedback}
+                </p>
+              ) : null}
+
+              {!isLoadingOffers && !offersError && offers.length === 0 ? (
+                <p className="mt-4 text-sm text-slate-300">
+                  No offers have been made on this listing yet.
+                </p>
+              ) : null}
+
+              {offers.length > 0 ? (
+                <ul className="mt-4 space-y-4">
+                  {offers.map((offer) => {
+                    const isAccepting =
+                      pendingOfferAction?.offerId === offer.id &&
+                      pendingOfferAction.action === "accept";
+                    const isDeclining =
+                      pendingOfferAction?.offerId === offer.id &&
+                      pendingOfferAction.action === "decline";
+
+                    return (
+                      <li
+                        aria-labelledby={`${offer.id}-offerer`}
+                        className="rounded-xl border border-white/10 bg-white/5 p-4"
+                        key={offer.id}
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <h4
+                            className="text-lg font-semibold text-white"
+                            id={`${offer.id}-offerer`}
+                          >
+                            {offer.offererName}
+                          </h4>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                              offer.status === "pending"
+                                ? "bg-amber-500/20 text-amber-100"
+                                : offer.status === "accepted"
+                                  ? "bg-emerald-500/20 text-emerald-100"
+                                  : "bg-red-500/20 text-red-100"
+                            }`}
+                          >
+                            {formatOfferStatus(offer.status)}
+                          </span>
+                        </div>
+
+                        <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+                          <div>
+                            <dt className="text-slate-400">Contact</dt>
+                            <dd className="mt-1 font-medium text-white">
+                              {offer.contact}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-slate-400">Offer amount</dt>
+                            <dd className="mt-1 font-medium text-white">
+                              {formatListingPrice(offer.amount, offer.currency)}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-slate-400">Offer text</dt>
+                            <dd className="mt-1 font-medium text-white">
+                              {offer.offerText}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-slate-400">Created</dt>
+                            <dd className="mt-1 font-medium text-white">
+                              {formatListingDate(offer.createdAt)}
+                            </dd>
+                          </div>
+                        </dl>
+
+                        {offer.status === "pending" ? (
+                          <div className="mt-4 flex flex-wrap gap-3">
+                            <button
+                              className={primaryButtonClassName}
+                              disabled={
+                                isLoadingOffers || pendingOfferAction !== null
+                              }
+                              onClick={() =>
+                                void updateOfferStatus(offer, "accept")
+                              }
+                              type="button"
+                            >
+                              {isAccepting
+                                ? "Accepting…"
+                                : `Accept offer from ${offer.offererName}`}
+                            </button>
+                            <button
+                              className={dangerButtonClassName}
+                              disabled={
+                                isLoadingOffers || pendingOfferAction !== null
+                              }
+                              onClick={() =>
+                                void updateOfferStatus(offer, "decline")
+                              }
+                              type="button"
+                            >
+                              {isDeclining
+                                ? "Declining…"
+                                : `Decline offer from ${offer.offererName}`}
+                            </button>
+                          </div>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : null}
             </section>
 
             <form

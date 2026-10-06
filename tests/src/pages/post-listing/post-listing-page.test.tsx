@@ -28,6 +28,10 @@ const repository = vi.hoisted(() => ({
   list: vi.fn(),
   get: vi.fn(),
   create: vi.fn(),
+  createOffer: vi.fn(),
+  listOffers: vi.fn(),
+  countOffers: vi.fn(),
+  report: vi.fn(),
 }));
 
 vi.mock("../../../../src/services/listing-service", () => ({
@@ -97,6 +101,9 @@ describe("post listing page", () => {
     vi.clearAllMocks();
     repository.create.mockResolvedValue(createdListing);
     repository.get.mockResolvedValue(createdListing);
+    repository.countOffers.mockResolvedValue(0);
+    repository.createOffer.mockResolvedValue(undefined);
+    repository.report.mockResolvedValue(undefined);
     vi.mocked(validateListingImage).mockReturnValue(null);
     vi.mocked(uploadListingImage).mockResolvedValue("blob:listing-image");
     revokeObjectURL = vi.fn();

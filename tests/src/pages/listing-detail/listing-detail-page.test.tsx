@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,9 +11,16 @@ const repository = vi.hoisted(() => ({
   list: vi.fn(),
   get: vi.fn(),
   create: vi.fn(),
+  createOffer: vi.fn(),
+  listOffers: vi.fn(),
+  countOffers: vi.fn(),
+  report: vi.fn(),
 }));
 
-vi.mock("../../../../src/services/listing-service", () => ({
+vi.mock("../../../../src/services/listing-service", async () => ({
+  ...(await vi.importActual<object>(
+    "../../../../src/services/listing-service",
+  )),
   createLocalListingRepository: () => repository,
 }));
 
@@ -45,6 +53,31 @@ function renderApp(path: string) {
   );
 }
 
+async function fillValidOffer(
+  user: ReturnType<typeof userEvent.setup>,
+  options: { currency?: string } = {},
+) {
+  await user.type(screen.getByLabelText("Your in-game name"), "HarborTrader");
+  await user.type(
+    screen.getByLabelText("Contact details"),
+    "In-game mail: HarborTrader",
+  );
+  if (options.currency) {
+    await user.selectOptions(
+      screen.getByLabelText("Offer currency"),
+      options.currency,
+    );
+  }
+  const amount = screen.queryByLabelText(/Amount \(/);
+  if (amount) {
+    await user.type(amount, "45000000");
+  }
+  await user.type(
+    screen.getByLabelText("Your offer"),
+    "Ready to purchase immediately at the harbor.",
+  );
+}
+
 describe("listing detail page", () => {
   afterEach(() => {
     cleanup();
@@ -55,6 +88,9 @@ describe("listing detail page", () => {
     vi.clearAllMocks();
     vi.setSystemTime(new Date("2026-10-05T12:00:00Z"));
     repository.get.mockResolvedValue(knownListing);
+    repository.countOffers.mockResolvedValue(0);
+    repository.createOffer.mockResolvedValue(undefined);
+    repository.report.mockResolvedValue(undefined);
   });
 
   it("renders a known listing from the repository", async () => {
@@ -165,6 +201,12 @@ describe("listing detail page", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(knownListing.description)).toBeInTheDocument();
     expect(screen.getByText("48,000,000 ducats")).toBeInTheDocument();
+    expect(
+      screen.getByText("This listing is no longer accepting new offers."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("form", { name: "Make an offer form" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows a SOLD badge when the listing has sold", async () => {
@@ -178,6 +220,147 @@ describe("listing detail page", () => {
       await screen.findByRole("heading", { name: "Adventurer Frigate" }),
     ).toBeInTheDocument();
     expect(screen.getByText("SOLD")).toBeInTheDocument();
+    expect(
+      screen.getByText("This listing is no longer accepting new offers."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("form", { name: "Make an offer form" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows only the public aggregate offer count", async () => {
+    repository.countOffers.mockResolvedValue(3);
+    renderApp("/listings/adventurer-frigate");
+
+    expect(
+      await screen.findByText("3 offers received so far."),
+    ).toBeInTheDocument();
+    expect(repository.countOffers).toHaveBeenCalledWith("adventurer-frigate");
+    expect(repository.listOffers).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(
+        "Only the offer count is public. Individual offer details stay private between each buyer and the seller.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("validates required offer fields before submission", async () => {
+    const user = userEvent.setup();
+    renderApp("/listings/adventurer-frigate");
+
+    await screen.findByRole("heading", { name: "Adventurer Frigate" });
+    await user.click(screen.getByRole("button", { name: "Send offer" }));
+
+    expect(
+      screen.getByText("In-game name must be at least 2 characters."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Contact details are required."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Amount is required for this currency."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Describe your offer in at least 10 characters."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      /Please fix 4 fields below before sending this offer./,
+    );
+    expect(repository.createOffer).not.toHaveBeenCalled();
+  });
+
+  it("submits a numeric offer and confirms without exposing other offers", async () => {
+    const user = userEvent.setup();
+    renderApp("/listings/adventurer-frigate");
+
+    await screen.findByRole("heading", { name: "Adventurer Frigate" });
+    await fillValidOffer(user);
+    await user.click(screen.getByRole("button", { name: "Send offer" }));
+
+    expect(
+      await screen.findByText(/Your offer was sent to PortRoyalShipwright./),
+    ).toBeInTheDocument();
+    expect(repository.createOffer).toHaveBeenCalledWith("adventurer-frigate", {
+      offererName: "HarborTrader",
+      contact: "In-game mail: HarborTrader",
+      currency: "ducats",
+      amount: 45_000_000,
+      offerText: "Ready to purchase immediately at the harbor.",
+    });
+    expect(repository.countOffers).toHaveBeenCalledTimes(2);
+    expect(repository.listOffers).not.toHaveBeenCalled();
+  });
+
+  it("hides the amount field and submits null for trade offers", async () => {
+    const user = userEvent.setup();
+    renderApp("/listings/adventurer-frigate");
+
+    await screen.findByRole("heading", { name: "Adventurer Frigate" });
+    await fillValidOffer(user, { currency: "trade" });
+    expect(screen.queryByLabelText(/Amount \(/)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Send offer" }));
+
+    expect(
+      await screen.findByText(/Your offer was sent to PortRoyalShipwright./),
+    ).toBeInTheDocument();
+    expect(repository.createOffer).toHaveBeenCalledWith("adventurer-frigate", {
+      offererName: "HarborTrader",
+      contact: "In-game mail: HarborTrader",
+      currency: "trade",
+      amount: null,
+      offerText: "Ready to purchase immediately at the harbor.",
+    });
+  });
+
+  it("requires a reporter name and reason before reporting", async () => {
+    const user = userEvent.setup();
+    renderApp("/listings/adventurer-frigate");
+
+    await screen.findByRole("heading", { name: "Adventurer Frigate" });
+    await user.click(
+      screen.getByRole("button", { name: "Report this listing" }),
+    );
+    await user.click(screen.getByRole("button", { name: "Submit report" }));
+
+    expect(
+      screen.getByText("Reporter name must be at least 2 characters."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Choose a reason for this report."),
+    ).toBeInTheDocument();
+    expect(repository.report).not.toHaveBeenCalled();
+  });
+
+  it("submits a report and keeps report data confidential", async () => {
+    const user = userEvent.setup();
+    renderApp("/listings/adventurer-frigate");
+
+    await screen.findByRole("heading", { name: "Adventurer Frigate" });
+    await user.click(
+      screen.getByRole("button", { name: "Report this listing" }),
+    );
+    await user.type(screen.getByLabelText("Your name"), "Port Observer");
+    await user.selectOptions(screen.getByLabelText("Reason"), "spam");
+    await user.type(
+      screen.getByLabelText("Details (optional)"),
+      "This listing duplicates another harbor post.",
+    );
+    await user.click(screen.getByRole("button", { name: "Submit report" }));
+
+    expect(
+      await screen.findByText(
+        "Thank you. Your report was submitted for review.",
+      ),
+    ).toBeInTheDocument();
+    expect(repository.report).toHaveBeenCalledWith("adventurer-frigate", {
+      reporterName: "Port Observer",
+      reason: "spam",
+      details: "This listing duplicates another harbor post.",
+    });
+    expect(screen.queryByLabelText("Your name")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/This listing duplicates another harbor post./),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the legacy heritage and provenance presentation", async () => {

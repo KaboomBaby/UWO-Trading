@@ -1,6 +1,8 @@
 import { mockListings } from "../data/mock-listings";
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import type {
+  CreateOfferInput,
+  CreateReportInput,
   CreatedListing,
   CreateListingInput,
   Listing,
@@ -8,6 +10,7 @@ import type {
   ListingCollection,
   ListingCurrency,
   ListingQuery,
+  Offer,
   UpdateListingInput,
 } from "../types/listing";
 import { isNumericListingCurrency } from "../types/listing";
@@ -21,6 +24,12 @@ export interface ListingRepository {
   markSold(editCode: string): Promise<Listing>;
   renew(editCode: string): Promise<Listing>;
   delete(editCode: string): Promise<void>;
+  createOffer(listingId: string, input: CreateOfferInput): Promise<void>;
+  listOffers(editCode: string): Promise<Offer[]>;
+  acceptOffer(editCode: string, offerId: string): Promise<Offer>;
+  declineOffer(editCode: string, offerId: string): Promise<Offer>;
+  countOffers(listingId: string): Promise<number>;
+  report(listingId: string, input: CreateReportInput): Promise<void>;
 }
 
 export function normalizeCategory(value: string): ListingCategory | "all" {
@@ -86,6 +95,38 @@ export function validateListingInput(input: CreateListingInput) {
   return errors;
 }
 
+export function validateOfferInput(input: CreateOfferInput) {
+  const errors: Record<string, string> = {};
+  if (input.offererName.trim().length < 2) {
+    errors.offererName = "In-game name must be at least 2 characters.";
+  }
+  if (!input.contact.trim()) errors.contact = "Contact details are required.";
+  if (isNumericListingCurrency(input.currency)) {
+    if (input.amount === null) {
+      errors.amount = "Amount is required for this currency.";
+    } else if (!Number.isFinite(input.amount) || input.amount <= 0) {
+      errors.amount = "Amount must be greater than zero.";
+    }
+  } else if (input.amount !== null) {
+    errors.currency = "Trade and negotiable offers cannot set an amount.";
+  }
+  if (input.offerText.trim().length < 10) {
+    errors.offerText = "Describe your offer in at least 10 characters.";
+  }
+  return errors;
+}
+
+export function validateReportInput(input: CreateReportInput) {
+  const errors: Record<string, string> = {};
+  if (input.reporterName.trim().length < 2) {
+    errors.reporterName = "Reporter name must be at least 2 characters.";
+  }
+  if (input.details && input.details.trim().length > 1000) {
+    errors.details = "Report details must be 1,000 characters or fewer.";
+  }
+  return errors;
+}
+
 export class ListingValidationError extends Error {
   readonly errors: Record<string, string>;
 
@@ -139,6 +180,18 @@ type CreateListingRpcResult = {
   edit_code: string;
 };
 
+type OfferRow = {
+  id: string;
+  listing_id: string;
+  offerer_name: string;
+  contact: string;
+  currency: ListingCurrency;
+  amount: number | null;
+  offer_text: string;
+  status: Offer["status"];
+  created_at: string;
+};
+
 function assertSuccessfulResponse(
   operation: string,
   error: PostgrestError | null,
@@ -166,6 +219,20 @@ function mapListingRow(row: ListingRow): Listing {
     expiresAt: row.expires_at,
     soldAt: row.sold_at,
     collection: row.collection ?? "current",
+  };
+}
+
+function mapOfferRow(row: OfferRow): Offer {
+  return {
+    id: row.id,
+    listingId: row.listing_id,
+    offererName: row.offerer_name,
+    contact: row.contact,
+    currency: row.currency,
+    amount: row.amount,
+    offerText: row.offer_text,
+    status: row.status,
+    createdAt: row.created_at,
   };
 }
 
@@ -331,6 +398,80 @@ export function createSupabaseListingRepository(
       assertSuccessfulResponse("delete listing", error);
       if (!data) throw new Error("Listing edit code not found.");
     },
+
+    async createOffer(listingId: string, input: CreateOfferInput) {
+      const errors = validateOfferInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+
+      const { error } = await client.from("offers").insert({
+        listing_id: listingId,
+        offerer_name: input.offererName.trim(),
+        contact: input.contact.trim(),
+        currency: input.currency,
+        amount: input.amount,
+        offer_text: input.offerText.trim(),
+      });
+      assertSuccessfulResponse("create offer", error);
+    },
+
+    async listOffers(editCode: string) {
+      const { data, error } = await client.rpc("list_listing_offers", {
+        edit_code: editCode,
+      });
+
+      assertSuccessfulResponse("load listing offers", error);
+      return (data as OfferRow[]).map(mapOfferRow);
+    },
+
+    async acceptOffer(editCode: string, offerId: string) {
+      const { data, error } = await client
+        .rpc("accept_listing_offer", {
+          edit_code: editCode,
+          offer_id: offerId,
+        })
+        .single();
+
+      assertSuccessfulResponse("accept offer", error);
+      return mapOfferRow(data as OfferRow);
+    },
+
+    async declineOffer(editCode: string, offerId: string) {
+      const { data, error } = await client
+        .rpc("decline_listing_offer", {
+          edit_code: editCode,
+          offer_id: offerId,
+        })
+        .single();
+
+      assertSuccessfulResponse("decline offer", error);
+      return mapOfferRow(data as OfferRow);
+    },
+
+    async countOffers(listingId: string) {
+      const { data, error } = await client
+        .rpc("listing_offer_count", { listing_id: listingId })
+        .single();
+
+      assertSuccessfulResponse("count listing offers", error);
+      return Number(data);
+    },
+
+    async report(listingId: string, input: CreateReportInput) {
+      const errors = validateReportInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+
+      const { error } = await client.from("reports").insert({
+        listing_id: listingId,
+        reporter_name: input.reporterName.trim(),
+        reason: input.reason,
+        details: input.details?.trim() ?? "",
+      });
+      assertSuccessfulResponse("report listing", error);
+    },
   };
 }
 
@@ -339,6 +480,7 @@ export function createLocalListingRepository(
 ): ListingRepository {
   const listings = [...initialListings];
   const editCodes = new Map<string, string>();
+  const offers: Offer[] = [];
 
   return {
     async list(query: ListingQuery = {}) {
@@ -476,6 +618,83 @@ export function createLocalListingRepository(
 
       const [listing] = listings.splice(index, 1);
       editCodes.delete(listing.id);
+    },
+
+    async createOffer(listingId: string, input: CreateOfferInput) {
+      const errors = validateOfferInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+      if (!listings.some((listing) => listing.id === listingId)) {
+        throw new Error("Listing not found.");
+      }
+
+      offers.unshift({
+        id: crypto.randomUUID(),
+        listingId,
+        offererName: input.offererName.trim(),
+        contact: input.contact.trim(),
+        currency: input.currency,
+        amount: input.amount,
+        offerText: input.offerText.trim(),
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      });
+    },
+
+    async listOffers(editCode: string) {
+      const listing = listings.find(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      if (!listing) throw new Error("Listing edit code not found.");
+
+      return offers
+        .filter((offer) => offer.listingId === listing.id)
+        .map((offer) => ({ ...offer }));
+    },
+
+    async acceptOffer(editCode: string, offerId: string) {
+      const listing = listings.find(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      const index = offers.findIndex(
+        (offer) => offer.id === offerId && offer.listingId === listing?.id,
+      );
+      if (!listing || index === -1) {
+        throw new Error("Listing edit code or offer was not found.");
+      }
+
+      offers[index] = { ...offers[index], status: "accepted" };
+      return { ...offers[index] };
+    },
+
+    async declineOffer(editCode: string, offerId: string) {
+      const listing = listings.find(
+        (item) => editCodes.get(item.id) === editCode,
+      );
+      const index = offers.findIndex(
+        (offer) => offer.id === offerId && offer.listingId === listing?.id,
+      );
+      if (!listing || index === -1) {
+        throw new Error("Listing edit code or offer was not found.");
+      }
+
+      offers[index] = { ...offers[index], status: "declined" };
+      return { ...offers[index] };
+    },
+
+    async countOffers(listingId: string) {
+      return offers.filter((offer) => offer.listingId === listingId).length;
+    },
+
+    async report(listingId: string, input: CreateReportInput) {
+      const errors = validateReportInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+      if (!listings.some((listing) => listing.id === listingId)) {
+        throw new Error("Listing not found.");
+      }
     },
   };
 }

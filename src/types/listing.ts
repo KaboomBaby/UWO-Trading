@@ -95,3 +95,41 @@ export type CreateListingInput = {
 
 export type UpdateListingInput = CreateListingInput;
 export type CreatedListing = Listing & { editCode: string };
+
+export type OfferStatus = "pending" | "accepted" | "declined";
+
+export type Offer = {
+  id: string;
+  listingId: string;
+  offererName: string;
+  contact: string;
+  currency: ListingCurrency;
+  amount: number | null;
+  offerText: string;
+  status: OfferStatus;
+  createdAt: string;
+};
+
+export type CreateOfferInput = {
+  offererName: string;
+  contact: string;
+  currency: ListingCurrency;
+  amount: number | null;
+  offerText: string;
+};
+
+export const REPORT_REASONS = [
+  "prohibited",
+  "fraud",
+  "spam",
+  "wrong-server",
+  "other",
+] as const;
+
+export type ReportReason = (typeof REPORT_REASONS)[number];
+
+export type CreateReportInput = {
+  reporterName: string;
+  reason: ReportReason;
+  details?: string;
+};

@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "../../../../src/app";
-import type { Listing } from "../../../../src/types/listing";
+import type { Listing, Offer } from "../../../../src/types/listing";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -15,6 +15,9 @@ const repository = vi.hoisted(() => ({
   markSold: vi.fn(),
   renew: vi.fn(),
   delete: vi.fn(),
+  listOffers: vi.fn(),
+  acceptOffer: vi.fn(),
+  declineOffer: vi.fn(),
 }));
 
 vi.mock("../../../../src/services/listing-service", () => ({
@@ -43,6 +46,42 @@ const expiredListing: Listing = {
   collection: "current",
 };
 
+const pendingDucatOffer: Offer = {
+  id: "offer-ducat",
+  listingId: expiredListing.id,
+  offererName: "Captain Silver",
+  contact: "In-game mail to Captain Silver",
+  currency: "ducats",
+  amount: 45_500_000,
+  offerText: "I can pay immediately after the Lisbon inspection.",
+  status: "pending",
+  createdAt: "2026-10-05T09:30:00Z",
+};
+
+const acceptedTradeOffer: Offer = {
+  id: "offer-trade",
+  listingId: expiredListing.id,
+  offererName: "Harbor Trader",
+  contact: "Maris port office, berth 12",
+  currency: "trade",
+  amount: null,
+  offerText: "A fitted cannon set and two navigation charts.",
+  status: "accepted",
+  createdAt: "2026-10-04T15:00:00Z",
+};
+
+const declinedNegotiableOffer: Offer = {
+  id: "offer-negotiable",
+  listingId: expiredListing.id,
+  offererName: "Port Broker",
+  contact: "Message through the market office",
+  currency: "negotiable",
+  amount: null,
+  offerText: "Let me know what flexibility you have on timing.",
+  status: "declined",
+  createdAt: "2026-10-03T18:45:00Z",
+};
+
 function renderManagePage() {
   return render(
     <MemoryRouter initialEntries={["/manage"]}>
@@ -66,6 +105,9 @@ describe("manage listings page", () => {
     repository.markSold.mockResolvedValue(expiredListing);
     repository.renew.mockResolvedValue(expiredListing);
     repository.delete.mockResolvedValue(undefined);
+    repository.listOffers.mockResolvedValue([]);
+    repository.acceptOffer.mockResolvedValue(pendingDucatOffer);
+    repository.declineOffer.mockResolvedValue(pendingDucatOffer);
   });
 
   afterEach(cleanup);
@@ -198,6 +240,160 @@ describe("manage listings page", () => {
       "Unable to save this listing: Edit code is no longer valid.",
     );
     expect(screen.queryByText("Changes saved.")).not.toBeInTheDocument();
+  });
+
+  it("loads and displays private offers for the managed listing", async () => {
+    const user = userEvent.setup();
+    repository.listOffers.mockResolvedValueOnce([
+      pendingDucatOffer,
+      acceptedTradeOffer,
+      declinedNegotiableOffer,
+    ]);
+    renderManagePage();
+    await loadListing(user);
+
+    expect(repository.listOffers).toHaveBeenCalledWith(editCode);
+    expect(await screen.findByText("Captain Silver")).toBeInTheDocument();
+    expect(
+      screen.getByText("In-game mail to Captain Silver"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("45,500,000 ducats")).toBeInTheDocument();
+    expect(
+      screen.getByText("I can pay immediately after the Lisbon inspection."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Pending")).toBeInTheDocument();
+    expect(screen.getByText("October 5, 2026")).toBeInTheDocument();
+
+    expect(screen.getByText("Harbor Trader")).toBeInTheDocument();
+    expect(screen.getByText("Trade")).toBeInTheDocument();
+    expect(screen.getByText("Accepted")).toBeInTheDocument();
+
+    expect(screen.getByText("Port Broker")).toBeInTheDocument();
+    expect(screen.getAllByText("Negotiable").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Declined")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Accept offer from Captain Silver" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Decline offer from Captain Silver" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Accept offer from Harbor Trader/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows accessible offer loading and load-error states, then refreshes offers", async () => {
+    const user = userEvent.setup();
+    let rejectOffers!: (reason?: unknown) => void;
+    repository.listOffers.mockReturnValueOnce(
+      new Promise<Offer[]>((_resolve, reject) => {
+        rejectOffers = reject;
+      }),
+    );
+    renderManagePage();
+    await user.type(screen.getByLabelText("Edit code"), editCode);
+    await user.click(screen.getByRole("button", { name: "Find listing" }));
+
+    expect(await screen.findByText("Adventurer Frigate")).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("status").map((element) => element.textContent),
+    ).toContain("Loading offers…");
+
+    rejectOffers(new Error("Offer permissions expired."));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Unable to load offers: Offer permissions expired.",
+    );
+
+    repository.listOffers.mockResolvedValueOnce([pendingDucatOffer]);
+    await user.click(screen.getByRole("button", { name: "Refresh offers" }));
+
+    expect(await screen.findByText("Captain Silver")).toBeInTheDocument();
+    expect(repository.listOffers).toHaveBeenCalledTimes(2);
+    expect(repository.listOffers).toHaveBeenNthCalledWith(1, editCode);
+    expect(repository.listOffers).toHaveBeenNthCalledWith(2, editCode);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("accepts and declines pending offers with returned statuses", async () => {
+    const user = userEvent.setup();
+    const pendingSecondOffer: Offer = {
+      ...pendingDucatOffer,
+      id: "offer-second",
+      offererName: "Second Mate",
+      contact: "Second Mate's market mailbox",
+      offerText: "I can gather the remainder by tomorrow.",
+    };
+    repository.listOffers.mockResolvedValueOnce([
+      pendingDucatOffer,
+      pendingSecondOffer,
+    ]);
+    repository.acceptOffer.mockResolvedValueOnce({
+      ...pendingDucatOffer,
+      status: "accepted",
+    });
+    repository.declineOffer.mockResolvedValueOnce({
+      ...pendingSecondOffer,
+      status: "declined",
+    });
+    renderManagePage();
+    await loadListing(user);
+
+    await user.click(
+      screen.getByRole("button", { name: "Accept offer from Captain Silver" }),
+    );
+    expect(repository.acceptOffer).toHaveBeenCalledWith(
+      editCode,
+      pendingDucatOffer.id,
+    );
+    expect(
+      await screen.findByText("Offer from Captain Silver accepted."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Accepted")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", {
+        name: "Accept offer from Captain Silver",
+      }),
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Decline offer from Second Mate" }),
+    );
+    expect(repository.declineOffer).toHaveBeenCalledWith(
+      editCode,
+      pendingSecondOffer.id,
+    );
+    expect(
+      await screen.findByText("Offer from Second Mate declined."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Declined")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", {
+        name: /offer from (Captain Silver|Second Mate)/,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("reflects offer-action errors without losing pending controls", async () => {
+    const user = userEvent.setup();
+    repository.listOffers.mockResolvedValueOnce([pendingDucatOffer]);
+    repository.acceptOffer.mockRejectedValueOnce(
+      new Error("Only pending offers can be accepted."),
+    );
+    renderManagePage();
+    await loadListing(user);
+
+    await user.click(
+      screen.getByRole("button", { name: "Accept offer from Captain Silver" }),
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Unable to accept this offer: Only pending offers can be accepted.",
+    );
+    expect(screen.getByText("Pending")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Accept offer from Captain Silver" }),
+    ).toBeInTheDocument();
+    expect(repository.declineOffer).not.toHaveBeenCalled();
   });
 
   it("marks an expired listing sold and renews it for fourteen days", async () => {
