@@ -20,6 +20,7 @@ describe("application routes", () => {
     expect(
       screen.getByRole("heading", { name: /open-sea marketplace/i }),
     ).toBeInTheDocument();
+    expect(screen.getByText(/repository-backed listings/i)).toBeInTheDocument();
   });
 
   it("renders the browse route", () => {

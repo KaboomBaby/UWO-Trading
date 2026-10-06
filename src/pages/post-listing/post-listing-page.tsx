@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { useListingRepository } from "../../lib/listing-repository-context";
 import {
   LISTING_CATEGORIES,
+  LISTING_CURRENCIES,
+  isNumericListingCurrency,
   type Listing,
   type ListingCategory,
 } from "../../types/listing";
@@ -11,22 +13,36 @@ import {
 type FormState = {
   title: string;
   category: ListingCategory | "";
+  currency: Listing["currency"] | "";
   price: string;
   description: string;
   seller: string;
   location: string;
+  server: string;
+  contactNote: string;
   emoji: string;
 };
 
 const emptyForm: FormState = {
   title: "",
   category: "",
+  currency: "",
   price: "",
   description: "",
   seller: "",
   location: "",
+  server: "",
+  contactNote: "",
   emoji: "",
 };
+
+const currencyLabels = {
+  ducats: "Ducats",
+  UWC: "UWC",
+  CT: "CT (Captain Tickets)",
+  trade: "Trade / Barter",
+  negotiable: "Negotiable",
+} as const;
 
 function formatCategory(category: ListingCategory) {
   return category.charAt(0).toUpperCase() + category.slice(1);
@@ -35,10 +51,12 @@ function formatCategory(category: ListingCategory) {
 function validate(form: FormState) {
   const errors: Partial<Record<keyof FormState, string>> = {};
   const title = form.title.trim();
-  const price = Number(form.price.trim());
   const description = form.description.trim();
   const seller = form.seller.trim();
   const location = form.location.trim();
+  const server = form.server.trim();
+  const numericCurrency =
+    form.currency !== "" && isNumericListingCurrency(form.currency);
 
   if (title.length < 3) {
     errors.title = "Title must be at least 3 characters.";
@@ -46,10 +64,18 @@ function validate(form: FormState) {
   if (!form.category) {
     errors.category = "Category is required.";
   }
-  if (!form.price.trim()) {
-    errors.price = "Price is required.";
-  } else if (!Number.isFinite(price) || price <= 0) {
-    errors.price = "Price must be a number greater than zero.";
+  if (!form.currency) {
+    errors.currency = "Currency is required.";
+  }
+  if (numericCurrency) {
+    const price = Number(form.price.trim());
+    if (!form.price.trim()) {
+      errors.price = "Price is required.";
+    } else if (!Number.isFinite(price) || price <= 0) {
+      errors.price = "Price must be a number greater than zero.";
+    } else if (form.currency === "CT" && !Number.isInteger(price)) {
+      errors.price = "Captain Tickets must be a whole number.";
+    }
   }
   if (description.length < 10) {
     errors.description = "Description must be at least 10 characters.";
@@ -59,6 +85,9 @@ function validate(form: FormState) {
   }
   if (!location) {
     errors.location = "Location is required.";
+  }
+  if (!server) {
+    errors.server = "Server is required.";
   }
 
   return errors;
@@ -92,6 +121,8 @@ export function PostListingPage() {
   const formHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const shouldFocusFormRef = useRef(false);
   const errorCount = Object.values(errors).filter(Boolean).length;
+  const numericCurrency =
+    form.currency !== "" && isNumericListingCurrency(form.currency);
 
   useEffect(() => {
     if (errorAnnouncementId > 0) {
@@ -119,6 +150,22 @@ export function PostListingPage() {
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
+  function updateCurrency(currency: FormState["currency"]) {
+    setForm((current) => ({
+      ...current,
+      currency,
+      price:
+        currency === "" || isNumericListingCurrency(currency)
+          ? current.price
+          : "",
+    }));
+    setErrors((current) => ({
+      ...current,
+      currency: undefined,
+      price: undefined,
+    }));
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSubmitting) return;
@@ -137,10 +184,13 @@ export function PostListingPage() {
       const listing = await repository.create({
         title: form.title.trim(),
         category: form.category as ListingCategory,
-        price: Number(form.price.trim()),
+        currency: form.currency as Listing["currency"],
+        price: numericCurrency ? Number(form.price.trim()) : null,
         description: form.description.trim(),
         seller: form.seller.trim(),
         location: form.location.trim(),
+        server: form.server.trim(),
+        contactNote: form.contactNote.trim(),
         ...(emoji ? { imageEmoji: emoji } : {}),
       });
       setCreatedListing(listing);
@@ -181,7 +231,8 @@ export function PostListingPage() {
             {createdListing.title} is ready
           </h1>
           <p className="mt-3 text-slate-200">
-            It is available in this browser session’s local marketplace memory.
+            It was saved through the active listing repository and is ready to
+            browse.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -207,7 +258,7 @@ export function PostListingPage() {
     <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
         <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-glow">
-          Local marketplace
+          Marketplace listing
         </p>
         <h1
           className="mt-4 text-3xl font-semibold text-white"
@@ -217,8 +268,9 @@ export function PostListingPage() {
           Post a listing
         </h1>
         <p className="mt-3 text-slate-300">
-          Listings are stored in this browser session’s local memory only. No
-          account or Supabase connection is required.
+          Listings are saved through the active repository: Supabase when
+          environment credentials are present, or this browser session’s
+          in-memory marketplace otherwise.
         </p>
 
         <form className="mt-8 space-y-6" noValidate onSubmit={handleSubmit}>
@@ -293,28 +345,61 @@ export function PostListingPage() {
             <div>
               <label
                 className="text-sm font-semibold text-slate-200"
+                htmlFor="currency"
+              >
+                Currency
+              </label>
+              <select
+                aria-describedby={
+                  errors.currency ? "currency-error" : undefined
+                }
+                aria-invalid={Boolean(errors.currency)}
+                className={inputClassName}
+                id="currency"
+                name="currency"
+                onChange={(event) =>
+                  updateCurrency(event.target.value as FormState["currency"])
+                }
+                required
+                value={form.currency}
+              >
+                <option value="">Select a currency</option>
+                {LISTING_CURRENCIES.map((currency) => (
+                  <option key={currency} value={currency}>
+                    {currencyLabels[currency]}
+                  </option>
+                ))}
+              </select>
+              <FieldError id="currency-error" message={errors.currency} />
+            </div>
+          </div>
+
+          {numericCurrency ? (
+            <div>
+              <label
+                className="text-sm font-semibold text-slate-200"
                 htmlFor="price"
               >
-                Price (gold)
+                Price ({currencyLabels[form.currency as Listing["currency"]]})
               </label>
               <input
                 aria-describedby={errors.price ? "price-error" : undefined}
                 aria-invalid={Boolean(errors.price)}
                 className={inputClassName}
                 id="price"
-                inputMode="decimal"
-                min="0.01"
+                inputMode={form.currency === "CT" ? "numeric" : "decimal"}
+                min={form.currency === "CT" ? "1" : "0.01"}
                 name="price"
                 onChange={(event) => updateField("price", event.target.value)}
                 placeholder="48000000"
                 required
-                step="any"
+                step={form.currency === "CT" ? "1" : "any"}
                 type="number"
                 value={form.price}
               />
               <FieldError id="price-error" message={errors.price} />
             </div>
-          </div>
+          ) : null}
 
           <div>
             <label
@@ -389,6 +474,49 @@ export function PostListingPage() {
               />
               <FieldError id="location-error" message={errors.location} />
             </div>
+          </div>
+
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="server"
+            >
+              Server
+            </label>
+            <input
+              aria-describedby={errors.server ? "server-error" : undefined}
+              aria-invalid={Boolean(errors.server)}
+              className={inputClassName}
+              id="server"
+              name="server"
+              onChange={(event) => updateField("server", event.target.value)}
+              placeholder="Maris"
+              required
+              type="text"
+              value={form.server}
+            />
+            <FieldError id="server-error" message={errors.server} />
+          </div>
+
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="contact-note"
+            >
+              Contact note{" "}
+              <span className="font-normal text-slate-400">(optional)</span>
+            </label>
+            <textarea
+              className={`${inputClassName} min-h-24 resize-y`}
+              id="contact-note"
+              name="contactNote"
+              onChange={(event) =>
+                updateField("contactNote", event.target.value)
+              }
+              placeholder="How and when buyers should reach you."
+              rows={3}
+              value={form.contactNote}
+            />
           </div>
 
           <div>

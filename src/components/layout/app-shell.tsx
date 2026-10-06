@@ -40,7 +40,7 @@ export function AppShell({ children }: AppShellProps) {
       <main className="flex-1">{children}</main>
       <footer className="border-t border-white/10 bg-ink/80 px-4 py-6 text-sm text-slate-400 sm:px-6">
         <div className="mx-auto max-w-7xl">
-          Milestone preview · local mock data · Supabase integration pending
+          Milestone preview · repository-backed listings
         </div>
       </footer>
     </div>

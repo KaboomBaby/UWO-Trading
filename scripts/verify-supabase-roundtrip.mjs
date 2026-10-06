@@ -16,16 +16,24 @@ const marker = `supabase-roundtrip-${Date.now()}`;
 const created = await repository.create({
   title: `Supabase round trip ${marker}`,
   category: "services",
+  currency: "ducats",
   price: 12345,
   description:
     "Temporary listing created through the application repository to verify Supabase persistence.",
   seller: "Supabase verification",
   location: "Remote test port",
+  server: "Maris",
+  contactNote: "Temporary verification contact.",
   imageEmoji: "🧪",
   collection: "current",
 });
 
-if (!created.id || created.currency !== "gold") {
+if (
+  !created.id ||
+  created.currency !== "ducats" ||
+  created.server !== "Maris" ||
+  !created.contactNote
+) {
   throw new Error(
     "Created listing did not include the expected contract fields.",
   );

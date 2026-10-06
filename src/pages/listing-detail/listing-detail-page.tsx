@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { useListingRepository } from "../../lib/listing-repository-context";
 import type { Listing } from "../../types/listing";
+import { formatListingPrice } from "../../types/listing";
 
 type DetailState =
   | { status: "ready"; requestedId: string; listing: Listing }
@@ -38,16 +39,8 @@ const listingVariants: Array<{
   },
 ];
 
-const numberFormatter = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 0,
-});
-
 function formatCategory(category: Listing["category"]) {
   return category.charAt(0).toUpperCase() + category.slice(1);
-}
-
-function formatGold(amount: number) {
-  return `${numberFormatter.format(amount)} gold`;
 }
 
 function parseVariant(value: string | null) {
@@ -104,8 +97,11 @@ function VariantNavigation({
 }
 
 function LegacyPresentation({ listing }: { listing: Listing }) {
-  const lowerValuation = Math.round(listing.price * 0.92);
-  const upperValuation = Math.round(listing.price * 1.18);
+  const hasNumericPrice = listing.price !== null;
+  const lowerValuation =
+    listing.price === null ? null : Math.round(listing.price * 0.92);
+  const upperValuation =
+    listing.price === null ? null : Math.round(listing.price * 1.18);
 
   return (
     <section
@@ -141,7 +137,12 @@ function LegacyPresentation({ listing }: { listing: Listing }) {
             Heritage valuation band
           </h3>
           <p className="mt-2 text-white">
-            {formatGold(lowerValuation)} – {formatGold(upperValuation)}
+            {lowerValuation !== null && upperValuation !== null
+              ? `${formatListingPrice(lowerValuation, listing.currency)} – ${formatListingPrice(
+                  upperValuation,
+                  listing.currency,
+                )}`
+              : "Value established through direct negotiation"}
           </p>
         </div>
         <div className="rounded-xl border border-white/10 bg-ink/70 p-4">
@@ -189,8 +190,10 @@ function LegacyPresentation({ listing }: { listing: Listing }) {
           </h3>
           <p className="mt-2 text-slate-200">
             Collector demand rewards complete provenance, stable equipment, and
-            a documented port history. The displayed band frames the asking
-            price against comparable heritage listings.
+            a documented port history.{" "}
+            {hasNumericPrice
+              ? "The displayed band frames the asking price against comparable heritage listings."
+              : "For trade or negotiable terms, value is established with the seller against comparable heritage listings."}
           </p>
         </aside>
       </div>
@@ -199,8 +202,12 @@ function LegacyPresentation({ listing }: { listing: Listing }) {
 }
 
 function EquipmentPresentation({ listing }: { listing: Listing }) {
-  const installationEstimate = Math.round(listing.price * 0.025);
-  const fittedCost = listing.price + installationEstimate;
+  const installationEstimate =
+    listing.price === null ? null : Math.round(listing.price * 0.025);
+  const fittedCost =
+    listing.price === null || installationEstimate === null
+      ? null
+      : listing.price + installationEstimate;
 
   return (
     <section
@@ -244,14 +251,21 @@ function EquipmentPresentation({ listing }: { listing: Listing }) {
             Installation
           </dt>
           <dd className="mt-2 text-white">
-            Dock installation · {formatGold(installationEstimate)}
+            Dock installation ·{" "}
+            {installationEstimate === null
+              ? "quoted after inspection"
+              : formatListingPrice(installationEstimate, listing.currency)}
           </dd>
         </div>
         <div className="rounded-xl border border-white/10 bg-ink/70 p-4">
           <dt className="text-sm font-semibold uppercase tracking-wide text-slate-400">
             Fitted cost
           </dt>
-          <dd className="mt-2 text-white">{formatGold(fittedCost)}</dd>
+          <dd className="mt-2 text-white">
+            {fittedCost === null
+              ? "Agreed with the seller"
+              : formatListingPrice(fittedCost, listing.currency)}
+          </dd>
         </div>
       </dl>
 
@@ -260,7 +274,9 @@ function EquipmentPresentation({ listing }: { listing: Listing }) {
           Equipment pricing context
         </h3>
         <p className="mt-2 text-slate-200">
-          The asking price covers the component package listed by{" "}
+          {listing.price === null
+            ? "Exchange terms cover the component package listed by "
+            : "The asking price covers the component package listed by "}
           {listing.seller}. Installation is quoted separately because labor and
           dock capacity vary by port.
         </p>
@@ -270,9 +286,15 @@ function EquipmentPresentation({ listing }: { listing: Listing }) {
 }
 
 function TradePresentation({ listing }: { listing: Listing }) {
-  const portFee = Math.round(listing.price * 0.03);
-  const escrowFee = Math.round(listing.price * 0.01);
-  const settlementTotal = listing.price + portFee + escrowFee;
+  const hasNumericPrice = listing.price !== null;
+  const portFee =
+    listing.price === null ? null : Math.round(listing.price * 0.03);
+  const escrowFee =
+    listing.price === null ? null : Math.round(listing.price * 0.01);
+  const settlementTotal =
+    listing.price === null || portFee === null || escrowFee === null
+      ? null
+      : listing.price + portFee + escrowFee;
 
   return (
     <section
@@ -289,8 +311,10 @@ function TradePresentation({ listing }: { listing: Listing }) {
         Trade valuation &amp; negotiation
       </h2>
       <p className="mt-3 max-w-3xl text-slate-200">
-        Prepare a structured offer for {listing.seller} with the total cost of
-        settlement and the actions needed before exchange.
+        Prepare a structured offer for {listing.seller} with{" "}
+        {hasNumericPrice
+          ? "the total cost of settlement and the actions needed before exchange."
+          : "the agreed exchange terms and the actions needed before exchange."}
       </p>
 
       <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -298,25 +322,39 @@ function TradePresentation({ listing }: { listing: Listing }) {
           <dt className="text-sm font-semibold uppercase tracking-wide text-slate-400">
             Seller asks
           </dt>
-          <dd className="mt-2 text-white">{formatGold(listing.price)}</dd>
+          <dd className="mt-2 text-white">
+            {formatListingPrice(listing.price, listing.currency)}
+          </dd>
         </div>
         <div className="rounded-xl border border-white/10 bg-ink/70 p-4">
           <dt className="text-sm font-semibold uppercase tracking-wide text-slate-400">
             Port fees
           </dt>
-          <dd className="mt-2 text-white">{formatGold(portFee)}</dd>
+          <dd className="mt-2 text-white">
+            {portFee === null
+              ? "Agreed during negotiation"
+              : formatListingPrice(portFee, listing.currency)}
+          </dd>
         </div>
         <div className="rounded-xl border border-white/10 bg-ink/70 p-4">
           <dt className="text-sm font-semibold uppercase tracking-wide text-slate-400">
             Escrow reserve
           </dt>
-          <dd className="mt-2 text-white">{formatGold(escrowFee)}</dd>
+          <dd className="mt-2 text-white">
+            {escrowFee === null
+              ? "Agreed during negotiation"
+              : formatListingPrice(escrowFee, listing.currency)}
+          </dd>
         </div>
         <div className="rounded-xl border border-white/10 bg-ink/70 p-4">
           <dt className="text-sm font-semibold uppercase tracking-wide text-slate-400">
             Settlement total
           </dt>
-          <dd className="mt-2 text-white">{formatGold(settlementTotal)}</dd>
+          <dd className="mt-2 text-white">
+            {settlementTotal === null
+              ? "Recorded in the final exchange agreement"
+              : formatListingPrice(settlementTotal, listing.currency)}
+          </dd>
         </div>
       </dl>
 
@@ -327,8 +365,8 @@ function TradePresentation({ listing }: { listing: Listing }) {
           </h3>
           <p className="mt-2 text-slate-200">
             Listing is available from {listing.location}. Confirm cargo space,
-            sailing schedule, and inspection rights before fixing the final
-            price.
+            sailing schedule, and inspection rights before fixing{" "}
+            {hasNumericPrice ? "the final price" : "the final exchange terms"}.
           </p>
         </div>
         <aside className="rounded-xl border border-white/10 bg-ink/70 p-4">
@@ -452,7 +490,7 @@ export function ListingDetailPage() {
             Listing not found
           </h1>
           <p className="mt-3 max-w-2xl text-slate-300">
-            This listing is not in the current local marketplace session. It may
+            This listing is not available from the active repository. It may
             have been removed, or the link may be outdated.
           </p>
         </div>
@@ -515,7 +553,7 @@ export function ListingDetailPage() {
             {listing.title}
           </h1>
           <p className="mt-4 text-2xl font-semibold text-amber-glow">
-            {formatGold(listing.price)}
+            {formatListingPrice(listing.price, listing.currency)}
           </p>
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
             <div>
@@ -530,7 +568,23 @@ export function ListingDetailPage() {
               </dt>
               <dd className="mt-1 text-white">{listing.location}</dd>
             </div>
+            <div>
+              <dt className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+                Server
+              </dt>
+              <dd className="mt-1 text-white">{listing.server}</dd>
+            </div>
           </dl>
+          {listing.contactNote.trim() ? (
+            <div className="mt-6 border-t border-white/10 pt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+                Contact
+              </h2>
+              <p className="mt-2 leading-relaxed text-slate-200">
+                {listing.contactNote.trim()}
+              </p>
+            </div>
+          ) : null}
           <div className="mt-6 border-t border-white/10 pt-6">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
               Description

@@ -1,10 +1,7 @@
 import { Link } from "react-router-dom";
 
 import type { Listing } from "../../types/listing";
-
-const priceFormatter = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 0,
-});
+import { formatListingPrice } from "../../types/listing";
 
 export function ListingCard({ listing }: { listing: Listing }) {
   return (
@@ -30,7 +27,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
           </span>
         </div>
         <p className="text-xl font-semibold text-amber-glow">
-          {priceFormatter.format(listing.price)} {listing.currency}
+          {formatListingPrice(listing.price, listing.currency)}
         </p>
         <dl className="mt-auto grid gap-2 text-sm text-slate-300">
           <div className="flex items-center gap-2">

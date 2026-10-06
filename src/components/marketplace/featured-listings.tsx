@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import type { Listing } from "../../types/listing";
+import { formatListingPrice } from "../../types/listing";
 
 type FeaturedListingsProps = {
   listings: Listing[];
@@ -15,11 +16,6 @@ const categoryLabels: Record<Listing["category"], string> = {
   resources: "Resources",
   services: "Services",
 };
-
-const priceFormatter = new Intl.NumberFormat("en-US", {
-  style: "decimal",
-  maximumFractionDigits: 0,
-});
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -127,7 +123,7 @@ export function FeaturedListings({
                       <div className="flex items-center justify-between gap-3">
                         <dt className="text-slate-400">Price</dt>
                         <dd className="font-semibold text-amber-glow">
-                          {priceFormatter.format(listing.price)} gold
+                          {formatListingPrice(listing.price, listing.currency)}
                         </dd>
                       </div>
                       <div className="flex items-center justify-between gap-3">

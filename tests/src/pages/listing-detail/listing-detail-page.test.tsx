@@ -21,11 +21,13 @@ const knownListing: Listing = {
   title: "Adventurer Frigate",
   category: "ships",
   price: 48_000_000,
-  currency: "gold",
+  currency: "ducats",
   description:
     "A dependable adventure frigate with strong cargo capacity and ocean handling.",
   seller: "PortRoyalShipwright",
   location: "Port Royal",
+  server: "Maris",
+  contactNote: "Message through the harbor office.",
   imageEmoji: "🚢",
   createdAt: "2026-10-04T14:00:00Z",
 };
@@ -57,13 +59,19 @@ describe("listing detail page", () => {
       await screen.findByRole("heading", { name: "Adventurer Frigate" }),
     ).toBeInTheDocument();
     expect(repository.get).toHaveBeenCalledWith("adventurer-frigate");
-    expect(screen.getByText("48,000,000 gold")).toBeInTheDocument();
+    expect(screen.getByText("48,000,000 ducats")).toBeInTheDocument();
     expect(screen.getByText("Ships")).toBeInTheDocument();
     expect(screen.getByText(knownListing.description)).toBeInTheDocument();
     expect(screen.getAllByText("PortRoyalShipwright").length).toBeGreaterThan(
       0,
     );
     expect(screen.getAllByText("Port Royal").length).toBeGreaterThan(0);
+    expect(screen.getByText("Server")).toBeInTheDocument();
+    expect(screen.getByText("Maris")).toBeInTheDocument();
+    expect(screen.getByText("Contact")).toBeInTheDocument();
+    expect(
+      screen.getByText("Message through the harbor office."),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("img", { name: "Adventurer Frigate visual" }),
     ).toHaveTextContent("🚢");
@@ -104,7 +112,7 @@ describe("listing detail page", () => {
     ).toBeInTheDocument();
     expect(repository.get).toHaveBeenCalledWith("missing-listing");
     expect(
-      screen.getByText(/not in the current local marketplace session/i),
+      screen.getByText(/not available from the active repository/i),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Browse listings" }),
@@ -124,7 +132,7 @@ describe("listing detail page", () => {
       screen.getAllByText(/Legacy Ship Collection/).length,
     ).toBeGreaterThan(0);
     expect(
-      screen.getByText("44,160,000 gold – 56,640,000 gold"),
+      screen.getByText("44,160,000 ducats – 56,640,000 ducats"),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Provenance timeline" }),
@@ -155,7 +163,7 @@ describe("listing detail page", () => {
       screen.getByText("Seller-confirmed inventory · inspected"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Dock installation · 1,200,000 gold"),
+      screen.getByText("Dock installation · 1,200,000 ducats"),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Equipment pricing context" }),
@@ -170,9 +178,9 @@ describe("listing detail page", () => {
         name: "Trade valuation & negotiation",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("1,440,000 gold")).toBeInTheDocument();
-    expect(screen.getByText("480,000 gold")).toBeInTheDocument();
-    expect(screen.getByText("49,920,000 gold")).toBeInTheDocument();
+    expect(screen.getByText("1,440,000 ducats")).toBeInTheDocument();
+    expect(screen.getByText("480,000 ducats")).toBeInTheDocument();
+    expect(screen.getByText("49,920,000 ducats")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Trade readiness" }),
     ).toBeInTheDocument();
@@ -208,5 +216,58 @@ describe("listing detail page", () => {
         name: /Default overview\s*Core listing facts/,
       }),
     ).toHaveAttribute("aria-current", "page");
+  });
+
+  it("hides the contact section when the note is blank", async () => {
+    repository.get.mockResolvedValue({ ...knownListing, contactNote: "   " });
+    renderApp("/listings/adventurer-frigate");
+
+    await screen.findByRole("heading", { name: "Adventurer Frigate" });
+    expect(
+      screen.queryByRole("heading", { name: "Contact" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Message through the harbor office."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders null-price presentations without fake numeric valuations", async () => {
+    const tradeListing: Listing = {
+      ...knownListing,
+      id: "barter-cargo",
+      title: "Barter Cargo",
+      price: null,
+      currency: "trade",
+    };
+    repository.get.mockResolvedValue(tradeListing);
+
+    const expectations = [
+      {
+        variant: "legacy",
+        heading: "Heritage & provenance",
+        text: "Value established through direct negotiation",
+      },
+      {
+        variant: "equipment",
+        heading: "Component specifications",
+        text: "Agreed with the seller",
+      },
+      {
+        variant: "trade",
+        heading: "Trade valuation & negotiation",
+        text: "Recorded in the final exchange agreement",
+      },
+    ] as const;
+
+    for (const expected of expectations) {
+      renderApp(`/listings/barter-cargo?variant=${expected.variant}`);
+      expect(
+        await screen.findByRole("heading", { name: expected.heading }),
+      ).toBeInTheDocument();
+      expect(screen.getByText(expected.text)).toBeInTheDocument();
+      expect(screen.getAllByText("Trade").length).toBeGreaterThan(0);
+      expect(screen.queryAllByText(/^nan$/i)).toHaveLength(0);
+      cleanup();
+    }
   });
 });

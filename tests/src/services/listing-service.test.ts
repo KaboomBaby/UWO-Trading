@@ -24,20 +24,25 @@ const validInput: CreateListingInput = {
   title: "Trading Schooner",
   category: "ships",
   price: 32_000_000,
+  currency: "ducats",
   description: "A swift schooner suitable for regional trade routes.",
   seller: "AmsterdamShipyard",
   location: "Amsterdam",
+  server: "Maris",
+  contactNote: "Mail me at the Amsterdam dock.",
 };
 
 type ListingRow = {
   id: string;
   title: string;
   category: "ships";
-  price: number;
-  currency: "gold";
+  price: number | null;
+  currency: "ducats" | "UWC" | "CT" | "trade" | "negotiable";
   description: string;
   seller: string;
   location: string;
+  server: string;
+  contact_note: string;
   image_emoji: string | null;
   created_at: string;
   collection: "current" | "legacy" | null;
@@ -62,7 +67,10 @@ type CapturedRequest = {
 type QueryChain = {
   eq(column: string, value: unknown): QueryChain;
   or(filter: string): QueryChain;
-  order(column: string, options: { ascending: boolean }): QueryChain;
+  order(
+    column: string,
+    options: { ascending: boolean; nullsFirst?: boolean },
+  ): QueryChain;
   maybeSingle(): Promise<SupabaseResponse>;
   single(): Promise<SupabaseResponse>;
   then(
@@ -153,10 +161,12 @@ const dbListing: ListingRow = {
   title: "Supabase Frigate",
   category: "ships",
   price: 42_000_000,
-  currency: "gold",
+  currency: "ducats",
   description: "A fast database-backed trading vessel.",
   seller: "Postgres Harbor",
   location: "Amsterdam",
+  server: "Maris",
+  contact_note: "Mail me at the database harbor.",
   image_emoji: "🚢",
   created_at: "2026-10-01T12:00:00.000Z",
   collection: "legacy",
@@ -167,10 +177,12 @@ const expectedListing = {
   title: "Supabase Frigate",
   category: "ships",
   price: 42_000_000,
-  currency: "gold",
+  currency: "ducats",
   description: "A fast database-backed trading vessel.",
   seller: "Postgres Harbor",
   location: "Amsterdam",
+  server: "Maris",
+  contactNote: "Mail me at the database harbor.",
   imageEmoji: "🚢",
   createdAt: "2026-10-01T12:00:00.000Z",
   collection: "legacy",
@@ -192,7 +204,9 @@ describe("local listing repository", () => {
   it("sorts by ascending price", async () => {
     const repository = createLocalListingRepository();
     const listings = await repository.list({ sort: "price-asc" });
-    const prices = listings.map((listing) => listing.price);
+    const prices = listings
+      .map((listing) => listing.price)
+      .filter((price): price is number => price !== null);
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
   });
 
@@ -228,6 +242,40 @@ describe("local listing repository", () => {
     expect(await repository.get(created.id)).toMatchObject({
       title: "Trading Schooner",
       collection: "legacy",
+    });
+  });
+
+  it("creates a barter listing without a numeric price", async () => {
+    const repository = createLocalListingRepository([]);
+    const created = await repository.create({
+      ...validInput,
+      currency: "trade",
+      price: null,
+    });
+
+    expect(created).toMatchObject({
+      currency: "trade",
+      price: null,
+      server: "Maris",
+      contactNote: "Mail me at the Amsterdam dock.",
+    });
+  });
+
+  it("validates currency-specific prices", () => {
+    expect(
+      validateListingInput({ ...validInput, currency: "negotiable" }),
+    ).toMatchObject({
+      currency: "Trade and negotiable listings cannot set a numeric price.",
+    });
+
+    expect(
+      validateListingInput({
+        ...validInput,
+        currency: "CT",
+        price: 120.5,
+      }),
+    ).toMatchObject({
+      price: "Captain Tickets must be a whole number.",
     });
   });
 
@@ -292,7 +340,10 @@ describe("Supabase listing repository", () => {
             "title.ilike.%Fast Vessel%,description.ilike.%Fast Vessel%,seller.ilike.%Fast Vessel%,location.ilike.%Fast Vessel%",
         },
       ],
-      order: { column: "price", options: { ascending: false } },
+      order: {
+        column: "price",
+        options: { ascending: false, nullsFirst: false },
+      },
     });
   });
 
@@ -361,10 +412,12 @@ describe("Supabase listing repository", () => {
       title: validInput.title,
       category: validInput.category,
       price: validInput.price,
-      currency: "gold",
+      currency: "ducats",
       description: validInput.description,
       seller: validInput.seller,
       location: validInput.location,
+      server: validInput.server,
+      contact_note: validInput.contactNote,
       image_emoji: "📦",
       collection: "current",
     });

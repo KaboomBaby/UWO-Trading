@@ -25,10 +25,12 @@ function createListing(
   return {
     category: "ships",
     price: 1_250_000,
-    currency: "gold",
+    currency: "ducats",
     description: "A fast merchant ship with strong cargo capacity.",
     seller: "Captain Aurora",
     location: "Lisbon",
+    server: "Maris",
+    contactNote: "Contact in game.",
     imageEmoji: "⛵",
     createdAt: "2026-01-01T12:00:00.000Z",
     ...overrides,

@@ -10,10 +10,12 @@ const listing: Listing = {
   title: "Adventurer Frigate",
   category: "ships",
   price: 48_000_000,
-  currency: "gold",
+  currency: "ducats",
   description: "A dependable adventure frigate.",
   seller: "PortRoyalShipwright",
   location: "Port Royal",
+  server: "Maris",
+  contactNote: "",
   imageEmoji: "🚢",
   createdAt: "2026-10-04T14:00:00Z",
 };
@@ -32,7 +34,7 @@ describe("ListingCard", () => {
     expect(link).toHaveAttribute("href", "/listings/adventurer-frigate");
     expect(link).toHaveTextContent("Adventurer Frigate");
     expect(link).toHaveTextContent("ships");
-    expect(link).toHaveTextContent("48,000,000 gold");
+    expect(link).toHaveTextContent("48,000,000 ducats");
     expect(link).toHaveTextContent("PortRoyalShipwright");
     expect(link).toHaveTextContent("Port Royal");
     expect(link).toHaveTextContent("🚢");
@@ -46,5 +48,35 @@ describe("ListingCard", () => {
     );
 
     expect(screen.getByText("Legacy")).toBeInTheDocument();
+  });
+
+  it("formats every supported listing currency without inventing numeric prices", () => {
+    const cases = [
+      {
+        currency: "UWC" as const,
+        price: 1_250.5,
+        expected: "1,250.5 UWC",
+      },
+      { currency: "CT" as const, price: 7, expected: "7 CT" },
+      { currency: "trade" as const, price: null, expected: "Trade" },
+      {
+        currency: "negotiable" as const,
+        price: null,
+        expected: "Negotiable",
+      },
+    ];
+
+    for (const testCase of cases) {
+      cleanup();
+      render(
+        <MemoryRouter>
+          <ListingCard
+            listing={{ ...listing, ...testCase, price: testCase.price }}
+          />
+        </MemoryRouter>,
+      );
+      expect(screen.getByText(testCase.expected)).toBeInTheDocument();
+      expect(screen.queryByText(/nan/i)).not.toBeInTheDocument();
+    }
   });
 });

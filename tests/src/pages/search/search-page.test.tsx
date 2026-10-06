@@ -23,10 +23,12 @@ const listing: Listing = {
   title: "Adventurer Frigate",
   category: "ships",
   price: 48_000_000,
-  currency: "gold",
+  currency: "ducats",
   description: "A dependable adventure frigate.",
   seller: "PortRoyalShipwright",
   location: "Port Royal",
+  server: "Maris",
+  contactNote: "Contact in game.",
   imageEmoji: "🚢",
   createdAt: "2026-10-04T14:00:00Z",
 };

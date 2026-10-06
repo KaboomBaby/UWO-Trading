@@ -5,8 +5,10 @@ import type {
   Listing,
   ListingCategory,
   ListingCollection,
+  ListingCurrency,
   ListingQuery,
 } from "../types/listing";
+import { isNumericListingCurrency } from "../types/listing";
 
 export interface ListingRepository {
   list(query?: ListingQuery): Promise<Listing[]>;
@@ -34,16 +36,38 @@ function matchesQuery(listing: Listing, search?: string) {
     .includes(needle);
 }
 
+function comparePrices(
+  a: Listing["price"],
+  b: Listing["price"],
+  ascending: boolean,
+) {
+  if (a === null && b === null) return 0;
+  if (a === null) return 1;
+  if (b === null) return -1;
+  return ascending ? a - b : b - a;
+}
+
 export function validateListingInput(input: CreateListingInput) {
   const errors: Record<string, string> = {};
   if (input.title.trim().length < 3)
     errors.title = "Title must be at least 3 characters.";
-  if (!Number.isFinite(input.price) || input.price <= 0)
-    errors.price = "Price must be greater than zero.";
+  if (isNumericListingCurrency(input.currency)) {
+    if (input.price === null) {
+      errors.price = "Price is required for this currency.";
+    } else if (!Number.isFinite(input.price) || input.price <= 0) {
+      errors.price = "Price must be greater than zero.";
+    } else if (input.currency === "CT" && !Number.isInteger(input.price)) {
+      errors.price = "Captain Tickets must be a whole number.";
+    }
+  } else if (input.price !== null) {
+    errors.currency =
+      "Trade and negotiable listings cannot set a numeric price.";
+  }
   if (input.description.trim().length < 10)
     errors.description = "Description must be at least 10 characters.";
   if (!input.seller.trim()) errors.seller = "Seller is required.";
   if (!input.location.trim()) errors.location = "Location is required.";
+  if (!input.server.trim()) errors.server = "Server is required.";
   return errors;
 }
 
@@ -80,11 +104,13 @@ type ListingRow = {
   id: string;
   title: string;
   category: ListingCategory;
-  price: number;
-  currency: "gold";
+  price: number | null;
+  currency: ListingCurrency;
   description: string;
   seller: string;
   location: string;
+  server: string;
+  contact_note: string;
   image_emoji: string | null;
   created_at: string;
   collection: ListingCollection | null;
@@ -109,6 +135,8 @@ function mapListingRow(row: ListingRow): Listing {
     description: row.description,
     seller: row.seller,
     location: row.location,
+    server: row.server,
+    contactNote: row.contact_note,
     imageEmoji: row.image_emoji ?? "📦",
     createdAt: row.created_at,
     collection: row.collection ?? "current",
@@ -162,9 +190,15 @@ export function createSupabaseListingRepository(
       }
 
       if (query.sort === "price-asc") {
-        request = request.order("price", { ascending: true });
+        request = request.order("price", {
+          ascending: true,
+          nullsFirst: false,
+        });
       } else if (query.sort === "price-desc") {
-        request = request.order("price", { ascending: false });
+        request = request.order("price", {
+          ascending: false,
+          nullsFirst: false,
+        });
       } else {
         request = request.order("created_at", { ascending: false });
       }
@@ -197,10 +231,12 @@ export function createSupabaseListingRepository(
           title: input.title,
           category: input.category,
           price: input.price,
-          currency: "gold",
+          currency: input.currency,
           description: input.description,
           seller: input.seller,
           location: input.location,
+          server: input.server.trim(),
+          contact_note: input.contactNote?.trim() ?? "",
           image_emoji: input.imageEmoji ?? "📦",
           collection: input.collection ?? "current",
         })
@@ -231,9 +267,13 @@ export function createLocalListingRepository(
       );
 
       if (query.sort === "price-asc") {
-        results = [...results].sort((a, b) => a.price - b.price);
+        results = [...results].sort((a, b) =>
+          comparePrices(a.price, b.price, true),
+        );
       } else if (query.sort === "price-desc") {
-        results = [...results].sort((a, b) => b.price - a.price);
+        results = [...results].sort((a, b) =>
+          comparePrices(a.price, b.price, false),
+        );
       } else {
         results = [...results].sort((a, b) =>
           b.createdAt.localeCompare(a.createdAt),
@@ -260,8 +300,10 @@ export function createLocalListingRepository(
           typeof crypto !== "undefined" && "randomUUID" in crypto
             ? crypto.randomUUID()
             : `listing-${Date.now()}`,
-        currency: "gold",
+        currency: input.currency,
         imageEmoji: input.imageEmoji ?? "📦",
+        server: input.server.trim(),
+        contactNote: input.contactNote?.trim() ?? "",
         collection: input.collection ?? "current",
         createdAt: new Date().toISOString(),
       };
