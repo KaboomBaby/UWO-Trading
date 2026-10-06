@@ -2,8 +2,10 @@ import { createContext, useContext, useMemo } from "react";
 
 import {
   createLocalTradingRepository,
+  createSupabaseTradingRepository,
   type TradingRepository,
 } from "../services/trading-service";
+import { getSupabaseClient } from "./supabase-client";
 
 const TradingRepositoryContext = createContext<TradingRepository | null>(null);
 
@@ -12,7 +14,12 @@ export function TradingRepositoryProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const repository = useMemo(() => createLocalTradingRepository(), []);
+  const repository = useMemo(() => {
+    const client = getSupabaseClient();
+    return client
+      ? createSupabaseTradingRepository(client)
+      : createLocalTradingRepository();
+  }, []);
   return (
     <TradingRepositoryContext.Provider value={repository}>
       {children}

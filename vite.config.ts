@@ -7,6 +7,10 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
     css: true,
+    env: {
+      VITE_SUPABASE_URL: "",
+      VITE_SUPABASE_ANON_KEY: "",
+    },
     include: ["tests/src/**/*.{test,ts,tsx}"],
   },
 });

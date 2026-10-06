@@ -10,11 +10,13 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "verify:supabase": "bun scripts/verify-supabase-roundtrip.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "usage:refresh": "bun scripts/usage-status.mjs --fetch"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4"

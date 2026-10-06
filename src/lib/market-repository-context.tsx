@@ -2,8 +2,10 @@ import { createContext, useContext, useMemo } from "react";
 
 import {
   createLocalMarketRepository,
+  createSupabaseMarketRepository,
   type MarketRepository,
 } from "../services/market-service";
+import { getSupabaseClient } from "./supabase-client";
 
 const MarketRepositoryContext = createContext<MarketRepository | null>(null);
 
@@ -12,7 +14,12 @@ export function MarketRepositoryProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const repository = useMemo(() => createLocalMarketRepository(), []);
+  const repository = useMemo(() => {
+    const client = getSupabaseClient();
+    return client
+      ? createSupabaseMarketRepository(client)
+      : createLocalMarketRepository();
+  }, []);
   return (
     <MarketRepositoryContext.Provider value={repository}>
       {children}
