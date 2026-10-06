@@ -43,6 +43,7 @@ type ListingRow = {
   location: string;
   server: string;
   contact_note: string;
+  image_url: string | null;
   image_emoji: string | null;
   created_at: string;
   collection: "current" | "legacy" | null;
@@ -167,6 +168,7 @@ const dbListing: ListingRow = {
   location: "Amsterdam",
   server: "Maris",
   contact_note: "Mail me at the database harbor.",
+  image_url: null,
   image_emoji: "🚢",
   created_at: "2026-10-01T12:00:00.000Z",
   collection: "legacy",
@@ -183,6 +185,7 @@ const expectedListing = {
   location: "Amsterdam",
   server: "Maris",
   contactNote: "Mail me at the database harbor.",
+  imageUrl: null,
   imageEmoji: "🚢",
   createdAt: "2026-10-01T12:00:00.000Z",
   collection: "legacy",
@@ -389,9 +392,24 @@ describe("Supabase listing repository", () => {
     expect(await repository.get("missing")).toBeUndefined();
   });
 
-  it("validates before inserting, then maps the created row", async () => {
+  it("maps a stored public image URL", async () => {
     const mock = createMockSupabaseClient({
-      data: dbListing,
+      data: [{ ...dbListing, image_url: "https://example.test/frigate.png" }],
+      error: null,
+      status: 200,
+      statusText: "OK",
+    });
+    const repository = createSupabaseListingRepository(mock.client);
+
+    await expect(repository.list()).resolves.toMatchObject([
+      { imageUrl: "https://example.test/frigate.png" },
+    ]);
+  });
+
+  it("validates before inserting, then maps the created row", async () => {
+    const imageUrl = "https://example.test/schooner.webp";
+    const mock = createMockSupabaseClient({
+      data: { ...dbListing, image_url: imageUrl },
       error: null,
       status: 201,
       statusText: "Created",
@@ -403,9 +421,9 @@ describe("Supabase listing repository", () => {
     ).rejects.toBeInstanceOf(ListingValidationError);
     expect(mock.requests).toHaveLength(0);
 
-    await expect(repository.create(validInput)).resolves.toEqual(
-      expectedListing,
-    );
+    await expect(
+      repository.create({ ...validInput, imageUrl }),
+    ).resolves.toEqual({ ...expectedListing, imageUrl });
 
     expect(mock.requests).toHaveLength(1);
     expect(mock.requests[0]?.insert).toEqual({
@@ -418,6 +436,7 @@ describe("Supabase listing repository", () => {
       location: validInput.location,
       server: validInput.server,
       contact_note: validInput.contactNote,
+      image_url: imageUrl,
       image_emoji: "📦",
       collection: "current",
     });

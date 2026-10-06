@@ -69,6 +69,7 @@ export type Listing = {
   location: string;
   server: string;
   contactNote: string;
+  imageUrl?: string | null;
   imageEmoji: string;
   createdAt: string;
   collection?: ListingCollection;
@@ -84,6 +85,7 @@ export type CreateListingInput = {
   location: string;
   server: string;
   contactNote?: string;
+  imageUrl?: string;
   imageEmoji?: string;
   collection?: ListingCollection;
 };

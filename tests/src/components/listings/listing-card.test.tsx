@@ -40,6 +40,31 @@ describe("ListingCard", () => {
     expect(link).toHaveTextContent("🚢");
   });
 
+  it("renders a responsive image in place of the emoji when available", () => {
+    render(
+      <MemoryRouter>
+        <ListingCard
+          listing={{
+            ...listing,
+            imageUrl: "https://example.com/listings/frigate.png",
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    const image = screen.getByRole("img", {
+      name: "Adventurer Frigate listing image",
+    });
+    expect(image).toHaveAttribute(
+      "src",
+      "https://example.com/listings/frigate.png",
+    );
+    expect(image.className).toContain("h-36");
+    expect(image.className).toContain("w-full");
+    expect(image.className).toContain("object-cover");
+    expect(screen.queryByText("🚢")).not.toBeInTheDocument();
+  });
+
   it("marks legacy listings", () => {
     render(
       <MemoryRouter>

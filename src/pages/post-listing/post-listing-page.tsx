@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
+import {
+  LISTING_IMAGE_MIME_TYPES,
+  uploadListingImage,
+  validateListingImage,
+} from "../../lib/listing-images";
 import { useListingRepository } from "../../lib/listing-repository-context";
 import {
   LISTING_CATEGORIES,
@@ -21,6 +26,11 @@ type FormState = {
   server: string;
   contactNote: string;
   emoji: string;
+};
+
+type UploadedListingImage = {
+  fileName: string;
+  url: string;
 };
 
 const emptyForm: FormState = {
@@ -106,6 +116,12 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 const inputClassName =
   "mt-2 w-full rounded-lg border border-white/15 bg-ink px-3 py-2 text-white placeholder:text-slate-500 focus:border-amber-glow focus:outline-none focus:ring-2 focus:ring-amber-glow/30";
 
+function releaseListingImageUrl(image: UploadedListingImage | null) {
+  if (image?.url.startsWith("blob:")) {
+    URL.revokeObjectURL(image.url);
+  }
+}
+
 export function PostListingPage() {
   const repository = useListingRepository();
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -116,9 +132,17 @@ export function PostListingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdListing, setCreatedListing] = useState<Listing | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] =
+    useState<UploadedListingImage | null>(null);
+  const [uploadingFileName, setUploadingFileName] = useState<string | null>(
+    null,
+  );
+  const [imageError, setImageError] = useState<string | null>(null);
   const errorSummaryRef = useRef<HTMLParagraphElement | null>(null);
   const successHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const formHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const imageRequestRef = useRef(0);
   const shouldFocusFormRef = useRef(false);
   const errorCount = Object.values(errors).filter(Boolean).length;
   const numericCurrency =
@@ -166,6 +190,88 @@ export function PostListingPage() {
     }));
   }
 
+  async function handleListingImage(
+    file: File | undefined,
+    input: HTMLInputElement | null,
+  ) {
+    if (input) {
+      input.value = "";
+    }
+
+    if (!file) {
+      setImageError("Choose an image file to upload.");
+      return;
+    }
+
+    const validationError = validateListingImage(file);
+    if (validationError) {
+      setImageError(validationError);
+      return;
+    }
+
+    releaseListingImageUrl(uploadedImage);
+    setUploadedImage(null);
+    setImageError(null);
+    setUploadingFileName(file.name);
+
+    const requestId = imageRequestRef.current + 1;
+    imageRequestRef.current = requestId;
+
+    try {
+      const url = await uploadListingImage(file);
+      if (imageRequestRef.current !== requestId) return;
+
+      setUploadedImage({ fileName: file.name, url });
+      setImageError(null);
+    } catch (error) {
+      if (imageRequestRef.current !== requestId) return;
+
+      setImageError(
+        error instanceof Error
+          ? error.message
+          : "Unable to upload the listing image.",
+      );
+    } finally {
+      if (imageRequestRef.current === requestId) {
+        setUploadingFileName(null);
+      }
+    }
+  }
+
+  function removeListingImage() {
+    imageRequestRef.current += 1;
+    releaseListingImageUrl(uploadedImage);
+    setUploadedImage(null);
+    setUploadingFileName(null);
+    setImageError(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
+  }
+
+  function handleFormPaste(event: React.ClipboardEvent<HTMLFormElement>) {
+    const file = event.clipboardData?.files?.[0];
+    if (!file) return;
+
+    event.preventDefault();
+    void handleListingImage(file, imageInputRef.current);
+  }
+
+  function handleFormDragOver(event: React.DragEvent<HTMLFormElement>) {
+    if (!event.dataTransfer?.types?.includes("Files")) return;
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  }
+
+  function handleFormDrop(event: React.DragEvent<HTMLFormElement>) {
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+
+    event.preventDefault();
+    void handleListingImage(file, imageInputRef.current);
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSubmitting) return;
@@ -191,6 +297,7 @@ export function PostListingPage() {
         location: form.location.trim(),
         server: form.server.trim(),
         contactNote: form.contactNote.trim(),
+        ...(uploadedImage ? { imageUrl: uploadedImage.url } : {}),
         ...(emoji ? { imageEmoji: emoji } : {}),
       });
       setCreatedListing(listing);
@@ -211,6 +318,12 @@ export function PostListingPage() {
     setForm(emptyForm);
     setErrors({});
     setSubmitError(null);
+    setUploadedImage(null);
+    setUploadingFileName(null);
+    setImageError(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
   }
 
   if (createdListing) {
@@ -273,7 +386,15 @@ export function PostListingPage() {
           in-memory marketplace otherwise.
         </p>
 
-        <form className="mt-8 space-y-6" noValidate onSubmit={handleSubmit}>
+        <form
+          aria-label="Post listing form"
+          className="mt-8 space-y-6"
+          noValidate
+          onDragOver={handleFormDragOver}
+          onDrop={handleFormDrop}
+          onPaste={handleFormPaste}
+          onSubmit={handleSubmit}
+        >
           {errorCount > 0 ? (
             <p
               className="rounded-lg border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-100"
@@ -427,6 +548,83 @@ export function PostListingPage() {
             <FieldError id="description-error" message={errors.description} />
           </div>
 
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="listing-image"
+            >
+              Listing image{" "}
+              <span className="font-normal text-slate-400">(optional)</span>
+            </label>
+            <div className="mt-2 rounded-lg border border-dashed border-white/25 bg-ink/70 p-4">
+              <p className="text-sm text-slate-300" id="listing-image-hint">
+                Choose a PNG, JPEG, or WebP file up to 5 MB, drag it onto this
+                form, or paste it from your clipboard.
+              </p>
+              <input
+                accept={LISTING_IMAGE_MIME_TYPES.join(",")}
+                aria-describedby={
+                  imageError
+                    ? "listing-image-hint listing-image-error"
+                    : "listing-image-hint"
+                }
+                aria-invalid={Boolean(imageError)}
+                className={`${inputClassName} border-dashed bg-transparent`}
+                id="listing-image"
+                name="listing-image"
+                onChange={(event) =>
+                  void handleListingImage(
+                    event.target.files?.[0],
+                    event.currentTarget,
+                  )
+                }
+                ref={imageInputRef}
+                type="file"
+              />
+              {uploadingFileName ? (
+                <p className="mt-3 text-sm text-amber-glow" role="status">
+                  Uploading {uploadingFileName}…
+                </p>
+              ) : null}
+              {imageError ? (
+                <p
+                  className="mt-3 text-sm text-red-200"
+                  id="listing-image-error"
+                  role="alert"
+                >
+                  {imageError}
+                </p>
+              ) : null}
+              {uploadedImage ? (
+                <figure className="mt-4 flex flex-wrap items-center gap-4">
+                  <img
+                    alt={`Selected listing image for ${form.title.trim() || "a new listing"}: ${uploadedImage.fileName}`}
+                    className="h-24 w-full max-w-36 rounded-lg border border-white/15 object-cover"
+                    src={uploadedImage.url}
+                  />
+                  <figcaption className="text-sm text-slate-300">
+                    {uploadedImage.fileName}
+                  </figcaption>
+                  <button
+                    className="rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                    onClick={removeListingImage}
+                    type="button"
+                  >
+                    Remove image
+                  </button>
+                </figure>
+              ) : uploadingFileName ? (
+                <button
+                  className="mt-3 rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                  onClick={removeListingImage}
+                  type="button"
+                >
+                  Remove image
+                </button>
+              ) : null}
+            </div>
+          </div>
+
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
               <label
@@ -551,10 +749,14 @@ export function PostListingPage() {
           <div className="flex flex-wrap items-center gap-4">
             <button
               className="rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={isSubmitting}
+              disabled={isSubmitting || uploadingFileName !== null}
               type="submit"
             >
-              {isSubmitting ? "Posting…" : "Publish listing"}
+              {isSubmitting
+                ? "Posting…"
+                : uploadingFileName
+                  ? "Uploading image…"
+                  : "Publish listing"}
             </button>
             <Link
               className="text-sm font-semibold text-slate-300 transition hover:text-white"
