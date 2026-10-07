@@ -5,7 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "../../../../src/app";
 import type { Listing, Offer } from "../../../../src/types/listing";
-import { testShipDetails } from "../../fixtures/ship-details";
+import {
+  testShipDetails,
+  testShipDetailsWithSkills,
+} from "../../fixtures/ship-details";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -281,6 +284,26 @@ describe("manage listings page", () => {
     expect(
       screen.queryByRole("button", { name: /Accept offer from Harbor Trader/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows selected ship skills with their game icons and Original marker", async () => {
+    const user = userEvent.setup();
+    repository.findByEditCode.mockResolvedValueOnce({
+      ...expiredListing,
+      shipDetails: testShipDetailsWithSkills,
+    });
+    renderManagePage();
+    await user.type(screen.getByLabelText("Edit code"), editCode);
+    await user.click(screen.getByRole("button", { name: "Find listing" }));
+
+    expect(
+      (await screen.findAllByText("Enhance Ship Handling")).length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText("Emergency Acceleration").length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Original").length).toBeGreaterThanOrEqual(1);
+    expect(document.querySelectorAll("img").length).toBeGreaterThanOrEqual(6);
   });
 
   it("shows accessible offer loading and load-error states, then refreshes offers", async () => {

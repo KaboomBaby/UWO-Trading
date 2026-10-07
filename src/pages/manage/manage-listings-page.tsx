@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useListingRepository } from "../../lib/listing-repository-context";
 import { isExpiredAt, useCurrentTime } from "../../lib/use-current-time";
+import { shipSkillIconUrl } from "../../data/ship-skills";
 import {
   ShipDetailsForm,
   emptyShipForm,
@@ -21,6 +22,7 @@ import {
   type ListingCollection,
   type ListingCurrency,
   type Offer,
+  type ShipDetails,
   type UpdateListingInput,
 } from "../../types/listing";
 
@@ -176,6 +178,56 @@ function formatListingDate(value: string) {
         month: "long",
         year: "numeric",
       }).format(date);
+}
+
+function ShipSkillsSummary({
+  shipDetails,
+}: {
+  shipDetails: ShipDetails | null | undefined;
+}) {
+  if (!shipDetails) return null;
+
+  const skills = [
+    ...(shipDetails.originalSkill
+      ? [{ ...shipDetails.originalSkill, isOriginal: true }]
+      : []),
+    ...shipDetails.optionalSkills.map((skill) => ({
+      ...skill,
+      isOriginal: false,
+    })),
+  ];
+
+  return (
+    <div className="mt-4 border-t border-white/10 pt-4">
+      <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+        Ship skills
+      </h4>
+      {skills.length === 0 ? (
+        <p className="mt-2 text-sm text-slate-300">No ship skills selected.</p>
+      ) : (
+        <ul className="mt-3 flex flex-wrap gap-3">
+          {skills.map((skill) => (
+            <li
+              className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
+              key={`${skill.isOriginal ? "original" : "optional"}-${skill.iconId}`}
+            >
+              <img
+                alt=""
+                className="h-8 w-8 rounded border border-white/15 bg-black/30 object-contain"
+                src={shipSkillIconUrl(skill.iconId)}
+              />
+              <div>
+                <p className="text-sm font-medium text-white">{skill.name}</p>
+                <p className="text-xs uppercase tracking-wide text-amber-glow">
+                  {skill.isOriginal ? "Original" : "Optional"}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
 
 function formatOfferStatus(status: Offer["status"]) {
@@ -640,6 +692,7 @@ export function ManageListingsPage() {
                   </dd>
                 </div>
               </dl>
+              <ShipSkillsSummary shipDetails={listing.shipDetails} />
             </section>
 
             <section

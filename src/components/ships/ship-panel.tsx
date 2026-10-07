@@ -1,4 +1,5 @@
 import type { ShipDetails } from "../../types/listing";
+import { shipSkillIconUrl } from "../../data/ship-skills";
 import {
   ShipStatIcon,
   ShipTypeIcon,
@@ -23,6 +24,32 @@ function StatCell({
       </div>
       <p className="mt-2 text-lg font-semibold text-white">{value}</p>
     </div>
+  );
+}
+
+function SkillBadge({
+  isOriginal,
+  name,
+  iconId,
+}: {
+  isOriginal?: boolean;
+  name: string;
+  iconId: string;
+}) {
+  return (
+    <li className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+      <img
+        alt=""
+        className="h-10 w-10 rounded-md border border-white/15 bg-black/30 object-contain"
+        src={shipSkillIconUrl(iconId)}
+      />
+      <div>
+        <p className="font-semibold text-white">{name}</p>
+        <p className="text-xs uppercase tracking-wide text-amber-glow">
+          {isOriginal ? "Original" : "Optional"}
+        </p>
+      </div>
+    </li>
   );
 }
 
@@ -138,6 +165,34 @@ export function ShipPanel({ details }: { details: ShipDetails }) {
             value={details.sailingRequirements.battleLevel}
           />
         </div>
+      </section>
+
+      <section aria-label="Ship skills" className="mt-5">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-amber-glow">
+          Ship skills
+        </h3>
+        {details.originalSkill || details.optionalSkills.length > 0 ? (
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+            {details.originalSkill ? (
+              <SkillBadge
+                iconId={details.originalSkill.iconId}
+                isOriginal
+                name={details.originalSkill.name}
+              />
+            ) : null}
+            {details.optionalSkills.map((skill) => (
+              <SkillBadge
+                iconId={skill.iconId}
+                key={skill.iconId}
+                name={skill.name}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-slate-300">
+            No ship skills selected.
+          </p>
+        )}
       </section>
 
       <dl className="mt-5 grid gap-3 border-t border-white/10 pt-4 text-sm sm:grid-cols-2">

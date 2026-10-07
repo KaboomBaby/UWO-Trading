@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "../../../../src/app";
 import type { CreatedListing } from "../../../../src/types/listing";
 import { testShipDetails } from "../../fixtures/ship-details";
+import { OPTIONAL_SHIP_SKILLS } from "../../../../src/data/ship-skills";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -225,6 +226,90 @@ describe("post listing page", () => {
 
     expect(screen.getByText("Grade is required.")).toBeInTheDocument();
     expect(repository.create).not.toHaveBeenCalled();
+  });
+
+  it("offers one Original slot, five Optional slots, and round-trips chosen skills", async () => {
+    const user = userEvent.setup();
+    renderPostPage();
+    await fillValidForm(user);
+
+    expect(screen.getByLabelText("Original skill")).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/^Optional skill \d$/)).toHaveLength(5);
+
+    await user.click(screen.getByRole("combobox", { name: "Original skill" }));
+    const originalList = screen.getByRole("listbox", {
+      name: "Original skill",
+    });
+    await user.click(
+      within(originalList).getByRole("button", {
+        name: /Enhance Ship Handling/,
+      }),
+    );
+
+    const optionalSkill = OPTIONAL_SHIP_SKILLS[1];
+    if (!optionalSkill) throw new Error("Optional fixture skill is missing");
+    await user.click(
+      screen.getByRole("combobox", { name: "Optional skill 1" }),
+    );
+    const optionalList = screen.getByRole("listbox", {
+      name: "Optional skill 1",
+    });
+    await user.click(
+      within(optionalList).getByRole("button", {
+        name: optionalSkill.name,
+      }),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(repository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        shipDetails: {
+          ...testShipDetails,
+          originalSkill: {
+            name: "Enhance Ship Handling",
+            iconId: "00002000",
+          },
+          optionalSkills: [
+            { name: optionalSkill.name, iconId: optionalSkill.iconId },
+          ],
+        },
+      }),
+    );
+  });
+
+  it("blocks a skill already chosen in another slot", async () => {
+    const user = userEvent.setup();
+    renderPostPage();
+    await fillValidForm(user);
+
+    await user.click(screen.getByRole("combobox", { name: "Original skill" }));
+    const originalList = screen.getByRole("listbox", {
+      name: "Original skill",
+    });
+    await user.click(
+      within(originalList).getByRole("button", {
+        name: /Enhance Ship Handling/,
+      }),
+    );
+
+    await user.click(
+      screen.getByRole("combobox", { name: "Optional skill 1" }),
+    );
+    await user.type(
+      screen.getByRole("combobox", { name: "Optional skill 1" }),
+      "Enhance Ship Handling",
+    );
+    const optionalList = screen.getByRole("listbox", {
+      name: "Optional skill 1",
+    });
+
+    expect(
+      within(optionalList).getByRole("button", {
+        name: /Enhance Ship Handling/,
+      }),
+    ).toBeDisabled();
   });
 
   it("creates a valid listing with the full repository input", async () => {

@@ -1,4 +1,8 @@
 import { mockListings } from "../data/mock-listings";
+import {
+  OPTIONAL_SHIP_SKILLS,
+  ORIGINAL_SHIP_SKILLS,
+} from "../data/ship-skills";
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import type {
   CreateOfferInput,
@@ -165,6 +169,21 @@ function validateShipDetails(
     errors.shipDetails = "Ship skills need both a name and icon ID.";
     return;
   }
+  const optionalIconIds = new Set(
+    OPTIONAL_SHIP_SKILLS.map((skill) => skill.iconId),
+  );
+  const originalIconIds = new Set(
+    ORIGINAL_SHIP_SKILLS.map((skill) => skill.iconId),
+  );
+  if (
+    (details.originalSkill &&
+      !originalIconIds.has(details.originalSkill.iconId)) ||
+    optionalSkills.some((skill) => !optionalIconIds.has(skill.iconId))
+  ) {
+    errors.shipDetails = "Ship skills must come from their matching game list.";
+    return;
+  }
+
   const iconIds = new Set<string>();
   for (const skill of skills) {
     if (iconIds.has(skill.iconId)) {

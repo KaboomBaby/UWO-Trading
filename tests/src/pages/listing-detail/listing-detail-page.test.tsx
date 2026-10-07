@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ListingRepositoryProvider } from "../../../../src/lib/listing-repository-context";
 import { ListingDetailPage } from "../../../../src/pages/listing-detail/listing-detail-page";
 import type { Listing } from "../../../../src/types/listing";
-import { testShipDetails } from "../../fixtures/ship-details";
+import { testShipDetailsWithSkills } from "../../fixtures/ship-details";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -167,7 +167,7 @@ describe("listing detail page", () => {
   it("renders the complete game-style ship specification panel", async () => {
     repository.get.mockResolvedValueOnce({
       ...knownListing,
-      shipDetails: testShipDetails,
+      shipDetails: testShipDetailsWithSkills,
     });
     renderApp("/listings/adventurer-frigate");
 
@@ -189,6 +189,9 @@ describe("listing detail page", () => {
     expect(screen.getByText("Req. building days")).toBeInTheDocument();
     expect(screen.getByText("28")).toBeInTheDocument();
     expect(screen.getByText("Large Flush Deck Style Hull")).toBeInTheDocument();
+    expect(screen.getByText("Enhance Ship Handling")).toBeInTheDocument();
+    expect(screen.getByText("Emergency Acceleration")).toBeInTheDocument();
+    expect(screen.getAllByText("Original").length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows an expired notice while retaining the listing", async () => {

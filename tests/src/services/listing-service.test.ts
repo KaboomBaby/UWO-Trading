@@ -19,6 +19,7 @@ import type {
   ShipDetails,
 } from "../../../src/types/listing";
 import { testShipDetails } from "../fixtures/ship-details";
+import { OPTIONAL_SHIP_SKILLS } from "../../../src/data/ship-skills";
 
 vi.mock("../../../src/lib/supabase-client", () => ({
   getSupabaseClient: vi.fn(),
@@ -326,6 +327,42 @@ describe("local listing repository", () => {
       validateListingInput({ ...validInput, category: "equipment" })
         .shipDetails,
     ).toBe("Ship details are only allowed for Ships listings.");
+  });
+
+  it("enforces ship skill list membership, limits, and duplicate rules", () => {
+    const tooManyOptional = OPTIONAL_SHIP_SKILLS.slice(0, 6);
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: {
+          ...testShipDetails,
+          optionalSkills: tooManyOptional,
+        },
+      }).shipDetails,
+    ).toBe("Choose at most five Optional ship skills.");
+
+    const duplicatedSkill = OPTIONAL_SHIP_SKILLS[0];
+    if (!duplicatedSkill) throw new Error("Optional fixture skill is missing");
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: {
+          ...testShipDetails,
+          originalSkill: duplicatedSkill,
+          optionalSkills: [duplicatedSkill],
+        },
+      }).shipDetails,
+    ).toBe("Choose each ship skill only once.");
+
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: {
+          ...testShipDetails,
+          optionalSkills: [{ name: "Not a game skill", iconId: "99999999" }],
+        },
+      }).shipDetails,
+    ).toBe("Ship skills must come from their matching game list.");
   });
 
   it("validates that improvements are nonnegative whole numbers", () => {

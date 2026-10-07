@@ -5,6 +5,13 @@ import {
   type ShipDetails,
   type ShipType,
 } from "../../types/listing";
+import {
+  OPTIONAL_SHIP_SKILLS,
+  ORIGINAL_SHIP_SKILLS,
+  getOptionalShipSkill,
+  getOriginalShipSkill,
+} from "../../data/ship-skills";
+import { ShipSkillPicker } from "./ship-skill-picker";
 import { ShipStatIcon, ShipTypeIcon, formatShipType } from "./ship-visuals";
 
 export type ShipFormState = {
@@ -152,6 +159,13 @@ export function validateShipForm(form: ShipFormState): ShipFormErrors {
   if (!form.requiredHull.trim()) {
     errors.requiredHull = "Required ship hull is required.";
   }
+  const selectedSkills = [form.originalSkill, ...form.optionalSkills].filter(
+    Boolean,
+  );
+  if (new Set(selectedSkills).size !== selectedSkills.length) {
+    errors.optionalSkills = "Choose each ship skill only once.";
+  }
+
   for (const { field, label } of numberRequirements) {
     const value = Number(form[field].trim());
     if (!form[field].trim()) {
@@ -192,8 +206,21 @@ export function shipDetailsFromForm(form: ShipFormState): ShipDetails {
     },
     buildingDays: Number(form.buildingDays),
     requiredHull: form.requiredHull.trim(),
-    originalSkill: null,
-    optionalSkills: [],
+    originalSkill: (() => {
+      const skill = form.originalSkill
+        ? getOriginalShipSkill(form.originalSkill)
+        : undefined;
+      return skill ? { name: skill.name, iconId: skill.iconId } : null;
+    })(),
+    optionalSkills: form.optionalSkills
+      .filter(Boolean)
+      .map((iconId) => {
+        const skill = getOptionalShipSkill(iconId);
+        return skill ? { name: skill.name, iconId: skill.iconId } : null;
+      })
+      .filter(
+        (skill): skill is { name: string; iconId: string } => skill !== null,
+      ),
   };
 }
 
@@ -244,6 +271,23 @@ export function ShipDetailsForm({
   errors: ShipFormErrors;
   onChange: ShipFormChange;
 }) {
+  const originalSkill = form.originalSkill
+    ? getOriginalShipSkill(form.originalSkill)
+    : undefined;
+  const selectedOptionalSkills = form.optionalSkills.map((iconId) =>
+    iconId ? getOptionalShipSkill(iconId) : undefined,
+  );
+  const allSelectedIconIds = [
+    form.originalSkill,
+    ...form.optionalSkills,
+  ].filter(Boolean);
+
+  function updateOptionalSkill(index: number, iconId: string) {
+    const nextSkills = [...form.optionalSkills];
+    nextSkills[index] = iconId;
+    onChange("optionalSkills", nextSkills);
+  }
+
   return (
     <section
       aria-label="Ship specifications"
@@ -488,6 +532,49 @@ export function ShipDetailsForm({
             onChange={onChange}
           />
         </div>
+      </fieldset>
+
+      <fieldset className="mt-6">
+        <legend className="text-sm font-semibold uppercase tracking-wide text-amber-glow">
+          Ship skills
+        </legend>
+        <p className="mt-2 text-sm text-slate-400">
+          Skills are optional. Choose at most one Original and five Optional
+          skills.
+        </p>
+        <div className="mt-3 grid gap-4 lg:grid-cols-2">
+          <ShipSkillPicker
+            disabledIconIds={allSelectedIconIds.filter(
+              (iconId) => iconId !== form.originalSkill,
+            )}
+            id="original-skill"
+            label="Original skill"
+            onChange={(iconId) => onChange("originalSkill", iconId)}
+            selectedSkill={originalSkill}
+            skills={ORIGINAL_SHIP_SKILLS}
+          />
+          {form.optionalSkills.map((selectedIconId, index) => {
+            const selectedSkill = selectedOptionalSkills[index];
+            return (
+              <ShipSkillPicker
+                disabledIconIds={allSelectedIconIds.filter(
+                  (iconId) => iconId !== selectedIconId,
+                )}
+                id={`optional-skill-${index + 1}`}
+                key={index}
+                label={`Optional skill ${index + 1}`}
+                onChange={(iconId) => updateOptionalSkill(index, iconId)}
+                selectedSkill={selectedSkill}
+                skills={OPTIONAL_SHIP_SKILLS}
+              />
+            );
+          })}
+        </div>
+        {errors.optionalSkills ? (
+          <p className="mt-2 text-sm text-red-200" role="alert">
+            {errors.optionalSkills}
+          </p>
+        ) : null}
       </fieldset>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)]">

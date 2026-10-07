@@ -1,4 +1,8 @@
 import type { ShipDetails } from "../../../src/types/listing";
+import {
+  OPTIONAL_SHIP_SKILLS,
+  ORIGINAL_SHIP_SKILLS,
+} from "../../../src/data/ship-skills";
 
 export const testShipDetails: ShipDetails = {
   type: "trade",
@@ -30,4 +34,10 @@ export const testShipDetails: ShipDetails = {
   requiredHull: "Large Flush Deck Style Hull",
   originalSkill: null,
   optionalSkills: [],
+};
+
+export const testShipDetailsWithSkills: ShipDetails = {
+  ...testShipDetails,
+  originalSkill: ORIGINAL_SHIP_SKILLS[0],
+  optionalSkills: OPTIONAL_SHIP_SKILLS.slice(1, 6),
 };
