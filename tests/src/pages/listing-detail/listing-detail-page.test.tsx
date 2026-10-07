@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ListingRepositoryProvider } from "../../../../src/lib/listing-repository-context";
 import { ListingDetailPage } from "../../../../src/pages/listing-detail/listing-detail-page";
 import type { Listing } from "../../../../src/types/listing";
+import { testShipDetails } from "../../fixtures/ship-details";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -161,6 +162,33 @@ describe("listing detail page", () => {
     expect(
       screen.getByRole("link", { name: "Post your own listing" }),
     ).toBeInTheDocument();
+  });
+
+  it("renders the complete game-style ship specification panel", async () => {
+    repository.get.mockResolvedValueOnce({
+      ...knownListing,
+      shipDetails: testShipDetails,
+    });
+    renderApp("/listings/adventurer-frigate");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Adventurer Frigate (Heavy)",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Grade 7 (High Speed Cargo Ship)"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Vertical sail")).toBeInTheDocument();
+    expect(screen.getAllByText("180").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Horizontal sail")).toBeInTheDocument();
+    expect(screen.getByText("420")).toBeInTheDocument();
+    expect(screen.getByText("28 / 5")).toBeInTheDocument();
+    expect(screen.getByText("Sailors required")).toBeInTheDocument();
+    expect(screen.getByText("45")).toBeInTheDocument();
+    expect(screen.getByText("Req. building days")).toBeInTheDocument();
+    expect(screen.getByText("28")).toBeInTheDocument();
+    expect(screen.getByText("Large Flush Deck Style Hull")).toBeInTheDocument();
   });
 
   it("shows an expired notice while retaining the listing", async () => {

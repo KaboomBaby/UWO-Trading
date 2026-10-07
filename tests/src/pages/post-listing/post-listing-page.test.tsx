@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "../../../../src/app";
 import type { CreatedListing } from "../../../../src/types/listing";
+import { testShipDetails } from "../../fixtures/ship-details";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -32,6 +33,7 @@ const createdListing: CreatedListing = {
   server: "Maris",
   contactNote: "In-game mail preferred.",
   imageEmoji: "🚢",
+  shipDetails: testShipDetails,
   createdAt: "2026-10-05T00:00:00Z",
   expiresAt: "2026-10-19T00:00:00Z",
   editCode: "UWO-EDIT-7F2K",
@@ -63,8 +65,38 @@ async function fillCommonFields(user: ReturnType<typeof userEvent.setup>) {
 
 async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await fillCommonFields(user);
+  await fillShipSpecifications(user);
   await user.selectOptions(screen.getByLabelText("Currency"), "ducats");
   await user.type(screen.getByLabelText("Price (Ducats)"), "32000000");
+}
+
+async function fillShipSpecifications(
+  user: ReturnType<typeof userEvent.setup>,
+) {
+  await user.selectOptions(screen.getByLabelText("Ship type"), "trade");
+  await user.selectOptions(screen.getByLabelText("Ship class"), "heavy");
+  await user.type(screen.getByLabelText("Grade"), "7");
+  await user.type(screen.getByLabelText("Ship role"), "High Speed Cargo Ship");
+  await user.type(screen.getByLabelText("Vertical sail"), "180");
+  await user.type(screen.getByLabelText("Horizontal sail"), "420");
+  await user.type(screen.getByLabelText("Row power"), "40");
+  await user.type(screen.getByLabelText("Turn speed"), "18");
+  await user.type(screen.getByLabelText("Wave resistance"), "72");
+  await user.type(screen.getByLabelText("Armour"), "96");
+  await user.type(screen.getByLabelText("Improvements"), "28");
+  await user.type(screen.getByLabelText("Durability"), "500");
+  await user.type(screen.getByLabelText("Crew capacity"), "180");
+  await user.type(screen.getByLabelText("Cannon capacity"), "120");
+  await user.type(screen.getByLabelText("Cargo capacity"), "950");
+  await user.type(screen.getByLabelText("Sailors required"), "45");
+  await user.type(screen.getByLabelText("Adventure Lv"), "42");
+  await user.type(screen.getByLabelText("Trade Lv"), "61");
+  await user.type(screen.getByLabelText("Battle Lv"), "27");
+  await user.type(screen.getByLabelText("Req. building days"), "28");
+  await user.type(
+    screen.getByLabelText("Required ship hull"),
+    "Large Flush Deck Style Hull",
+  );
 }
 
 describe("post listing page", () => {
@@ -165,6 +197,36 @@ describe("post listing page", () => {
     expect(repository.create).not.toHaveBeenCalled();
   });
 
+  it("shows the game-style ship specification panel only for Ships", async () => {
+    const user = userEvent.setup();
+    renderPostPage();
+
+    await user.selectOptions(screen.getByLabelText("Category"), "property");
+    expect(screen.queryByLabelText("Ship type")).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Sailing requirements"),
+    ).not.toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("Category"), "ships");
+    expect(screen.getByLabelText("Ship type")).toBeInTheDocument();
+    expect(screen.getByLabelText("Ship class")).toBeInTheDocument();
+    expect(screen.getByLabelText("Sailors required")).toBeInTheDocument();
+    expect(screen.getByLabelText("Req. building days")).toBeInTheDocument();
+    expect(screen.getByLabelText("Required ship hull")).toBeInTheDocument();
+  });
+
+  it("requires complete ship specifications before creating a Ships listing", async () => {
+    const user = userEvent.setup();
+    renderPostPage();
+    await fillValidForm(user);
+    await user.clear(screen.getByLabelText("Grade"));
+
+    await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    expect(screen.getByText("Grade is required.")).toBeInTheDocument();
+    expect(repository.create).not.toHaveBeenCalled();
+  });
+
   it("creates a valid listing with the full repository input", async () => {
     const user = userEvent.setup();
     renderPostPage();
@@ -189,12 +251,15 @@ describe("post listing page", () => {
       location: "Amsterdam",
       server: "Maris",
       contactNote: "In-game mail preferred.",
+      shipDetails: testShipDetails,
     });
 
     await user.click(screen.getByRole("link", { name: "View posted listing" }));
     expect(repository.get).toHaveBeenCalledWith("new-trading-schooner");
     expect(
-      await screen.findByRole("heading", { name: "Trading Schooner" }),
+      await screen.findByRole("heading", {
+        name: /Trading Schooner \(Heavy\)/,
+      }),
     ).toBeInTheDocument();
   });
 
@@ -271,9 +336,8 @@ describe("post listing page", () => {
   it("hides the price field and sends null for trade listings", async () => {
     const user = userEvent.setup();
     renderPostPage();
-    await fillCommonFields(user);
+    await fillValidForm(user);
     await user.selectOptions(screen.getByLabelText("Currency"), "ducats");
-    await user.type(screen.getByLabelText("Price (Ducats)"), "32000000");
     await user.selectOptions(
       screen.getByLabelText("Currency"),
       "Trade / Barter",

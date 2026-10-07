@@ -14,7 +14,11 @@ import {
   useListingRepository,
 } from "../../../src/lib/listing-repository-context";
 import { getSupabaseClient } from "../../../src/lib/supabase-client";
-import type { CreateListingInput } from "../../../src/types/listing";
+import type {
+  CreateListingInput,
+  ShipDetails,
+} from "../../../src/types/listing";
+import { testShipDetails } from "../fixtures/ship-details";
 
 vi.mock("../../../src/lib/supabase-client", () => ({
   getSupabaseClient: vi.fn(),
@@ -30,6 +34,7 @@ const validInput: CreateListingInput = {
   location: "Amsterdam",
   server: "Maris",
   contactNote: "Mail me at the Amsterdam dock.",
+  shipDetails: testShipDetails,
 };
 
 type ListingRow = {
@@ -44,6 +49,7 @@ type ListingRow = {
   server: string;
   contact_note: string;
   image_emoji: string | null;
+  ship_details: ShipDetails | null;
   created_at: string;
   expires_at: string;
   sold_at: string | null;
@@ -207,6 +213,7 @@ const dbListing: ListingRow = {
   server: "Maris",
   contact_note: "Mail me at the database harbor.",
   image_emoji: "🚢",
+  ship_details: testShipDetails,
   created_at: "2026-10-01T12:00:00.000Z",
   expires_at: "2026-10-15T12:00:00Z",
   sold_at: null,
@@ -225,6 +232,7 @@ const expectedListing = {
   server: "Maris",
   contactNote: "Mail me at the database harbor.",
   imageEmoji: "🚢",
+  shipDetails: testShipDetails,
   createdAt: "2026-10-01T12:00:00.000Z",
   expiresAt: "2026-10-15T12:00:00Z",
   soldAt: null,
@@ -289,6 +297,7 @@ describe("local listing repository", () => {
     expect(await repository.get(created.id)).toMatchObject({
       title: "Trading Schooner",
       collection: "legacy",
+      shipDetails: testShipDetails,
     });
   });
 
@@ -308,6 +317,26 @@ describe("local listing repository", () => {
     });
   });
 
+  it("rejects ship listings without details and non-ship listings with them", () => {
+    expect(
+      validateListingInput({ ...validInput, shipDetails: null }).shipDetails,
+    ).toBe("Ship details are required for Ships listings.");
+
+    expect(
+      validateListingInput({ ...validInput, category: "equipment" })
+        .shipDetails,
+    ).toBe("Ship details are only allowed for Ships listings.");
+  });
+
+  it("validates that improvements are nonnegative whole numbers", () => {
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: { ...testShipDetails, improvements: -1 },
+      }).shipDetails,
+    ).toBe("Ship improvements must be a whole number of zero or more.");
+  });
+
   it("manages a local listing through its private edit code", async () => {
     const repository = createLocalListingRepository([]);
     const created = await repository.create(validInput);
@@ -323,6 +352,7 @@ describe("local listing repository", () => {
       title: "Updated Schooner",
     });
     expect(updated.title).toBe("Updated Schooner");
+    expect(updated.shipDetails).toEqual(testShipDetails);
 
     const sold = await repository.markSold(created.editCode);
     expect(sold.soldAt).toEqual(expect.any(String));
@@ -538,6 +568,7 @@ describe("Supabase listing repository", () => {
         server_name: validInput.server,
         contact_note: validInput.contactNote,
         image_emoji: "📦",
+        ship_details: testShipDetails,
         collection: "current",
       },
     });
@@ -593,6 +624,7 @@ describe("Supabase listing repository", () => {
       location: validInput.location,
       server_name: validInput.server,
       contact_note: validInput.contactNote,
+      ship_details: testShipDetails,
     });
   });
 

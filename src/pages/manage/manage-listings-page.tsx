@@ -3,6 +3,15 @@ import { useEffect, useRef, useState } from "react";
 import { useListingRepository } from "../../lib/listing-repository-context";
 import { isExpiredAt, useCurrentTime } from "../../lib/use-current-time";
 import {
+  ShipDetailsForm,
+  emptyShipForm,
+  shipDetailsFromForm,
+  shipFormFromDetails,
+  validateShipForm,
+  type ShipFormErrors,
+  type ShipFormState,
+} from "../../components/ships/ship-details-form";
+import {
   LISTING_CATEGORIES,
   LISTING_CURRENCIES,
   formatListingPrice,
@@ -27,7 +36,11 @@ type FormState = {
   contactNote: string;
   emoji: string;
   collection: ListingCollection;
+  ship: ShipFormState;
 };
+
+type ManageFormErrors = Partial<Record<keyof FormState, string>> &
+  ShipFormErrors;
 
 type PendingAction = "save" | "mark-sold" | "renew" | "delete";
 
@@ -78,11 +91,12 @@ function formStateFromListing(listing: Listing): FormState {
     contactNote: listing.contactNote,
     emoji: listing.imageEmoji,
     collection: listing.collection ?? "current",
+    ship: shipFormFromDetails(listing.shipDetails),
   };
 }
 
-function validate(form: FormState) {
-  const errors: Partial<Record<keyof FormState, string>> = {};
+function validate(form: FormState): ManageFormErrors {
+  const errors: ManageFormErrors = {};
   const title = form.title.trim();
   const description = form.description.trim();
   const seller = form.seller.trim();
@@ -115,6 +129,9 @@ function validate(form: FormState) {
   if (!server) {
     errors.server = "Server is required.";
   }
+  if (form.category === "ships") {
+    Object.assign(errors, validateShipForm(form.ship));
+  }
 
   return errors;
 }
@@ -135,6 +152,8 @@ function updateInputFromForm(form: FormState): UpdateListingInput {
     contactNote: form.contactNote.trim(),
     imageEmoji: emoji || "📦",
     collection: form.collection,
+    shipDetails:
+      form.category === "ships" ? shipDetailsFromForm(form.ship) : null,
   };
 }
 
@@ -182,9 +201,7 @@ export function ManageListingsPage() {
   const [offerFeedback, setOfferFeedback] = useState<string | null>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof FormState, string>>
-  >({});
+  const [errors, setErrors] = useState<ManageFormErrors>({});
   const [errorAnnouncementId, setErrorAnnouncementId] = useState(0);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(
     null,
@@ -291,6 +308,36 @@ export function ManageListingsPage() {
       currency: undefined,
       price: undefined,
     }));
+    setActionError(null);
+    setActionFeedback(null);
+  }
+
+  function updateCategory(category: ListingCategory) {
+    if (!form) return;
+
+    setForm({
+      ...form,
+      category,
+      ship: category === "ships" ? form.ship : { ...emptyShipForm },
+    });
+    setErrors((current) => ({
+      ...current,
+      ...Object.fromEntries(
+        Object.keys(emptyShipForm).map((field) => [field, undefined]),
+      ),
+    }));
+    setActionError(null);
+    setActionFeedback(null);
+  }
+
+  function updateShipField<K extends keyof ShipFormState>(
+    field: K,
+    value: ShipFormState[K],
+  ) {
+    if (!form) return;
+
+    setForm({ ...form, ship: { ...form.ship, [field]: value } });
+    setErrors((current) => ({ ...current, [field]: undefined }));
     setActionError(null);
     setActionFeedback(null);
   }
@@ -801,10 +848,7 @@ export function ManageListingsPage() {
                     id="category"
                     name="category"
                     onChange={(event) =>
-                      updateField(
-                        "category",
-                        event.target.value as ListingCategory,
-                      )
+                      updateCategory(event.target.value as ListingCategory)
                     }
                     value={form.category}
                   >
@@ -815,6 +859,15 @@ export function ManageListingsPage() {
                     ))}
                   </select>
                 </div>
+                {form.category === "ships" ? (
+                  <div className="sm:col-span-2">
+                    <ShipDetailsForm
+                      errors={errors}
+                      form={form.ship}
+                      onChange={updateShipField}
+                    />
+                  </div>
+                ) : null}
                 <div>
                   <label
                     className="text-sm font-semibold text-slate-200"

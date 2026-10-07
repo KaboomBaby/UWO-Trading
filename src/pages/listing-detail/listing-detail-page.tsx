@@ -17,6 +17,11 @@ import {
   type ListingCurrency,
   type ReportReason,
 } from "../../types/listing";
+import { ShipPanel } from "../../components/ships/ship-panel";
+import {
+  ShipTypeIcon,
+  formatShipClass,
+} from "../../components/ships/ship-visuals";
 
 type DetailState =
   | { status: "ready"; requestedId: string; listing: Listing }
@@ -1142,6 +1147,8 @@ export function ListingDetailPage() {
 
   const { listing } = state;
   const isExpired = isExpiredAt(listing.expiresAt, currentTime);
+  const shipDetails =
+    listing.category === "ships" ? (listing.shipDetails ?? null) : null;
 
   return (
     <section
@@ -1174,13 +1181,20 @@ export function ListingDetailPage() {
       ) : null}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-          <span
-            aria-label={`${listing.title} visual`}
-            className="text-7xl sm:text-8xl"
-            role="img"
-          >
-            {listing.imageEmoji}
-          </span>
+          {shipDetails ? (
+            <ShipTypeIcon
+              className="h-28 w-28 text-amber-glow"
+              type={shipDetails.type}
+            />
+          ) : (
+            <span
+              aria-label={`${listing.title} visual`}
+              className="text-7xl sm:text-8xl"
+              role="img"
+            >
+              {listing.imageEmoji}
+            </span>
+          )}
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -1198,11 +1212,18 @@ export function ListingDetailPage() {
             id="listing-title"
             className="mt-4 text-3xl font-semibold text-white sm:text-4xl"
           >
-            {listing.title}
+            {shipDetails
+              ? `${listing.title} (${formatShipClass(shipDetails.shipClass)})`
+              : listing.title}
           </h1>
           <p className="mt-4 text-2xl font-semibold text-amber-glow">
             {formatListingPrice(listing.price, listing.currency)}
           </p>
+          {shipDetails ? (
+            <div className="mt-6">
+              <ShipPanel details={shipDetails} />
+            </div>
+          ) : null}
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
             <div>
               <dt className="text-sm font-semibold uppercase tracking-wide text-slate-400">

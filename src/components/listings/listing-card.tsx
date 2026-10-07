@@ -2,6 +2,11 @@ import { Link } from "react-router-dom";
 
 import type { Listing } from "../../types/listing";
 import { formatListingPrice } from "../../types/listing";
+import {
+  ShipTypeIcon,
+  formatShipClass,
+  formatShipType,
+} from "../ships/ship-visuals";
 
 export function ListingCard({ listing }: { listing: Listing }) {
   return (
@@ -10,7 +15,14 @@ export function ListingCard({ listing }: { listing: Listing }) {
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-amber-glow/70 hover:bg-white/10"
     >
       <div className="flex h-36 items-center justify-center bg-gradient-to-br from-sea-blue/25 to-ink/90 text-5xl">
-        <span aria-hidden="true">{listing.imageEmoji}</span>
+        {listing.shipDetails ? (
+          <ShipTypeIcon
+            className="h-20 w-20 text-amber-glow"
+            type={listing.shipDetails.type}
+          />
+        ) : (
+          <span aria-hidden="true">{listing.imageEmoji}</span>
+        )}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
@@ -29,6 +41,12 @@ export function ListingCard({ listing }: { listing: Listing }) {
             <span className="rounded-full bg-sea-blue/25 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200">
               {listing.category}
             </span>
+            {listing.shipDetails ? (
+              <span className="rounded-full bg-amber-glow/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-glow">
+                {formatShipType(listing.shipDetails.type)} ·{" "}
+                {formatShipClass(listing.shipDetails.shipClass)}
+              </span>
+            ) : null}
           </span>
         </div>
         <p className="text-xl font-semibold text-amber-glow">

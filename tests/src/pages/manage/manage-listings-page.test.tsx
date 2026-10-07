@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "../../../../src/app";
 import type { Listing, Offer } from "../../../../src/types/listing";
+import { testShipDetails } from "../../fixtures/ship-details";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -39,6 +40,7 @@ const expiredListing: Listing = {
   server: "Maris",
   contactNote: "In-game mail preferred.",
   imageEmoji: "🚢",
+  shipDetails: testShipDetails,
   createdAt: "2026-09-20T12:00:00Z",
   expiresAt: "2026-10-04T12:00:00Z",
   soldAt: null,
@@ -218,6 +220,7 @@ describe("manage listings page", () => {
       contactNote: updatedListing.contactNote,
       imageEmoji: "⛵",
       collection: "legacy",
+      shipDetails: testShipDetails,
     });
     expect(
       await screen.findByText("Updated Adventurer Frigate"),
@@ -263,7 +266,7 @@ describe("manage listings page", () => {
     expect(screen.getByText("October 5, 2026")).toBeInTheDocument();
 
     expect(screen.getByText("Harbor Trader")).toBeInTheDocument();
-    expect(screen.getByText("Trade")).toBeInTheDocument();
+    expect(screen.getAllByText("Trade").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Accepted")).toBeInTheDocument();
 
     expect(screen.getByText("Port Broker")).toBeInTheDocument();

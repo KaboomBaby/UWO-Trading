@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { ListingCard } from "../../../../src/components/listings/listing-card";
 import type { Listing } from "../../../../src/types/listing";
+import { testShipDetails } from "../../fixtures/ship-details";
 
 const listing: Listing = {
   id: "adventurer-frigate",
@@ -49,6 +50,17 @@ describe("ListingCard", () => {
     );
 
     expect(screen.getByText("Legacy")).toBeInTheDocument();
+  });
+
+  it("uses the selected ship type visual and summary for ship listings", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ListingCard listing={{ ...listing, shipDetails: testShipDetails }} />
+      </MemoryRouter>,
+    );
+
+    expect(container.querySelector("svg")).toBeInTheDocument();
+    expect(screen.getByText("Trade · Heavy")).toBeInTheDocument();
   });
 
   it("shows a SOLD badge when the listing has sold", () => {

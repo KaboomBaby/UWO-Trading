@@ -29,6 +29,49 @@ export const NUMERIC_LISTING_CURRENCIES = [
 export type NumericListingCurrency =
   (typeof NUMERIC_LISTING_CURRENCIES)[number];
 
+export const SHIP_TYPES = ["battle", "trade", "adventure"] as const;
+export type ShipType = (typeof SHIP_TYPES)[number];
+
+export const SHIP_CLASSES = ["light", "standard", "heavy"] as const;
+export type ShipClass = (typeof SHIP_CLASSES)[number];
+
+export type ShipSkill = {
+  name: string;
+  iconId: string;
+};
+
+export type ShipDetails = {
+  type: ShipType;
+  shipClass: ShipClass;
+  grade: number;
+  role: string;
+  performance: {
+    verticalSail: number;
+    horizontalSail: number;
+    rowPower: number;
+    turnSpeed: number;
+    waveResistance: number;
+    armour: number;
+  };
+  improvements: number;
+  durability: number;
+  hold: {
+    crew: number;
+    cannons: number;
+    cargo: number;
+    sailorsRequired: number;
+  };
+  sailingRequirements: {
+    adventureLevel: number;
+    tradeLevel: number;
+    battleLevel: number;
+  };
+  buildingDays: number;
+  requiredHull: string;
+  originalSkill: ShipSkill | null;
+  optionalSkills: ShipSkill[];
+};
+
 export function isNumericListingCurrency(
   currency: ListingCurrency,
 ): currency is NumericListingCurrency {
@@ -71,6 +114,7 @@ export type Listing = {
   server: string;
   contactNote: string;
   imageEmoji: string;
+  shipDetails?: ShipDetails | null;
   createdAt: string;
   expiresAt: string;
   soldAt?: string | null;
@@ -88,6 +132,7 @@ export type CreateListingInput = {
   server: string;
   contactNote?: string;
   imageEmoji?: string;
+  shipDetails?: ShipDetails | null;
   collection?: ListingCollection;
 };
 

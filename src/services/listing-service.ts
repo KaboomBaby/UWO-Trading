@@ -11,6 +11,7 @@ import type {
   ListingCurrency,
   ListingQuery,
   Offer,
+  ShipDetails,
   UpdateListingInput,
 } from "../types/listing";
 import { isNumericListingCurrency } from "../types/listing";
@@ -71,6 +72,109 @@ function generateListingEditCode() {
   );
 }
 
+function isNonnegativeInteger(value: number) {
+  return Number.isInteger(value) && value >= 0;
+}
+
+function validateShipPerformance(
+  details: ShipDetails,
+  errors: Record<string, string>,
+) {
+  const entries = Object.entries(details.performance);
+  if (entries.length !== 6) {
+    errors.shipDetails = "Ship performance is incomplete.";
+    return;
+  }
+
+  for (const [field, value] of entries) {
+    if (!isNonnegativeInteger(value)) {
+      errors.shipDetails = `Ship performance ${field} must be a whole number of zero or more.`;
+      return;
+    }
+  }
+}
+
+function validateShipDetails(
+  details: ShipDetails,
+  errors: Record<string, string>,
+) {
+  if (
+    !["battle", "trade", "adventure"].includes(details.type) ||
+    !["light", "standard", "heavy"].includes(details.shipClass)
+  ) {
+    errors.shipDetails = "Choose a valid ship type and class.";
+    return;
+  }
+  if (!isNonnegativeInteger(details.grade)) {
+    errors.shipDetails = "Ship grade must be a whole number of zero or more.";
+    return;
+  }
+  if (!details.role.trim()) {
+    errors.shipDetails = "Ship role is required.";
+    return;
+  }
+
+  validateShipPerformance(details, errors);
+  if (errors.shipDetails) return;
+
+  if (!isNonnegativeInteger(details.improvements)) {
+    errors.shipDetails =
+      "Ship improvements must be a whole number of zero or more.";
+    return;
+  }
+
+  if (
+    !isNonnegativeInteger(details.durability) ||
+    !isNonnegativeInteger(details.buildingDays)
+  ) {
+    errors.shipDetails =
+      "Durability and required building days must be whole numbers of zero or more.";
+    return;
+  }
+  if (
+    Object.values(details.hold).some((value) => !isNonnegativeInteger(value))
+  ) {
+    errors.shipDetails =
+      "Ship hold values must be whole numbers of zero or more.";
+    return;
+  }
+  if (
+    Object.values(details.sailingRequirements).some(
+      (value) => !isNonnegativeInteger(value),
+    )
+  ) {
+    errors.shipDetails =
+      "Sailing requirements must be whole numbers of zero or more.";
+    return;
+  }
+  if (!details.requiredHull.trim()) {
+    errors.shipDetails = "Required ship hull is required.";
+    return;
+  }
+
+  const optionalSkills = details.optionalSkills ?? [];
+  if (optionalSkills.length > 5) {
+    errors.shipDetails = "Choose at most five Optional ship skills.";
+    return;
+  }
+  const skills = [details.originalSkill, ...optionalSkills].filter(
+    (skill): skill is NonNullable<typeof skill> =>
+      skill !== null && skill !== undefined,
+  );
+  if (skills.some((skill) => !skill.name.trim() || !skill.iconId.trim())) {
+    errors.shipDetails = "Ship skills need both a name and icon ID.";
+    return;
+  }
+  const iconIds = new Set<string>();
+  for (const skill of skills) {
+    if (iconIds.has(skill.iconId)) {
+      errors.shipDetails = "Choose each ship skill only once.";
+      return;
+    }
+    iconIds.add(skill.iconId);
+  }
+}
+
 export function validateListingInput(input: CreateListingInput) {
   const errors: Record<string, string> = {};
   if (input.title.trim().length < 3)
@@ -92,6 +196,15 @@ export function validateListingInput(input: CreateListingInput) {
   if (!input.seller.trim()) errors.seller = "Seller is required.";
   if (!input.location.trim()) errors.location = "Location is required.";
   if (!input.server.trim()) errors.server = "Server is required.";
+  if (input.category === "ships") {
+    if (!input.shipDetails) {
+      errors.shipDetails = "Ship details are required for Ships listings.";
+    } else {
+      validateShipDetails(input.shipDetails, errors);
+    }
+  } else if (input.shipDetails) {
+    errors.shipDetails = "Ship details are only allowed for Ships listings.";
+  }
   return errors;
 }
 
@@ -168,6 +281,7 @@ type ListingRow = {
   server: string;
   contact_note: string;
   image_emoji: string | null;
+  ship_details: ShipDetails | null;
   created_at: string;
   expires_at: string;
   sold_at: string | null;
@@ -213,6 +327,7 @@ function mapListingRow(row: ListingRow): Listing {
     server: row.server,
     contactNote: row.contact_note,
     imageEmoji: row.image_emoji ?? "📦",
+    shipDetails: row.ship_details ?? null,
     createdAt: row.created_at,
     expiresAt: row.expires_at,
     soldAt: row.sold_at,
@@ -268,7 +383,9 @@ function listingRpcArguments(editCode: string, input: CreateListingInput) {
     location: input.location.trim(),
     server_name: input.server.trim(),
     contact_note: input.contactNote?.trim() ?? "",
+    image_url: null,
     image_emoji: input.imageEmoji ?? "📦",
+    ship_details: input.shipDetails ?? null,
     collection: input.collection ?? "current",
   };
 }
@@ -529,6 +646,7 @@ export function createLocalListingRepository(
             : `listing-${Date.now()}`,
         currency: input.currency,
         imageEmoji: input.imageEmoji ?? "📦",
+        shipDetails: input.shipDetails ?? null,
         server: input.server.trim(),
         contactNote: input.contactNote?.trim() ?? "",
         collection: input.collection ?? "current",
@@ -573,6 +691,7 @@ export function createLocalListingRepository(
         server: input.server.trim(),
         contactNote: input.contactNote?.trim() ?? "",
         imageEmoji: input.imageEmoji ?? "📦",
+        shipDetails: input.shipDetails ?? null,
         collection: input.collection ?? "current",
       };
       return { ...listings[index] };

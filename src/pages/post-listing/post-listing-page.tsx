@@ -3,6 +3,14 @@ import { Link } from "react-router-dom";
 
 import { useListingRepository } from "../../lib/listing-repository-context";
 import {
+  ShipDetailsForm,
+  emptyShipForm,
+  shipDetailsFromForm,
+  validateShipForm,
+  type ShipFormErrors,
+  type ShipFormState,
+} from "../../components/ships/ship-details-form";
+import {
   LISTING_CATEGORIES,
   LISTING_CURRENCIES,
   isNumericListingCurrency,
@@ -22,7 +30,17 @@ type FormState = {
   server: string;
   contactNote: string;
   emoji: string;
+  ship: ShipFormState;
 };
+
+type ListingFormErrors = Partial<Record<keyof FormState, string>> &
+  ShipFormErrors;
+
+function clearShipErrors(): ListingFormErrors {
+  return Object.fromEntries(
+    Object.keys(emptyShipForm).map((field) => [field, undefined]),
+  ) as ListingFormErrors;
+}
 
 const emptyForm: FormState = {
   title: "",
@@ -35,6 +53,7 @@ const emptyForm: FormState = {
   server: "",
   contactNote: "",
   emoji: "",
+  ship: emptyShipForm,
 };
 
 type EditCodeCopyState = "idle" | "copied" | "error";
@@ -51,8 +70,8 @@ function formatCategory(category: ListingCategory) {
   return category.charAt(0).toUpperCase() + category.slice(1);
 }
 
-function validate(form: FormState) {
-  const errors: Partial<Record<keyof FormState, string>> = {};
+function validate(form: FormState): ListingFormErrors {
+  const errors: ListingFormErrors = {};
   const title = form.title.trim();
   const description = form.description.trim();
   const seller = form.seller.trim();
@@ -92,6 +111,9 @@ function validate(form: FormState) {
   if (!server) {
     errors.server = "Server is required.";
   }
+  if (form.category === "ships") {
+    Object.assign(errors, validateShipForm(form.ship));
+  }
 
   return errors;
 }
@@ -112,9 +134,7 @@ const inputClassName =
 export function PostListingPage() {
   const repository = useListingRepository();
   const [form, setForm] = useState<FormState>(emptyForm);
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof FormState, string>>
-  >({});
+  const [errors, setErrors] = useState<ListingFormErrors>({});
   const [errorAnnouncementId, setErrorAnnouncementId] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdListing, setCreatedListing] = useState<CreatedListing | null>(
@@ -173,6 +193,30 @@ export function PostListingPage() {
     }));
   }
 
+  function updateCategory(category: ListingCategory | "") {
+    setForm((current) => ({
+      ...current,
+      category,
+      ship: category === "ships" ? current.ship : { ...emptyShipForm },
+    }));
+    setErrors((current) => ({
+      ...current,
+      ...clearShipErrors(),
+      category: undefined,
+    }));
+  }
+
+  function updateShipField<K extends keyof ShipFormState>(
+    field: K,
+    value: ShipFormState[K],
+  ) {
+    setForm((current) => ({
+      ...current,
+      ship: { ...current.ship, [field]: value },
+    }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSubmitting) return;
@@ -198,6 +242,8 @@ export function PostListingPage() {
         location: form.location.trim(),
         server: form.server.trim(),
         contactNote: form.contactNote.trim(),
+        shipDetails:
+          form.category === "ships" ? shipDetailsFromForm(form.ship) : null,
         ...(emoji ? { imageEmoji: emoji } : {}),
       });
       setCreatedListing(listing);
@@ -365,70 +411,70 @@ export function PostListingPage() {
             <FieldError id="title-error" message={errors.title} />
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <label
-                className="text-sm font-semibold text-slate-200"
-                htmlFor="category"
-              >
-                Category
-              </label>
-              <select
-                aria-describedby={
-                  errors.category ? "category-error" : undefined
-                }
-                aria-invalid={Boolean(errors.category)}
-                className={inputClassName}
-                id="category"
-                name="category"
-                onChange={(event) =>
-                  updateField(
-                    "category",
-                    event.target.value as ListingCategory | "",
-                  )
-                }
-                required
-                value={form.category}
-              >
-                <option value="">Select a category</option>
-                {LISTING_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {formatCategory(category)}
-                  </option>
-                ))}
-              </select>
-              <FieldError id="category-error" message={errors.category} />
-            </div>
-            <div>
-              <label
-                className="text-sm font-semibold text-slate-200"
-                htmlFor="currency"
-              >
-                Currency
-              </label>
-              <select
-                aria-describedby={
-                  errors.currency ? "currency-error" : undefined
-                }
-                aria-invalid={Boolean(errors.currency)}
-                className={inputClassName}
-                id="currency"
-                name="currency"
-                onChange={(event) =>
-                  updateCurrency(event.target.value as FormState["currency"])
-                }
-                required
-                value={form.currency}
-              >
-                <option value="">Select a currency</option>
-                {LISTING_CURRENCIES.map((currency) => (
-                  <option key={currency} value={currency}>
-                    {currencyLabels[currency]}
-                  </option>
-                ))}
-              </select>
-              <FieldError id="currency-error" message={errors.currency} />
-            </div>
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="category"
+            >
+              Category
+            </label>
+            <select
+              aria-describedby={errors.category ? "category-error" : undefined}
+              aria-invalid={Boolean(errors.category)}
+              className={inputClassName}
+              id="category"
+              name="category"
+              onChange={(event) =>
+                updateCategory(event.target.value as ListingCategory | "")
+              }
+              required
+              value={form.category}
+            >
+              <option value="">Select a category</option>
+              {LISTING_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {formatCategory(category)}
+                </option>
+              ))}
+            </select>
+            <FieldError id="category-error" message={errors.category} />
+          </div>
+
+          {form.category === "ships" ? (
+            <ShipDetailsForm
+              errors={errors}
+              form={form.ship}
+              onChange={updateShipField}
+            />
+          ) : null}
+
+          <div>
+            <label
+              className="text-sm font-semibold text-slate-200"
+              htmlFor="currency"
+            >
+              Currency
+            </label>
+            <select
+              aria-describedby={errors.currency ? "currency-error" : undefined}
+              aria-invalid={Boolean(errors.currency)}
+              className={inputClassName}
+              id="currency"
+              name="currency"
+              onChange={(event) =>
+                updateCurrency(event.target.value as FormState["currency"])
+              }
+              required
+              value={form.currency}
+            >
+              <option value="">Select a currency</option>
+              {LISTING_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currencyLabels[currency]}
+                </option>
+              ))}
+            </select>
+            <FieldError id="currency-error" message={errors.currency} />
           </div>
 
           {numericCurrency ? (

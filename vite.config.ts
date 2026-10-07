@@ -11,6 +11,6 @@ export default defineConfig({
       VITE_SUPABASE_URL: "",
       VITE_SUPABASE_ANON_KEY: "",
     },
-    include: ["tests/src/**/*.{test,ts,tsx}"],
+    include: ["tests/src/**/*.test.{ts,tsx}"],
   },
 });
