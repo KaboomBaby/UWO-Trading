@@ -15,6 +15,7 @@ bun run dev
 bun run lint
 bun run test
 bun run build
+bun run skills:icons
 bun run verify:supabase
 bun run preview
 ```
@@ -26,7 +27,10 @@ provide the anon/publishable key; never put a service-role key in the app or
 repository. Database schema and reference data are versioned under
 `supabase/migrations`.
 
-`bun run verify:supabase` creates and reads a temporary listing through the
-application repository. It intentionally lacks public delete permission, so
-remove the printed test row through your Supabase management tool after
-verification.
+`bun run skills:icons` attempts to download every unique ship-skill icon from
+the harvested source URLs. Skills whose source downloads fail use their
+original supplied URL through `src/data/ship-skill-icon-status.json`.
+
+`bun run verify:supabase` creates, reads, updates, re-reads, and deletes a
+temporary SHIP listing through the application repository, then checks that
+listing counts return to their pre-test state.
