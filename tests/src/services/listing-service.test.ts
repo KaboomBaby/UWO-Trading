@@ -263,21 +263,28 @@ describe("local listing repository", () => {
   });
 
   it("filters by current and legacy collections", async () => {
-    const repository = createLocalListingRepository();
-    const legacy = await repository.list({ collection: "legacy" });
-    const current = await repository.list({ collection: "current" });
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-08T10:00:00Z"));
 
-    expect(legacy.map((listing) => listing.id)).toEqual([
-      "legacy-grand-voyager",
-    ]);
-    expect(
-      (
-        await repository.list({ collection: "legacy", includeExpired: true })
-      ).map((listing) => listing.id),
-    ).toEqual(["legacy-grand-voyager", "legacy-merchant-caravel"]);
-    expect(current).not.toContainEqual(
-      expect.objectContaining({ collection: "legacy" }),
-    );
+    const repository = createLocalListingRepository();
+    try {
+      const legacy = await repository.list({ collection: "legacy" });
+      const current = await repository.list({ collection: "current" });
+
+      expect(legacy.map((listing) => listing.id)).toEqual([
+        "legacy-grand-voyager",
+      ]);
+      expect(
+        (
+          await repository.list({ collection: "legacy", includeExpired: true })
+        ).map((listing) => listing.id),
+      ).toEqual(["legacy-grand-voyager", "legacy-merchant-caravel"]);
+      expect(current).not.toContainEqual(
+        expect.objectContaining({ collection: "legacy" }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("finds a listing by id", async () => {

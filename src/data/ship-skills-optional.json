@@ -1,418 +1,418 @@
 {
-  "harvested": "2026-10-06",
+  "harvested": "2026-10-08",
   "list": "Optional ship skills",
-  "note": "Complete list is 82 skills. An earlier read truncated at 50 (Attack Prevention Net was #50 of 82). Every skill has a unique icon on eversong.ivyro.net.",
+  "note": "Complete list is 82 skills. Every skill uses a genuine 24x28 in-game icon harvested from Papaya Play post 5846.",
   "skills": [
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002000.png",
+      "icon": "/ship-skill-icons/00002000.png",
       "iconId": "00002000",
       "name": "Enhance Ship Handling"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002001.png",
+      "icon": "/ship-skill-icons/00002001.png",
       "iconId": "00002001",
       "name": "Emergency Acceleration"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002002.png",
+      "icon": "/ship-skill-icons/00002002.png",
       "iconId": "00002002",
       "name": "Rowing Assistance"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002004.png",
+      "icon": "/ship-skill-icons/00002004.png",
       "iconId": "00002004",
       "name": "Direct Hit Prevention"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002005.png",
+      "icon": "/ship-skill-icons/00002005.png",
       "iconId": "00002005",
       "name": "Casting Net"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002006.png",
+      "icon": "/ship-skill-icons/00002006.png",
       "iconId": "00002006",
       "name": "Recreation Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002007.png",
+      "icon": "/ship-skill-icons/00002007.png",
       "iconId": "00002007",
       "name": "Aide's Cabin"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002008.png",
+      "icon": "/ship-skill-icons/00002008.png",
       "iconId": "00002008",
       "name": "Improved Rudder"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002009.png",
+      "icon": "/ship-skill-icons/00002009.png",
       "iconId": "00002009",
       "name": "Flotsam Search"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002010.png",
+      "icon": "/ship-skill-icons/00002010.png",
       "iconId": "00002010",
       "name": "High Lookout"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002011.png",
+      "icon": "/ship-skill-icons/00002011.png",
       "iconId": "00002011",
       "name": "Hauling Assistance"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002012.png",
+      "icon": "/ship-skill-icons/00002012.png",
       "iconId": "00002012",
       "name": "Lifeboat"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002013.png",
+      "icon": "/ship-skill-icons/00002013.png",
       "iconId": "00002013",
       "name": "Shipwright's Quarters"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002014.png",
+      "icon": "/ship-skill-icons/00002014.png",
       "iconId": "00002014",
       "name": "Sail Sewing Skill"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002015.png",
+      "icon": "/ship-skill-icons/00002015.png",
       "iconId": "00002015",
       "name": "Military Camouflage"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002016.png",
+      "icon": "/ship-skill-icons/00002016.png",
       "iconId": "00002016",
       "name": "Library"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002017.png",
+      "icon": "/ship-skill-icons/00002017.png",
       "iconId": "00002017",
       "name": "Reference Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002018.png",
+      "icon": "/ship-skill-icons/00002018.png",
       "iconId": "00002018",
       "name": "Food Storage"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002020.png",
+      "icon": "/ship-skill-icons/00002020.png",
       "iconId": "00002020",
       "name": "Moored Mine"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002021.png",
+      "icon": "/ship-skill-icons/00002021.png",
       "iconId": "00002021",
       "name": "Camouflaged Hold"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002022.png",
+      "icon": "/ship-skill-icons/00002022.png",
       "iconId": "00002022",
       "name": "Improved Hold"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002023.png",
+      "icon": "/ship-skill-icons/00002023.png",
       "iconId": "00002023",
       "name": "Galley"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002024.png",
+      "icon": "/ship-skill-icons/00002024.png",
       "iconId": "00002024",
       "name": "Workshop"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002025.png",
+      "icon": "/ship-skill-icons/00002025.png",
       "iconId": "00002025",
       "name": "Wind-Resistant Mast"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002026.png",
+      "icon": "/ship-skill-icons/00002026.png",
       "iconId": "00002026",
       "name": "Wave-Resistant Armouring"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002027.png",
+      "icon": "/ship-skill-icons/00002027.png",
       "iconId": "00002027",
       "name": "Fireproof Wall"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002028.png",
+      "icon": "/ship-skill-icons/00002028.png",
       "iconId": "00002028",
       "name": "Earthquake-proof Hold"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002029.png",
+      "icon": "/ship-skill-icons/00002029.png",
       "iconId": "00002029",
       "name": "Domestic Livestock Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002030.png",
+      "icon": "/ship-skill-icons/00002030.png",
       "iconId": "00002030",
       "name": "Sanitation Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002031.png",
+      "icon": "/ship-skill-icons/00002031.png",
       "iconId": "00002031",
       "name": "Everyday Item Storage"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002032.png",
+      "icon": "/ship-skill-icons/00002032.png",
       "iconId": "00002032",
       "name": "Manufactured Item Storage"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002033.png",
+      "icon": "/ship-skill-icons/00002033.png",
       "iconId": "00002033",
       "name": "General Luxury Goods Storage"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002034.png",
+      "icon": "/ship-skill-icons/00002034.png",
       "iconId": "00002034",
       "name": "Quality Luxury Goods Storage"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002035.png",
+      "icon": "/ship-skill-icons/00002035.png",
       "iconId": "00002035",
       "name": "Quality Cabin"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002036.png",
+      "icon": "/ship-skill-icons/00002036.png",
       "iconId": "00002036",
       "name": "Paymaster Cabin"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002037.png",
+      "icon": "/ship-skill-icons/00002037.png",
       "iconId": "00002037",
       "name": "Special Lab"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002038.png",
+      "icon": "/ship-skill-icons/00002038.png",
       "iconId": "00002038",
       "name": "Cooking Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002039.png",
+      "icon": "/ship-skill-icons/00002039.png",
       "iconId": "00002039",
       "name": "Manufacture Lab"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002040.png",
+      "icon": "/ship-skill-icons/00002040.png",
       "iconId": "00002040",
       "name": "Heavy Bombing"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002041.png",
+      "icon": "/ship-skill-icons/00002041.png",
       "iconId": "00002041",
       "name": "Explosive Shell"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002042.png",
+      "icon": "/ship-skill-icons/00002042.png",
       "iconId": "00002042",
       "name": "Armouring Deterioration Bullet"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002043.png",
+      "icon": "/ship-skill-icons/00002043.png",
       "iconId": "00002043",
       "name": "Armour Piercing Bullet"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002044.png",
+      "icon": "/ship-skill-icons/00002044.png",
       "iconId": "00002044",
       "name": "Special Smoke Bomb"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002045.png",
+      "icon": "/ship-skill-icons/00002045.png",
       "iconId": "00002045",
       "name": "Intensive Charge"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002046.png",
+      "icon": "/ship-skill-icons/00002046.png",
       "iconId": "00002046",
       "name": "Improved Gun Port"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002060.png",
+      "icon": "/ship-skill-icons/00002060.png",
       "iconId": "00002060",
       "name": "Demolition Work"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002061.png",
+      "icon": "/ship-skill-icons/00002061.png",
       "iconId": "00002061",
       "name": "Secret Blast"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002062.png",
+      "icon": "/ship-skill-icons/00002062.png",
       "iconId": "00002062",
       "name": "Pre-emptive Attack"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002063.png",
+      "icon": "/ship-skill-icons/00002063.png",
       "iconId": "00002063",
       "name": "Special Sterncastle"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002064.png",
+      "icon": "/ship-skill-icons/00002064.png",
       "iconId": "00002064",
       "name": "Attack Prevention Net"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002065.png",
+      "icon": "/ship-skill-icons/00002065.png",
       "iconId": "00002065",
       "name": "Swordplay Training Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002066.png",
+      "icon": "/ship-skill-icons/00002066.png",
       "iconId": "00002066",
       "name": "Shooting Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002067.png",
+      "icon": "/ship-skill-icons/00002067.png",
       "iconId": "00002067",
       "name": "Melee Room"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002080.png",
+      "icon": "/ship-skill-icons/00002080.png",
       "iconId": "00002080",
       "name": "Improved Ram"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002081.png",
+      "icon": "/ship-skill-icons/00002081.png",
       "iconId": "00002081",
       "name": "Special Ram"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002082.png",
+      "icon": "/ship-skill-icons/00002082.png",
       "iconId": "00002082",
       "name": "Ramming Tactics"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002083.png",
+      "icon": "/ship-skill-icons/00002083.png",
       "iconId": "00002083",
       "name": "Set Fire"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002100.png",
+      "icon": "/ship-skill-icons/00002100.png",
       "iconId": "00002100",
       "name": "Cooperation Enhancement"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002101.png",
+      "icon": "/ship-skill-icons/00002101.png",
       "iconId": "00002101",
       "name": "Command Post"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002102.png",
+      "icon": "/ship-skill-icons/00002102.png",
       "iconId": "00002102",
       "name": "Repair Support"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002103.png",
+      "icon": "/ship-skill-icons/00002103.png",
       "iconId": "00002103",
       "name": "Intensive Repair"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002104.png",
+      "icon": "/ship-skill-icons/00002104.png",
       "iconId": "00002104",
       "name": "Medical Support"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002105.png",
+      "icon": "/ship-skill-icons/00002105.png",
       "iconId": "00002105",
       "name": "Bullet-proof Armouring"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002106.png",
+      "icon": "/ship-skill-icons/00002106.png",
       "iconId": "00002106",
       "name": "Drainage Pump"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002120.png",
+      "icon": "/ship-skill-icons/00002120.png",
       "iconId": "00002120",
       "name": "Sea Mine Search"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002121.png",
+      "icon": "/ship-skill-icons/00002121.png",
       "iconId": "00002121",
       "name": "Sea Mine Removal"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002122.png",
+      "icon": "/ship-skill-icons/00002122.png",
       "iconId": "00002122",
       "name": "Special Sea Mine"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002123.png",
+      "icon": "/ship-skill-icons/00002123.png",
       "iconId": "00002123",
       "name": "Roaring Sea Mine"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002125.png",
+      "icon": "/ship-skill-icons/00002125.png",
       "iconId": "00002125",
       "name": "Improved Sea Mine"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002126.png",
+      "icon": "/ship-skill-icons/00002126.png",
       "iconId": "00002126",
       "name": "Assault Deck Battle"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002127.png",
+      "icon": "/ship-skill-icons/00002127.png",
       "iconId": "00002127",
       "name": "Evade Melee Battle"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002128.png",
+      "icon": "/ship-skill-icons/00002128.png",
       "iconId": "00002128",
       "name": "Welcome Melee Battle"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002129.png",
+      "icon": "/ship-skill-icons/00002129.png",
       "iconId": "00002129",
       "name": "Deck Barrier"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002130.png",
+      "icon": "/ship-skill-icons/00002130.png",
       "iconId": "00002130",
       "name": "Watertight Bulkhead"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002131.png",
+      "icon": "/ship-skill-icons/00002131.png",
       "iconId": "00002131",
       "name": "Nanban Trade Preference"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002132.png",
+      "icon": "/ship-skill-icons/00002132.png",
       "iconId": "00002132",
       "name": "Steam Engine"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002133.png",
+      "icon": "/ship-skill-icons/00002133.png",
       "iconId": "00002133",
       "name": "Ship Lights in Foggy Seas"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002134.png",
+      "icon": "/ship-skill-icons/00002134.png",
       "iconId": "00002134",
       "name": "Monster Battle Armament"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002900.png",
+      "icon": "/ship-skill-icons/00002900.png",
       "iconId": "00002900",
       "name": "Gunboat Refit"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002901.png",
+      "icon": "/ship-skill-icons/00002901.png",
       "iconId": "00002901",
       "name": "Armoured Ship Refit"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002902.png",
+      "icon": "/ship-skill-icons/00002902.png",
       "iconId": "00002902",
       "name": "Melee Battle Ship Refit"
     },
     {
-      "icon": "http://eversong.ivyro.net/1/skill/00002904.png",
+      "icon": "/ship-skill-icons/00002904.png",
       "iconId": "00002904",
       "name": "Exploration Ship Refit"
     }
   ],
-  "source": "https://dhodb.ivyro.net/eg/main.php?id=143&chp=6"
+  "source": "https://uwo.papayaplay.com/uwo.do?tp=news.view&postid=5846"
 }

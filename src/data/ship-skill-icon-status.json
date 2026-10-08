@@ -1,87 +1,1414 @@
 {
-  "localIconIds": [],
-  "remoteIconIds": [
-    "00002000",
-    "00002001",
-    "00002002",
-    "00002004",
-    "00002005",
-    "00002006",
-    "00002007",
-    "00002008",
-    "00002009",
-    "00002010",
-    "00002011",
-    "00002012",
-    "00002013",
-    "00002014",
-    "00002015",
-    "00002016",
-    "00002017",
-    "00002018",
-    "00002020",
-    "00002021",
-    "00002022",
-    "00002023",
-    "00002024",
-    "00002025",
-    "00002026",
-    "00002027",
-    "00002028",
-    "00002029",
-    "00002030",
-    "00002031",
-    "00002032",
-    "00002033",
-    "00002034",
-    "00002035",
-    "00002036",
-    "00002037",
-    "00002038",
-    "00002039",
-    "00002040",
-    "00002041",
-    "00002042",
-    "00002043",
-    "00002044",
-    "00002045",
-    "00002046",
-    "00002060",
-    "00002061",
-    "00002062",
-    "00002063",
-    "00002064",
-    "00002065",
-    "00002066",
-    "00002067",
-    "00002080",
-    "00002081",
-    "00002082",
-    "00002083",
-    "00002100",
-    "00002101",
-    "00002102",
-    "00002103",
-    "00002104",
-    "00002105",
-    "00002106",
-    "00002120",
-    "00002121",
-    "00002122",
-    "00002123",
-    "00002125",
-    "00002126",
-    "00002127",
-    "00002128",
-    "00002129",
-    "00002130",
-    "00002131",
-    "00002132",
-    "00002133",
-    "00002134",
-    "00002900",
-    "00002901",
-    "00002902",
-    "00002904"
+  "source": {
+    "post": "https://uwo.papayaplay.com/uwo.do?tp=news.view&postid=5846",
+    "sheet": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBOX-vHd-PjS3ofDHCXF-d4clPgMjKvNSJbONQp-k2wZALtPKKoO86muXhJVxijyoMtfQthBQaRlzL/pubhtml?gid=1726468186&single=true&widget=false&chrome=false&headers=false&range=C2:J1500",
+    "entryCount": 108
+  },
+  "canonicalAliases": [
+    {
+      "appName": "Direct Hit Prevention",
+      "sourceName": "Direct Hit Block",
+      "fandomTitle": "Direct hit prevention"
+    },
+    {
+      "appName": "Earthquake-proof Hold",
+      "sourceName": "Shock-Resistant Hold",
+      "fandomTitle": "Earthquake-proof Hold"
+    }
+  ],
+  "crossChecks": {
+    "fandomApi": "https://unchartedwaters.fandom.com/api.php",
+    "uwoUltimateGuides": "https://files.uwoguides.info/",
+    "policy": "validation-only; icons are sourced exclusively from Papaya Play"
+  },
+  "harvestedAt": "2026-10-08",
+  "mappedSkillCount": 82,
+  "unmatchedSourceNames": [
+    "Detonate Fire Ship",
+    "Evade Collision Attack",
+    "Diversion Cannon Fire",
+    "Reaction Rudder",
+    "Improved Deck",
+    "Improved Propulsion",
+    "Steady Leadership",
+    "High-speed Sailing",
+    "Destructive Melee",
+    "Improved Grapeshots",
+    "Mast Destruction",
+    "Rescue Team",
+    "Longitude Measurement",
+    "Fleet Unity",
+    "Fire-resistant Shipside",
+    "Sailor Wave Tactics",
+    "Luxury Goods Bonus",
+    "Pacific Mastery",
+    "High-speed Transportation",
+    "High-Spirited Melee",
+    "Trust Building",
+    "Anti-Heavy Ship Cannons",
+    "Deep-Sea Cabin",
+    "Eastern Trade Preference",
+    "Deadeye Shot",
+    "Queen's Protection"
+  ],
+  "sourceEntries": [
+    {
+      "sourceEntry": 1,
+      "sourceName": "Enhance Ship Handling",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWzHSJO9gtZApHMm6f1zMumlHI9Fl5rxj4JCTEebESYi275zYoy7pKC9ch4aque2dOPtCkVEH-Lq5RtC6PCvUH4wGqoduznqN4SoxBNtNfSB3UdX5MKtr-zQdqRkHzb6zOjw5jZGIvyvLNMJje6zfQEaLe2=s52-w45-h52",
+      "mappedIconId": "00002000",
+      "mappedName": "Enhance Ship Handling"
+    },
+    {
+      "sourceEntry": 2,
+      "sourceName": "Emergency Acceleration",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xURAtO-1BUIua2nixy6ITqX2wBl8PrhutLkBOZpXyc5MKx8xe7G7N2oYOy6gmW3LUrs8XgL8tUGFrpZDeUaJT28SRFGU8FfZ0E4PRvmcNW41Vw5o1VKzRIu5xIVzGnRUJxaFrobaGhu6r01m7ilEd9jp_0=s52-w45-h52",
+      "mappedIconId": "00002001",
+      "mappedName": "Emergency Acceleration"
+    },
+    {
+      "sourceEntry": 3,
+      "sourceName": "Rowing Assistance",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUEhMmlfQGf1c0tcAP6IJvHbWayjg1syTGCCzexMWa3qfUkNSi2IOrBRRystwELJ1C8ZzkgW_hurUKgMET-HJhstIsp8hkLSaCwNugZQypxlHslujjbfA0BKSvWVEeA4IZoOCXNj_3SIN0zUsVlb2mtIK3E=s52-w45-h52",
+      "mappedIconId": "00002002",
+      "mappedName": "Rowing Assistance"
+    },
+    {
+      "sourceEntry": 4,
+      "sourceName": "Casting Net",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVzd4G-_DPQ4aR2ON4C6AMk-Md5DeMMZ2aeDNVAM4hOrHGnLCwRsCqDIlUfGDqkLByPyOknA-II36amaAUvE6W18sBXaNMQ_vV4iG9Ol5MDs0zS-9s91quz62yqi4C8q06a8rbkHMyEEuT1QiPbr_I0ny4U=s52-w45-h52",
+      "mappedIconId": "00002005",
+      "mappedName": "Casting Net"
+    },
+    {
+      "sourceEntry": 5,
+      "sourceName": "Recreation Room",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUi-iS_ztOX5mIKf6ZvduFxcr4sQ0y6fFf_sXC21qPjmWti_1MfUIGnEWR57-X2U7i1e4B70wJtGlZGowr_7c5vcnadZmFc2mna-Tqb4mg2mA0fxHV3P6rkj8PuodAR9Nm8PnzOJd-9DVNuRhcNv8nvFmY=s52-w45-h52",
+      "mappedIconId": "00002006",
+      "mappedName": "Recreation Room"
+    },
+    {
+      "sourceEntry": 6,
+      "sourceName": "Aide's Cabin",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUlQg0_6hSlZTgxKjBTht3tJ3y2ErYpDcD0_JxZtaMsurEpv0SApEd9xehGljiiw4iJZrxRAEL_YodW38Gwm2KIB0YVkvC2BOqF1B8ut-e4F0bTeXLJxAnhlj_9Dyz2QdhCeYpKUza1_AnBsGgVebdx6tSN=s52-w45-h52",
+      "mappedIconId": "00002007",
+      "mappedName": "Aide's Cabin"
+    },
+    {
+      "sourceEntry": 7,
+      "sourceName": "Improved Rudder",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV8ha1aYmiSkIoyNCOFCJ7FEx6dUvGCLY4w1UQGRB7rsZNDBZAq9kk9_Vjmg7bMnv-T5cF82oPL396fYkthHEYSgI0qFEBWzHu_GXr1LuVMOpoQbt5PkuLxyO0S6_zAH89LAeRWQv-npOG1bkhDjvA6zBM=s52-w45-h52",
+      "mappedIconId": "00002008",
+      "mappedName": "Improved Rudder"
+    },
+    {
+      "sourceEntry": 8,
+      "sourceName": "Flotsam Search",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWz37y3udlC0fdrJ4WQ3qCArkc0acm_nNM9mCCd1D6sxM52oiAnUPfs-zBu0aNxdEQPuvn1ypoTTnkJS6c8BdvvPYYiy8W3ZN05B2jgghq9BIUztAs77JTpIOTeFzGj_dMhgCN5VuthmAK-Ag5F41Do3JKi=s52-w45-h52",
+      "mappedIconId": "00002009",
+      "mappedName": "Flotsam Search"
+    },
+    {
+      "sourceEntry": 9,
+      "sourceName": "High Lookout",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVhr-P6DwbWz1y-ZcKzr7O5N0a5lTXW8ph4HyKo1gEaPUVvG38cL8IfMntrPF6bWzNga9A5xiDfHnE0B1TBMeA8v3eNT0r-58plB8L_sR1aMibNUhglpNHNHoX4Fk5kU3E-Y9iqTPqbZV5DEKjZQRIHDzJ0=s52-w45-h52",
+      "mappedIconId": "00002010",
+      "mappedName": "High Lookout"
+    },
+    {
+      "sourceEntry": 10,
+      "sourceName": "Hauling Assistance",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUhVWa7rRFfiST6GMS-_9W8EhKsutyXd9OpMNU32sOUlkeH924xamJPjxHejhxYrLW-zeCIo9fOEJCZB3RYoZqaM8DdnwPY409U-JrTXYZ_eRPQeUMpJWQx40b45NUjsnGc6hd-r21vEHoSXdfrlFCNu4M=s52-w45-h52",
+      "mappedIconId": "00002011",
+      "mappedName": "Hauling Assistance"
+    },
+    {
+      "sourceEntry": 11,
+      "sourceName": "Lifeboat",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVdLpOLH-m5QuLSCoMTvwp13V2UyZHyyQifL8c7j9tKSa4qdw-KyTbmZUU_mI2MmO2PHMTBcw8bFtC0XSQvo2Od6RHNjjQAp2WGi-WectgDfJJzkQUDW2sXC36iQy3-h560yzxeKb8iX0lGuyWFJaGnSJaL=s52-w45-h52",
+      "mappedIconId": "00002012",
+      "mappedName": "Lifeboat"
+    },
+    {
+      "sourceEntry": 12,
+      "sourceName": "Shipwright's Quarters",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVm-b3cC16UsROAeWJVxo2EBXX8-eC1gz1kLl-Nz0egZ6-RZjAScRVdqx3n9y6KtNYvxb1a8oRJeL_3zq6BiyCqcKD0YCU0SOhsBb_2vw7tqQZgZ0Lctx5munar9HsymxrKw54ngU5KCGwYUBpyDDAmtfM=s52-w45-h52",
+      "mappedIconId": "00002013",
+      "mappedName": "Shipwright's Quarters"
+    },
+    {
+      "sourceEntry": 13,
+      "sourceName": "Sail Sewing Skill",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVUj53NX2rJRc9AW54b45q5zhn1BWSR-KmhqmNDA0UoxdAgOSmSbwEZC6kgK6NQzbxb30iX7342b07l4LqU_PD7ABwXuVjKw59hmyCb0AErl0AzAEGyQPW0vmAzeAjD4ZPwAQDJ8RlZX9IAhwNJzNBwGCrT=s52-w45-h52",
+      "mappedIconId": "00002014",
+      "mappedName": "Sail Sewing Skill"
+    },
+    {
+      "sourceEntry": 14,
+      "sourceName": "Military Camouflage",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXP3Du8PVSDvDsqi0t3JYOfYmBbSal9jDH7U8fH0ojzCTQ9Q4CRlJkGq_Y7rfsmnauayzzQmUUtSDU_RIq0WqE2TSpX5K7dpyHaEGuPlo0u1S7iU9sfF9DriHEKA16Tq_0O6tKsHw5NUPNioiwbw_3shmID=s52-w45-h52",
+      "mappedIconId": "00002015",
+      "mappedName": "Military Camouflage"
+    },
+    {
+      "sourceEntry": 15,
+      "sourceName": "Library",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXXqPVDX_fBSGh62cQTBgPt1e7UxjzK_tcSSGaQrYJEcSUacam_GMjtxlGvFYSZV1LT0t4ccm1fwBz-4dTdNfQGA-2wKlALjOj_L9KW59p1yMhBej7cdu5X8qFNB2J4znQIt8SY9iLWn0nMk5mIg7C3jgGf=s52-w45-h52",
+      "mappedIconId": "00002016",
+      "mappedName": "Library"
+    },
+    {
+      "sourceEntry": 16,
+      "sourceName": "Reference Room",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUawBhZk4S0SkFgwV-4Yz2uwRq6iUQlvQUVPe2mpHCfbT1vsyo3RkULbaAdPfNA08G3ryyBjDbzTaWJ_pV5_ndyfj_6Wy3pbw673CdHfSM8GSuJueMPDyDtCg1qsd6JWLEaZJ6-wDVuUTF_GWUipQGvpLcT=s52-w45-h52",
+      "mappedIconId": "00002017",
+      "mappedName": "Reference Room"
+    },
+    {
+      "sourceEntry": 17,
+      "sourceName": "Food Storage",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVW9rNl5QN1VTQFTwhAOI3QKxDbVD6cfDOBzgurkVZ_w2zrbGzRYwAj0wUdIDvUWCrEuSDjZ6HIRgFviU-gu6ul-8Zvob9La1OAYiaUhhMOHOWBu3cYa3UNCDF-93RY6_A6Z4Om7akozapIh0gdLtowKmu1=s52-w45-h52",
+      "mappedIconId": "00002018",
+      "mappedName": "Food Storage"
+    },
+    {
+      "sourceEntry": 18,
+      "sourceName": "Moored Mine",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXD6jWXiH2parMxpPuTskCmJLk4-NxRWAscvhh-QysRu-ryENom-E-6r0N07-IDBgy53yJjZgLr4B7FhDj_lvb4X5_p4M1TOBE7SnK_yr-42IlP2VPlhRebydO9BAK2qByMRSh8UKRjb_UrUseKk0OT_JRx=s52-w45-h52",
+      "mappedIconId": "00002020",
+      "mappedName": "Moored Mine"
+    },
+    {
+      "sourceEntry": 19,
+      "sourceName": "Camouflaged Hold",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXpIyPtK9QKeitBhCMRf9kZGM9R77sVpyooItGtpJNsi1zppubyJOsEdjMCE-C99UVgIIyr0rtSagmEwRLOSUrqalV08UkEeaiv2STnwB4OK_mlZPl4ijv5ejKVM8FpzdasXNCPpOyWctv4ROiUVb5l2nYN=s52-w45-h52",
+      "mappedIconId": "00002021",
+      "mappedName": "Camouflaged Hold"
+    },
+    {
+      "sourceEntry": 20,
+      "sourceName": "Improved Hold",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXxbmpTsxG3tE_oZGsnMHx9m9984KILxBpye1w3jIqg1BS-NGRqnuqAeYVBe5K01RAOhtt0ZRRWO9ztr2_87m-c5HtZschcyTvRmXwvTxc3JamGuAG0jggVkWpWn_RMQS_InH6OnQrNf4GuQt60tSyEnhEc=s52-w45-h52",
+      "mappedIconId": "00002022",
+      "mappedName": "Improved Hold"
+    },
+    {
+      "sourceEntry": 21,
+      "sourceName": "Galley",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXIUAiQaywhlEbF0GMrIHnC46ggLffiNHqm9SEO8gAQr7YsMX-zfehT9u8CwGrYkoyLwA6EZZo-PpZO5VGGX-W0tI1dTKQZEDkNL0TBw1HTaspdJEXOb_xscIfqctgEy_ZbcjFRlLd-Ar86HEgdJzIsr7Y=s52-w45-h52",
+      "mappedIconId": "00002023",
+      "mappedName": "Galley"
+    },
+    {
+      "sourceEntry": 22,
+      "sourceName": "Workshop",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXuHAnhcm2UJ8Lh-U51Mbg2wZ4ndcIUVUkSJQ5GBCXZn7TIogq9syd4hlL0ptyiM5-0IH8X2LG7Cu4JqeTjCewJuz8vph1ApS6-zfrSF-RqwPmMl0-r7gfIzffYnxho07RxfPcA0go1XrMzmYX9Sq1EXzzz=s52-w45-h52",
+      "mappedIconId": "00002024",
+      "mappedName": "Workshop"
+    },
+    {
+      "sourceEntry": 23,
+      "sourceName": "Wind-Resistant Mast",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVC9e_jEV2yZgJZkvUkjSF-4KLjvDbDAmiEyyYbn4-PsUw5kbXv3Q9tXhlII8V3xtwS6B_7Tl1CWmSknfiCLKXItxiT5HZ2Abv_mu6vPdd7aY74V0oLr_lrq8rKmoWT3cnNwh-cH-Zx5zX-JJLhkr6gNX7S=s52-w45-h52",
+      "mappedIconId": "00002025",
+      "mappedName": "Wind-Resistant Mast"
+    },
+    {
+      "sourceEntry": 24,
+      "sourceName": "Wave-Resistant Armouring",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUWySXerdppBKwRN19sUTSITVqoF-pm3qN8ANrMCnKsMQVY9zVR7_XAJX3HL4qvXRUUJVGYS91u6FW2M_pLq3vSYqut9gmNxjvmMujGSeOamJarZeK1pnWfKx3X0B49cIgBv10pVCq9HPh0loYqLmZJo2ZE=s52-w45-h52",
+      "mappedIconId": "00002026",
+      "mappedName": "Wave-Resistant Armouring"
+    },
+    {
+      "sourceEntry": 25,
+      "sourceName": "Fireproof Wall",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW8ARGqws9WWdVzFL6k6543nFWBHgCaGO86DDAzLPpJn3K9ArJk9ler66uYNMwNu-UYLwb-zVturIqnKzmPEdIa10geOAKhPyufqppYPFErjxoBiG9pAb83QNlby0WYDfITfh16oy_p9snTTATSF6n0nXUh=s52-w45-h52",
+      "mappedIconId": "00002027",
+      "mappedName": "Fireproof Wall"
+    },
+    {
+      "sourceEntry": 26,
+      "sourceName": "Shock-Resistant Hold",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXnbu1SsyrJkC9EbLDu4OkCceWhEZWhFqvC3ZvF5tMXuNRiMI4cbqAryqtd44hamK5WI_bDyiDWE8hT42I0htu1x45hUvUKZ9VnpzFaB1-3U3xYYG01LEG_fl6kaWkrulVBNkE119kuaeU_BI_Xatapqutr=s52-w45-h52",
+      "mappedIconId": "00002028",
+      "mappedName": "Earthquake-proof Hold"
+    },
+    {
+      "sourceEntry": 27,
+      "sourceName": "Domestic Livestock Room",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVZjV9lOIeRdW9uYdm4oFF65AHhxZCuyLSJ6p690BGfAj1uKv_2f_6f1rCc7EpHuBgVDBZrDQbtAZNqBfCMBDhtRnuX-74C2rdQqdcQHGydA7N43geGTkkcUJJzNULweIFGMqbLSBbWGH5UBtUVyeOIW0I=s52-w45-h52",
+      "mappedIconId": "00002029",
+      "mappedName": "Domestic Livestock Room"
+    },
+    {
+      "sourceEntry": 28,
+      "sourceName": "Sanitation Room",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXUWt3hGZA4ADNmNSVwolMcx2n-U2iCkauULNZzRWHZZuWSVHTItktI4tfGz1DImBRRrJ_tblPEKq8DHy57yijL2g-t2lwy-BTd3gRLwsNRlzIAE1Wfw_nb0vY-tcDY6oWDhZGuxq0fca5y7YDkYa15brY=s52-w45-h52",
+      "mappedIconId": "00002030",
+      "mappedName": "Sanitation Room"
+    },
+    {
+      "sourceEntry": 29,
+      "sourceName": "Everyday Item Storage",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVDuwXKy0mfX__xb4ZRm3nIEBGudPYp86z8__AflUdqNFjckovxeUBed7HRbddoxKHZhYRJAzaY9SZ28hD2wIGAU1TiwlOsAUSuXj4r--bV2lgq2rqW-1PKmXjO9z7G2IElpZRsktCDW0xc1GpSDwXAWho=s52-w45-h52",
+      "mappedIconId": "00002031",
+      "mappedName": "Everyday Item Storage"
+    },
+    {
+      "sourceEntry": 30,
+      "sourceName": "Manufactured Item Storage",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWOnJWbDB3zjaKbUWaDGp8_u0idHWqIbz5pr_3G01PIeJeKB9F3f8AcqCYHd4egXnsXbhZ7ckIV2zm6XiWQyzmbaUZ0zETN3I8S7Ly_8krlhf2mF7U0juaRIWsUxfETTzP9T1itRAgyJc3RSppmYWvlj9iw=s52-w45-h52",
+      "mappedIconId": "00002032",
+      "mappedName": "Manufactured Item Storage"
+    },
+    {
+      "sourceEntry": 31,
+      "sourceName": "General Luxury Goods Storage",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUNQ-T8Yx7TG8qRpPNqBTVoUc2NdjLhkKczHGXJrmZhzKb2S0dZ5F69tlN0cvaASKxLKDVE2gTU53yQ05RkEsPQzMCNvWZM609Z-u-cBUCscX78V_VvuTd8yUE9Vgc5YR3_H2y_Rf1f_K6RgmQNQGx5l_s=s52-w45-h52",
+      "mappedIconId": "00002033",
+      "mappedName": "General Luxury Goods Storage"
+    },
+    {
+      "sourceEntry": 32,
+      "sourceName": "Quality Luxury Goods Storage",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU-KmEwrnRlTfPlZrdbOiRXZto_EMOwbkcpMYlkBCCeL9eh_50-o-2QG-CoxrmQxvzhotHdmi_OFFq3DPTsa4PcHCQk7UzepkOrlN429WCU2Ny3iGmxE2HZe0ebFECA1SUOSAzxpePnd8L0_-9w_70rmZo-=s52-w45-h52",
+      "mappedIconId": "00002034",
+      "mappedName": "Quality Luxury Goods Storage"
+    },
+    {
+      "sourceEntry": 33,
+      "sourceName": "Quality Cabin",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXkldfYxZMYb8x933Rgi7L60db-Pte4bmP2Ud8aHKTO4f5rA-HjKAShM74QsLFTvc_qXOIgiZSjaVGYuDFOG13vXTI0zUj2qRgDGMJvRl9mjH87b8IrzszcYaZxtaGj_xk7kKz2S8uSmiBrcRUy8b9SRx6F=s52-w45-h52",
+      "mappedIconId": "00002035",
+      "mappedName": "Quality Cabin"
+    },
+    {
+      "sourceEntry": 34,
+      "sourceName": "Paymaster Cabin",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVzJJe0oeE0kPAmiTvLwUhsP7wJB7lOYep2RPqEReOKarctFN5OlZKndjOJoUvf33sJwF-bWe8RlHu2_V3tjT5J8jMo8XAeiyTjluJR43e_Ol5z1hivDKf1Qg2PurOtotp2FUS11xtjwL1ozuXdbPPYV2lN=s52-w45-h52",
+      "mappedIconId": "00002036",
+      "mappedName": "Paymaster Cabin"
+    },
+    {
+      "sourceEntry": 35,
+      "sourceName": "Special Lab",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVSD0odJfjntOgcG9RyrqMABXdfaxxvQ5rjEeZaHjs52buq0jH4OajCTSpDlElfHub7HUbOQtM5GcM4pMcmLeJ-EXRxSIcBBBoRTK3czwmALiURoKsgITwX_rpYJDeuevUBTj7lx6zvXX4_8a8AiiyV7cQ=s52-w45-h52",
+      "mappedIconId": "00002037",
+      "mappedName": "Special Lab"
+    },
+    {
+      "sourceEntry": 36,
+      "sourceName": "Cooking Room",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVrPaJQqQc63T03qBrKw_FuLYhNhBJYQc8cStrkF6NZKDlGNzKZfDHV0IZKoasPm59aQivAgOFfMUoP8X6sRjj0hvc7CrFoZ6zD2GKs4vtDPtq3Hw2rzEiv9C2gjrIysJVMbOvr8CLC_WnAvl-sRHIkF1I=s52-w45-h52",
+      "mappedIconId": "00002038",
+      "mappedName": "Cooking Room"
+    },
+    {
+      "sourceEntry": 37,
+      "sourceName": "Manufacture Lab",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV1NCy7LiumUSRYt2s_-EHAbPu3aRDrfkXOCzXY5II-xa0UEJ-FToJYco04racWUy2yoJEHJBHr7Fb56kyr5VbtpfLAQVHX3jAnq5mqg9wi6mEVGGXmHIUZXEFVzrPwUdGrUdlVf0ma3nqcAKrbX-qYahI=s52-w45-h52",
+      "mappedIconId": "00002039",
+      "mappedName": "Manufacture Lab"
+    },
+    {
+      "sourceEntry": 38,
+      "sourceName": "Heavy Bombing",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUM2iagmbB02zmXDo4uRO4n2dKFgAJ-T8rOcMKxXdDpHBf64JobgNz1Lq-wIdIVRv5TapFk_f7iaCQCsrF2p1yZiXENNAgDlcEry7GkJustVGKsCyiNLkoG17sxbX8plRhEWNyfxKEYGd7WZW1wtv3ReBJL=s52-w45-h52",
+      "mappedIconId": "00002040",
+      "mappedName": "Heavy Bombing"
+    },
+    {
+      "sourceEntry": 39,
+      "sourceName": "Explosive Shell",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXJddbrswa3hs-Y1HYCpE-nTixRKkZ4PpkbADoszXIjPXW2KziN4P2PT1OT9W24e1c0GjFxcTt_8xnYuqAzNM9zODJbm_IwOff01y9ouovT4079J_azod3H1gQfWRXq4wAUXJ0C5S9c3ErCfPikE6Li8o8f=s52-w45-h52",
+      "mappedIconId": "00002041",
+      "mappedName": "Explosive Shell"
+    },
+    {
+      "sourceEntry": 40,
+      "sourceName": "Armouring Deterioration Bullet",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWX5pRtfdWiKK_RUsGKVryuBLXIxcjuZiB7AhOii3EX6_qaQhIRdLIRodf7uj-Bj1jzJ0eknkwj6wyQ_ZDXBziReEKLNRW__XYcMgEv-Ut2TNwsHIzoeEvnfXXm5me9yh6IuW5L78rqJ3lVh2hO23ooGw7p=s52-w45-h52",
+      "mappedIconId": "00002042",
+      "mappedName": "Armouring Deterioration Bullet"
+    },
+    {
+      "sourceEntry": 41,
+      "sourceName": "Armour Piercing Bullet",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUZ3EJKaNW5-q3TClt378zhiTlL2gkiSucPseAJDKEvhg69OAGc37N45mrbtYDtgPRZtXZArb20_R4385U-ZMkJKMMSn1NZ-_kDctAVDtHcEdwxzhiHEkmzXqHGDreul8TeXCMePge31kpT7j0yDIddk-71=s52-w45-h52",
+      "mappedIconId": "00002043",
+      "mappedName": "Armour Piercing Bullet"
+    },
+    {
+      "sourceEntry": 42,
+      "sourceName": "Special Smoke Bomb",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWcjpVAOVGVXUeLOFIItzpN2_FNEbgBGUHnJsuFNLCMKI1gb28JAgwURwpHbILXjchHyl2zICIXNBla1N7khK8YI5Zhh9-QKokRJViXpEZmNhIipkSjKw2CxGBN7lzokwPJh8rfYBizKTEbmf_Kdc0BJCk=s52-w45-h52",
+      "mappedIconId": "00002044",
+      "mappedName": "Special Smoke Bomb"
+    },
+    {
+      "sourceEntry": 43,
+      "sourceName": "Intensive Charge",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU80QMa8glnyAkNoBi1-WCDWiIkOcMosE3KDmDpBcsYjLQ4qRq8mCIcEf0Mv6GdVQBihUCPbnGDTvAimd-0A_DuLLkXA9yJ-bMWZr4z_GVjv38GQ8sVE7Zomm6J2G8a9jgU-jdVbPUNivLeOZxiJ0047d2Z=s52-w45-h52",
+      "mappedIconId": "00002045",
+      "mappedName": "Intensive Charge"
+    },
+    {
+      "sourceEntry": 44,
+      "sourceName": "Improved Gun Port",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWBTnCUk2DW3_6sqXGhS6mUKlCb4PwanRcYsIj-f1SrwjFosJQX5f_pVju1H4RQOmVUiY79R4byNGv9VQoIjsA4TqEv6fiOBliEesMbM_Evt0invY2OxQok86fnXG0PQ-oSO4583YHNUxdy3QrJr6EEUf0=s52-w45-h52",
+      "mappedIconId": "00002046",
+      "mappedName": "Improved Gun Port"
+    },
+    {
+      "sourceEntry": 45,
+      "sourceName": "Demolition Work",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVMKzE_d24Qw-xIuYGVCtgvAi0XEkXXPUW7T-OIm3cEbZ6BI2GLZ6KAv-liXHBO67C8yi2gGEnjZQ8dyqqNx4rc8WFpIx-e5HtQp1ZLDr8PkiF96Jxt4dwEAFxCoJoGDWyZ2wLIaf_Rms0zON0UWoscXXo=s52-w45-h52",
+      "mappedIconId": "00002060",
+      "mappedName": "Demolition Work"
+    },
+    {
+      "sourceEntry": 46,
+      "sourceName": "Secret Blast",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUIAkdIUC8xE-Ty1fRZ5rkMhnAykX57WXwTKR9NUXRQrPqTySkXXqNb9w-hhFShF_zbDxpijNZ0bEhdGXLyJqE4qZa3e7WqZZKl9M_57LBStJSgSKL5Smesv_-64XvCB-LRcTNpuq2huvMfg3HIAv_PBHrQ=s52-w45-h52",
+      "mappedIconId": "00002061",
+      "mappedName": "Secret Blast"
+    },
+    {
+      "sourceEntry": 47,
+      "sourceName": "Pre-emptive Attack",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW5WbTatBkDnTq1kYb9AIwCvYB_mWoR6s54Xe_hok-URccVk9PZfMN9deVMXcLt3B1dRQ7orV2yeLGw_dPZZm3RKstQ_eY2BGvMmBvqdr8lHcBInknsGRfYS7gf2FnsJ8y1psVBFJGR6IlCHL7AR1M6xXcd=s52-w45-h52",
+      "mappedIconId": "00002062",
+      "mappedName": "Pre-emptive Attack"
+    },
+    {
+      "sourceEntry": 48,
+      "sourceName": "Special Sterncastle",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU2ryVBFE91C_XwW2bsma8kk5Ta-Cxi7s231RB4IVY-L77cu6PK-DtMfJ-pQNLTD8LDuwO4eH1ZcTtW3wfojS5hBB7DgtgoNNFFkeoJJB-ToWG7vq7csQIuJdF-yJHsy_AE4kM6xVk2j-MrICAZWROpjomZ=s52-w45-h52",
+      "mappedIconId": "00002063",
+      "mappedName": "Special Sterncastle"
+    },
+    {
+      "sourceEntry": 49,
+      "sourceName": "Attack Prevention Net",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVnqjBWZBl4zdHfoWI0e80dOspHYGWKJoFcylI4q4WEb9Bd0H0LokiUI4RcKp8OW9CV6-45nYrT6BaadJlsKAERtLFnQvOP2bs4WtXNqCBaNKkp1dsaaxYTlD0urXEaPRjrC_9ouKQMRWCpeKa1KxUVAQpv=s52-w45-h52",
+      "mappedIconId": "00002064",
+      "mappedName": "Attack Prevention Net"
+    },
+    {
+      "sourceEntry": 50,
+      "sourceName": "Swordplay Training Room",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xX-PzXP4S2pSfhPgClERVh9rhd7zktuU3QOPqygkKQ_e5hkgJQ7Xo020gKaefJlbknS0fo8Vrq3CnEcGnr6LkTy4kIJ_WlLs5NsEZ4b8H-TUhcTsotyHRZg1cu_kfjtkdYnlkPZomOsoNtG-aAqC8W2Ep4=s52-w45-h52",
+      "mappedIconId": "00002065",
+      "mappedName": "Swordplay Training Room"
+    },
+    {
+      "sourceEntry": 51,
+      "sourceName": "Shooting Room",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW3IouQqcmSIdiRN7OPB4xTCavdOuTyZ8FMvvSWxhc_NcV7-Xsqmamg5GHZcirdMNvKGhQJSipHTzqoyNxpIHeusjEl6xnYvA9EAweYwlw2RRb5n7YFR0hWWNXlokoXDq9yATCltz4rNytXblVAnGStpsc=s52-w45-h52",
+      "mappedIconId": "00002066",
+      "mappedName": "Shooting Room"
+    },
+    {
+      "sourceEntry": 52,
+      "sourceName": "Melee Room",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXfdBVW7hvsXH0bAHNGQsRd5s1x-qvwNGwq9fjo3seXXr-iMsxKk6UwB66QTfxXtDTFAfQWsRn9LxivRp5amIaOF6f7ErWGC8Ca_7Gj31Q6peZDWs7verRs8DgQ80tRjqmLdSwCnI844J5js8PJbMXVL5GL=s52-w45-h52",
+      "mappedIconId": "00002067",
+      "mappedName": "Melee Room"
+    },
+    {
+      "sourceEntry": 53,
+      "sourceName": "Improved Ram",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXHPpCTrCkSKwYfmedTMiwabtKwCEPqaArnsyIZ4h1xjgOl8I2aHhw4_kNMTURUeHteSBcgxXjtmr3yESqZabTJ-8o4lthfU5tIAg_sRduPBNOWvnsDytjsA1TRl4sJwEqIvqEGCGz15Bsb1NzDio_cefe7=s52-w45-h52",
+      "mappedIconId": "00002080",
+      "mappedName": "Improved Ram"
+    },
+    {
+      "sourceEntry": 54,
+      "sourceName": "Special Ram",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUQKyL2T2bH6_umLcTxbHAfp5AQhg5f-RGRmiXda9o9sZZtaluYvWSHhWQp3Uf1JlMODOU0e7EhJ5keJHIyioB4XCWvyyuMgkk7pBnEwhz_40S9KHbuPip7DpKmK3gPRtzHU4deMzk5PFqHqnTaDkocJGH9=s52-w45-h52",
+      "mappedIconId": "00002081",
+      "mappedName": "Special Ram"
+    },
+    {
+      "sourceEntry": 55,
+      "sourceName": "Ramming Tactics",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXTcTsPH0Z8lMgo_t2c8ZxfeH2HgeuQLqM4TThmCSj80CtROPBD768Z0kShe-18rBOqkpggi7Q_I_7lfteAIToRFfwiNx_fSnFffFWR_xdt0xGRYC4vMnmUW8bgHfnuhLdhuMBgHHAY9GCYEjMAeoq7438c=s52-w45-h52",
+      "mappedIconId": "00002082",
+      "mappedName": "Ramming Tactics"
+    },
+    {
+      "sourceEntry": 56,
+      "sourceName": "Set Fire",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWUeVpVDvMxzcIoLT5_uAoIJMIce4eC-bXCAP55S9Qm_79AnE5s2e4nvG7V3ceK8kJFzM7noy6bEEy5v-8mEJz4oHWxAwtCuGRUCfB2GZJ84ucD8y_QWSh1H8sySgFJI8HwnAmcFZo1efPLHS__p1v1bVTD=s52-w45-h52",
+      "mappedIconId": "00002083",
+      "mappedName": "Set Fire"
+    },
+    {
+      "sourceEntry": 57,
+      "sourceName": "Cooperation Enhancement",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVPC2qkYjUnlweHYcAR2Ek8JZKhwBZ90sJ8AQl82c1C_sSuQBJUoN4i8uVFJOHxqcAU2qL2ASJyxulEPbKzhd8uLXDbY7OgmBC0Tzf2vXrWW8zAGoUX2J6DqoByeEKtRtJhCCiDfS99zrAGjeWhy6yxTfh1=s52-w45-h52",
+      "mappedIconId": "00002100",
+      "mappedName": "Cooperation Enhancement"
+    },
+    {
+      "sourceEntry": 58,
+      "sourceName": "Command Post",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV7uU21TpZk0PHPlcsX-9GHk7QDIQEPvdJMBtBemDO99b4pl_M42IgF2jJsFd6ijRfUvb-8dY2Ypz3DZmM4ChPMJi3YfBGOVsmM0BcIQ0R-BuRiFJaRbZuJvds0e7DA1S30BphHZGLmXp_uivWhuE7Cwa4=s52-w45-h52",
+      "mappedIconId": "00002101",
+      "mappedName": "Command Post"
+    },
+    {
+      "sourceEntry": 59,
+      "sourceName": "Repair Support",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVjzn0yui66qos30OEdORSBdy1QH93AeLbWzcn3xfFlQRAeUAPcpm4nYcRxjZpB9rsQPeBNMGxMq-WZHmRJQrENAqJ8Xc-0bnEmgEeIyxrv2x9RuMtbhPnooAT5PWN5Y8Z3v365me1A2JB3VLIKkdcjbfoc=s52-w45-h52",
+      "mappedIconId": "00002102",
+      "mappedName": "Repair Support"
+    },
+    {
+      "sourceEntry": 60,
+      "sourceName": "Intensive Repair",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWoqj6J486TFtxOE7ipj9JIxw81buW654lcK6kJVOyohlY1GIrqGB7JfwgFgnkqtwOOIv9wujNBPMAGF18XDmnLjF-Sh-gwf3zKMkpx-Aoi6BHdEEtcpTmn1c0MULtFHacv2fLpypeu8vyKs6OokFrketmR=s52-w45-h52",
+      "mappedIconId": "00002103",
+      "mappedName": "Intensive Repair"
+    },
+    {
+      "sourceEntry": 61,
+      "sourceName": "Medical Support",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVxmlcOgHgMegxPofpdHLurMPVggJ-gpRqO-gfb-Q9enuJHu-9ZmayS7j6TxR46DoODHvgIdLdS2BXnjun5PkCgqmA3DYZUj-mi2cev274bydbeEf1kWdPc_VygxejkTo_8zBg8nxoTr4lDBMm2wvnS5ESV=s52-w45-h52",
+      "mappedIconId": "00002104",
+      "mappedName": "Medical Support"
+    },
+    {
+      "sourceEntry": 62,
+      "sourceName": "Bullet-proof Armouring",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWzN9hCtpazWkHmid3Fhwp_1PwALT-ybWShCZA74x702tsVPJ05iB1PKPDZnaq0vNiNSepmR5i46ldDjJocrmlDRJYB5XjPCORODZnHB89Xsn14ZlZHTddednAo--4Rm23CnrPr6WCR0SCyDfFYw3gFZWY-=s52-w45-h52",
+      "mappedIconId": "00002105",
+      "mappedName": "Bullet-proof Armouring"
+    },
+    {
+      "sourceEntry": 63,
+      "sourceName": "Drainage Pump",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVi_YspsxuZlgd-RPmo1ZCkzSpnnaiMvIfBKbel5I_GEDckS2DnDQjT_Owx_apTqrUQDfyvDWfskfbjjiokKdUJPuyxqUkJukvLqD9wcBl02B-u6-n337_xQyGhTi8LmEEjfW2nieVPOwJAC6QiSMFa8hvX=s52-w45-h52",
+      "mappedIconId": "00002106",
+      "mappedName": "Drainage Pump"
+    },
+    {
+      "sourceEntry": 64,
+      "sourceName": "Sea Mine Search",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXI7QmsqRfzQXYaN52CaxyG34fMsUC7GwT1etBRkdeO307qNkB4bCHKgvRi7aIo468IZnWCakYiz7Y0t9kcfpvHJpyOja7LgAPYhDQ8Nyfhim47HcZwJAeNTKCdUJOarA67zJhn_2L1BW3Kq47sISeV_h9S=s52-w45-h52",
+      "mappedIconId": "00002120",
+      "mappedName": "Sea Mine Search"
+    },
+    {
+      "sourceEntry": 65,
+      "sourceName": "Sea Mine Removal",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xX59NAx2cWb_EDprz6zKFzIS9zBkAyUCj0VTRuzEUuPf4YTlAjULSRWGkkGrkxis7OJYhQquVl3XT0HiUmpmeIn5X8q5OTzbMMyfFyDJcxi7j-BygUuFafpsPlrlh7yWdIErhcoCheq_LIaKIrypi2VDHTZ=s52-w45-h52",
+      "mappedIconId": "00002121",
+      "mappedName": "Sea Mine Removal"
+    },
+    {
+      "sourceEntry": 66,
+      "sourceName": "Special Sea Mine",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUcE-aIRJ0GMFZ4-2rRU_gA61vyFM6-nAPKbwlKXVYXcqS9sBycGbWZczhYxsFtULI6WJxK2OH3l1Z1wMjGMvnv3t6VigUc9Ra3v_SWQAouxvJFzYasiHMb_O2AvX6fGk1WEtjYxlzkGhjElSg28cgz6os=s52-w45-h52",
+      "mappedIconId": "00002122",
+      "mappedName": "Special Sea Mine"
+    },
+    {
+      "sourceEntry": 67,
+      "sourceName": "Roaring Sea Mine",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU4OFdo_bhYMfLhVc4hXlAYQAdVEesEdCRfJU2xqd1xq2ma7HazM8qTFEKTihfqVX8aYKBKu9brwSWB-LSqwTF89bxhUTJGmnWBkgLIIU8PnWy9qqygJkQ2cug5LLYWz6q6fCz0rfZer9Opq5dg9faNt_4=s52-w45-h52",
+      "mappedIconId": "00002123",
+      "mappedName": "Roaring Sea Mine"
+    },
+    {
+      "sourceEntry": 68,
+      "sourceName": "Improved Sea Mine",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU6JJd1ctmWAHDtyTx_QrS63IiJ3FW0xyf-wrVLvmp6FtlN5AcaO24V_uM_xQkbIvvFpNmUf6nZvAplb7hE5l7kJBb5xvCAVW55vkAfKMkFQv2VFWeUHn5gULI7kaT5fVmHjAp7mQEsOJrRZlUSz3ZiIEE=s52-w45-h52",
+      "mappedIconId": "00002125",
+      "mappedName": "Improved Sea Mine"
+    },
+    {
+      "sourceEntry": 69,
+      "sourceName": "Assault Deck Battle",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXN8RV-LI-WT8cAuN0ZXrdFxuxZpKfjq0OcFG6OUu5fZHoN1lBMsg-Z0T7zVigckvJd0nKyttvWXhbhaMXHZ4om286_3RhLP7AdHpCDHFobxtDxWEP7tlnRjJ9AD7dmiev8w7Niag2Zc0pB8-Qr1Nr5azhL=s52-w45-h52",
+      "mappedIconId": "00002126",
+      "mappedName": "Assault Deck Battle"
+    },
+    {
+      "sourceEntry": 70,
+      "sourceName": "Evade Melee Battle",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW5xNuaHzgDcMvRM-GK_PWTEnGrqjGSEqIAy2hJJQ0c19NOnDpec6U4XKYlmG9Wj4cBYH3DatWU-YH1o5-8yE4Jvgydr-jhSJE6JmJcYoXUtgFjD-hRQO9CyxZUz1SVgY0Pc6Nv2OgnS4oX3xc3m8ZFwMA=s52-w45-h52",
+      "mappedIconId": "00002127",
+      "mappedName": "Evade Melee Battle"
+    },
+    {
+      "sourceEntry": 71,
+      "sourceName": "Welcome Melee Battle",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW9gorLVaTPHSmimj5DltRFCKRyrgKR-r3TZjg9a_IZjegUa5ZgJ2hzoLwj9j3MJZBb6YzL2FawQWGKW-crCfqxmF91w3yihMFe8gyxGDDps9BHLBqupVCy3udxc6-aJJRBs9CibWI2JZow8Kk4UO8gp93y=s52-w45-h52",
+      "mappedIconId": "00002128",
+      "mappedName": "Welcome Melee Battle"
+    },
+    {
+      "sourceEntry": 72,
+      "sourceName": "Deck Barrier",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV6W-SubH3LBk3bPS8TgPWriqHRdFHB6ZLZj5aiHgfQb_F_bEpHH2O38AwcfZwcWg6ushPLrTXDPqjZmvQ8-IILP-7T5LcuHkaEYcr-ndrr_cWGFXc0MfvB8i5Xs0ZVuWUL6aOH1r2gc9OOEEj3UKZDmsm7=s52-w45-h52",
+      "mappedIconId": "00002129",
+      "mappedName": "Deck Barrier"
+    },
+    {
+      "sourceEntry": 73,
+      "sourceName": "Watertight Bulkhead",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVOglcXikLyFWa9WOUKsHTw6zw77Xo64OY5QpvrWMaMnu2k-HID0BM7CxZck4BscTj2V9qdVvO6xZZxFng3e0zUV0INiDOEvi6IGZ38SmG2KDGesQwIsG-4348gSzOdCBGm3-FVJFpoyq5fzv2okq9yYqY=s52-w45-h52",
+      "mappedIconId": "00002130",
+      "mappedName": "Watertight Bulkhead"
+    },
+    {
+      "sourceEntry": 74,
+      "sourceName": "Nanban Trade Preference",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXFm1rvd2RropfE7OQ0RaX0Gpc1a-s-BuSE0RhzH8ab_LY1mZYAcvDawPhucKrBHxXwsCywJIeRgV99iXtdZ3F6Ep7cjEFu0CKBhZedr4lZw3HjWdr_eT9DFEsBzl2yViJ6tdeG6UAGwlrpzfV1gMhMqVB8=s52-w45-h52",
+      "mappedIconId": "00002131",
+      "mappedName": "Nanban Trade Preference"
+    },
+    {
+      "sourceEntry": 75,
+      "sourceName": "Steam Engine",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUib0RSgkz1GUF-j-PUmZneo2ibwY2ZRzvobdQVVi_fXUlPTH0p47OiIgF7W41BYbvlovxczL83D3DSVuLCfW5kQY1oIAQOPguk9XaD87AOOq1ZxpRhww1Ep8J_RQdQ1hiDJf27tmQGbHinYH_SPlfvg97K=s52-w45-h52",
+      "mappedIconId": "00002132",
+      "mappedName": "Steam Engine"
+    },
+    {
+      "sourceEntry": 76,
+      "sourceName": "Ship Lights in Foggy Seas",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVYyjepZ1mDSq1sL4gRaSo8zEuPNgglBnKxA1A4rgFZj9LDyOMJTy65TQJUf2dPZ0nrSMAGr7elmbJ5OpI1m0SBFzi3Vyc9KBlRYkeBeBrii0D9fvAQ1C91KGb1LLvN7QHWfe7RTrRV1lX-hakTQ4Jl7r76=s52-w45-h52",
+      "mappedIconId": "00002133",
+      "mappedName": "Ship Lights in Foggy Seas"
+    },
+    {
+      "sourceEntry": 77,
+      "sourceName": "Monster Battle Armament",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVMErGUjFqOryca2QDNm58RMkncGZtV-cRSYz4OqBtxQ5NUqfawfm6W5-SwFce2QCscSiAfNrxkelr_gm6yzwXvWWQGvX7FCPhoPdWqFKEfpuHf311S35UFiPrVapj-GPEY6JYnyXI8G4XdhjkcR2Zka-7D=s52-w45-h52",
+      "mappedIconId": "00002134",
+      "mappedName": "Monster Battle Armament"
+    },
+    {
+      "sourceEntry": 78,
+      "sourceName": "Detonate Fire Ship",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xX4ODTwRmLUxvREGvIrGTEf3clkTdt-w4Y78em-ARroXydcT2VGOgdK9yE_kHwLXyihFUf7O_q5kHCwKWm9mR1Zv_ZWkeJzWN5UXSLlns9HDJ4djWWGOfk9JzN61m_UYdDQiQJ0pUUSTy1GKLYo=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 79,
+      "sourceName": "Evade Collision Attack",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWgn7J9w8_lJpffaqZNZwjf_o7XgLp8cICVSLfzlVVhTmqaEVKA9ca8VZzC9PbtvBLv9DAWH_DxO4wtU_o9f4oW6RAYiClkDCvZI82QJE3v8yBaEnBmCK9sPjESEkzkAGn0Ai335vjpTGOKawbiBGXOrEkT=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 80,
+      "sourceName": "Diversion Cannon Fire",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVAfg_IO1KMl9GluvbR7kSlhHrc8IBjVXBTBvaPBVqiC_7udhwU0CC5A9cOTD4ToEL1STL4wyevpzylywmmRtbWGJXkNDBVTFb52UfTCLDrJVQzowNZqv_YyfIyfCjzYFcO9_7G21ik9LJ0dqS1Eiu0Q6U=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 81,
+      "sourceName": "Reaction Rudder",
+      "category": "Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXz1ik4L8YWzoIO0ANS5bhMI3rxnIpbCPxg23hoAsm6UBtEttuaucvjFoItaqT9O5N4zcX9fpeTssyOCcdlnnUyq9FUl3m5eh-fsRnw9myrxiciZSMQ16xoxrKmB0opAiywMKmFVrna60gJFsUopUUFSu10=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 82,
+      "sourceName": "Improved Deck",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXFI0Gcj27bakPV7BstPJR-zO5bLs3AqQhUdnREExeBfXuqOxCQAsvPL07xdxm5EW3oM9GysDm3xzKEYlUBGKA6LqJ_Maz0X1xxbNrz-22wrUCWlo0EPnq5g-lY2IuVPrTudCMn2bitlwQginXQ7veRm2Fn=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 83,
+      "sourceName": "Improved Propulsion",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXZbyAi_FoiGEulBZ431nUK69mLk07ME6Dgp476jUEdTxys3wg-eshu7K98zo1lhUwnf91KarHDZhZF0eOopBPB_27J1h2NrqkVFgqQcrbrI85T05QEDmmV6H3Y554wZHAadhEuohqKGCyOoI65Q_eBFYkf=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 84,
+      "sourceName": "Steady Leadership",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWVC0-8TpNKgwxicoDRqGLquB69iWQj3h6fWiYZbcdly7hxMsZ98qOKvVXE8mykatghGoaLW_zzSXjniYW8LjFKCZMO5ZnS6fylspcBNeZ9NkyzZKBCupvg2HZq8i5mxWTpDN3qKAJ-nh8suXQ4wOiMGzLJ=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 85,
+      "sourceName": "High-speed Sailing",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXKtVHHd1DYS759mKUMSUGAUUnCvY5P5-1iBWg9uzRLqBb-xz_BrtgzvbtOEwxw1ouTZZriboxXlDSnGWwZJiNl9JDTtn3uHHRvZTl2MoU0jzEuzEIl4j1cecwsiq32rSCRtQCuPYCYsavzj15IK2phGjM=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 86,
+      "sourceName": "Destructive Melee",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWY3TQz8cqssE3cPClky9ElCO4Y_Ta3FKXl3jtoYC_quQhCVqwUmgptaBxGl-33jV9Be4CxuBzC0eg3vUgPGDiRAmZ4e8ThcyfSNI8GdOARBIlq33cAnbXVxr6giO3o-43NOGweNVfi1NayP-FeN9KiO74=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 87,
+      "sourceName": "Improved Grapeshots",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVrdwG1qpTN5bqEkllBsIr06naB-MqlV6j3YeKDl7FBpwCrDyC9d79pRxe8Vh47wnQBH731ubtqxtnQe-rldBevP_0ZgI3XzRirnQ57ZmJGHP7ewXJwc8p1rZ4_F0z-4n2w2JhQ89qAbxEMEzrGFSVFWg=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 88,
+      "sourceName": "Mast Destruction",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXDikMoJ5jq_ncUGQz-DlO0RjZdtuo_nvYieLcoieloC5RynWSTl5Haz8FzwDLI9TNU4sHxp7xiiUjV0ipPZSspsuyxeTmEHCc3bJvON5l8bchEyJeM6wSFI9mkI_U5yMBkMb-kOnpoX4jh_yoad621kV19=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 89,
+      "sourceName": "Rescue Team",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVkNozGTYZ8LfGvAt7x__u2QnJoqbxc2k-9QFJ2Zk0IFU_TE__c8_uTpo0asA4O8my-bYUeAtLhIghU4tRARsuu94tPyTmcbDMlwooEs2HZLjt7gdrBkBinktl0lUjv4EEfaUB_IPNrab5E9tg7Aos7oEsR=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 90,
+      "sourceName": "Longitude Measurement",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWPGqGCv0KMuSga3hGaZLt-gA6fQurKq3NhssY3vVWZ3sqK0-tA8M4sPTQ_b7GyZoqlIZv5m4SgjY702BkuHxb8SPO88cV8pPkGAiLTCEjw6cL-kGvGisXWjcQ6HpZZ8uMpAdT9dTKU3aj-ocEVlSJTag0Y=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 91,
+      "sourceName": "Fleet Unity",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVQecOml7ZxL25br4Y2goDp1Fi76hzaYg8bIOPzde6PLS5Kdq4IBktGFTrA6ulesdupVmxZEFvdZChokeMAtD7NvCLyDTzVukZukwH2vA5qbVFda8RrNWfytOypN-0KGC5P3AptRsh4m_Tw-9RvqhsMpyEi=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 92,
+      "sourceName": "Fire-resistant Shipside",
+      "category": "Original Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU7VbXBxnJf_VcOvbjRPD90lwqN5bCfGiwtxe7KqJmxsclA95av73g1F3yFdFD0ufHjSBxyO2W7dI6-XH42FT2xit6IuOD4xWbvJ9OOGBk7sPf7kyfhcn-_Q4DFJIZldwCw0aJft7vkuSgSFTTVNAoWNVRX=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 93,
+      "sourceName": "Sailor Wave Tactics",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWNYZEI7H3KZzKk1I2KIL6I18_-f32pFF3l710X2T0JHZOturx9LPk75hg20gW4U7vQL3sGcTWgiYUuVuN1bcAR9GhoOrxeGh6wtTJ3aEYyzYWOQH9h-uLR0_butJP6f_UF_b99Yz4YJ9ANvo8wmJur2bQU=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 94,
+      "sourceName": "Luxury Goods Bonus",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWeAOU-GwadU-gvabS99JWILFWNG93piHXS8pA1M_ivlwUFxxt8ySOm8eB18Bq-kQOYsoOuV__UXAYZZ4MTT2i90vs-syKjMUMjkwPdspqGwxWTg98GmmmaP5RCWYI2IR5l2YA_3_H-PfDitZsWGtLiwFw=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 95,
+      "sourceName": "Pacific Mastery",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVSwwHFpUMvpHnB7LzedQdm4Kid1d1lbyzZuKqzUNZsw_IhoUStzVGIt505mmvd787CSYnw-uzRn7_ul2kohz2GRoMl82EKVbVL6fXxKYfsmOpG0qrFIQKUmJ-1jgX9KT3N2sKfLHAlPH0EwzX0SBoZpVJ9=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 96,
+      "sourceName": "Direct Hit Block",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWaRx9bq7jXcJwcccMR9OVnjY_0YqwwiUnlEWWRuKK7m4o8oyTSH1L5b1bI5NpMv6HH7fuw9Yi3JxqaNq9yIqbb2SnGhNM12q1p8GWh3CqynvE1eVCUugzqMpU1zy5kWqhJglT1SIpppLxqjuz-fCIXO_I=s52-w45-h52",
+      "mappedIconId": "00002004",
+      "mappedName": "Direct Hit Prevention"
+    },
+    {
+      "sourceEntry": 97,
+      "sourceName": "High-speed Transportation",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXskCdapTchnWxYargUZkZ3chxkjAqXlTuPNIOGhTURk_riW64SJKYnHLwgOhBeG8rAmAd8myRncFItssPq720INqT-2whBVKeZF9xBAUgcv3smzBpzv4AfdDpHUm6lV7ViaIwjjbVfBqVncl_f3ZXqYkYt=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 98,
+      "sourceName": "High-Spirited Melee",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXLX6qUrX1xjQAZN4eyAcZGaeEe9b0NWVPXp5EcotE0UNOxX66G5HGrODbiChN4xUh2qdpUGaaLtSU84ReoY4Av1gyY4_sZ2-Vp8w3dGs44RYKT1CusNUqQY2RIBuwpEuqvqqHSQzvtfl_6tTCK-LHhMs8=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 99,
+      "sourceName": "Trust Building",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXE4c6WQYshl0ubpZ9EBRK0n28l2ZOQE0Iz-A2IF00RI93dMrUZAmANqgjyUcZ1kJVf2MKcpaetTxInxrEo_CH2B8qPn-OA8SIZT10abl1wwVvYhkS0Pj2i5etVC5z2eqmj8E9Qqa9jMxYrxBhDbWFSL6k=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 100,
+      "sourceName": "Anti-Heavy Ship Cannons",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUqe5S0NaWftz6fyOYuN8oIwEldHVvVI3pQdPvRaa-Vw-fGsJGPdqv3s-j_5fq5OFeRvciCJs0KVA-gb0WjVAoGiEkNiA-bgtVSV1FAwBgGQPFZG031Nt-QDPeDW8NHAQjHp07yLWnsgaR3GfTcdhldubo=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 101,
+      "sourceName": "Deep-Sea Cabin",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWlLysivuI_g46JGNi-nhE7fmigBwXPvCyn5a22A581r-Vx6_nXMGt6aVj3TBVQu9rttg8AMXzmIDq3BndVorzJ0vLqXaDZa3lRsRfbCXAvRfkZ70bmvKTu3uxJYxuPpss-Umgu4Gbi-FWuTKOjEBGQUK74=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 102,
+      "sourceName": "Eastern Trade Preference",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXh624ekdIEbmhJBvUQkWOB1po5yNPw1rs9C2LOsesbSZdBSN3iTsnDDtjbmecorYxrY-Y_Ry0wwwucC-TkMmmHrH82f8Ylw-bYc3Fsd0fY5Z9KoIk0h8XegK1dImovlvLg2QB4q10OqGS_1a5vnJdWaCQ=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 103,
+      "sourceName": "Deadeye Shot",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXo1rK3ah4gfDHQf06fdGjZnWqgsTbdZoBDyfm4kI04AFGWz4Cuv7r1RUpr-zNij6TIWgXlFftAsaCJwSJjuyCSzGVXHMSKuC076waE3UvWHGCmykOcRYFDfOS0EcMC-lVeOHiN_2_SVEpVF0p0TmsKLkxg=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 104,
+      "sourceName": "Queen's Protection",
+      "category": "Exclusive Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXaOnoUywWVo9VxCPKk_GysPduMYMfrT7CQ1Tm1TMcTbqC815sCH_fTtOXTTDRsyQnkWu3RRcJMUQcPve5t9BSxqX3wxZg0aOlF3ddfm4UXIr9gqP2yfMQ29ylbR1jucUizHdfMLtMh8OLGMg83-BSmegCu=s52-w45-h52",
+      "mappedIconId": null,
+      "mappedName": null
+    },
+    {
+      "sourceEntry": 105,
+      "sourceName": "Gunboat Refit",
+      "category": "Ship Rebuild Bonus Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXur6_Ke_7JBaEKGgsKFHf3u95R-aHQbQRuXqz-Dl5M51X2R_hXWN0AsCYsUmfsFw1pFET90JFp5Pjs68p5WcpgZmTalfz_bI-wJ3ndL2hW6Ls_V_fC33j-5UzFHLBv0lHYCtYVGDudW0K0fw3FyLd8xPE=s52-w45-h52",
+      "mappedIconId": "00002900",
+      "mappedName": "Gunboat Refit"
+    },
+    {
+      "sourceEntry": 106,
+      "sourceName": "Armoured Ship Refit",
+      "category": "Ship Rebuild Bonus Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWBl8nkkrNQvXsCRC6sEeP1gWR2-Kd5xFLaPM_req3JYuKZ_7-L_nNdzz_b1VI4QO11oGOuCZnqOQ_VrBU_RDeazIno-RN64LtMZipONB8lcAETS_fWArvWN1n1Xdzef3sSs-AcuAWTF8LJBpdqnROQaOM=s52-w45-h52",
+      "mappedIconId": "00002901",
+      "mappedName": "Armoured Ship Refit"
+    },
+    {
+      "sourceEntry": 107,
+      "sourceName": "Melee Battle Ship Refit",
+      "category": "Ship Rebuild Bonus Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWpSpUEHYNf80V_6kbMAA6IVdP2Xy2Ke-tDo1lrZ01aGCaN4_2ejFeF-3nLEi6UC25WCXel4k9QwDY1Eft58Vm8IOqEcgwtYJ1w_PBuQarfRpuh-94wV44mjDmxfk9d7-Jrs8K_BWlGqTIzEgmKbAcuQCnP=s52-w45-h52",
+      "mappedIconId": "00002902",
+      "mappedName": "Melee Battle Ship Refit"
+    },
+    {
+      "sourceEntry": 108,
+      "sourceName": "Exploration Ship Refit",
+      "category": "Ship Rebuild Bonus Optional Ship Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU-csaC_NoGWcLg-VkhUWyX4XgZ9wq4dG6Aip0meN5-djKD-A5Hn603tmqw85KizcidUL6YreVNowHMBz26cP9PcAhcdlmssPrUJwzARsanRrOgqRx628uEJ5fkYtWegGt8PssE9TDxveVZbNGFl0YqpJM=s52-w45-h52",
+      "mappedIconId": "00002904",
+      "mappedName": "Exploration Ship Refit"
+    }
+  ],
+  "icons": [
+    {
+      "iconId": "00002000",
+      "name": "Enhance Ship Handling",
+      "sourceName": "Enhance Ship Handling",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWzHSJO9gtZApHMm6f1zMumlHI9Fl5rxj4JCTEebESYi275zYoy7pKC9ch4aque2dOPtCkVEH-Lq5RtC6PCvUH4wGqoduznqN4SoxBNtNfSB3UdX5MKtr-zQdqRkHzb6zOjw5jZGIvyvLNMJje6zfQEaLe2=s52-w45-h52"
+    },
+    {
+      "iconId": "00002001",
+      "name": "Emergency Acceleration",
+      "sourceName": "Emergency Acceleration",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xURAtO-1BUIua2nixy6ITqX2wBl8PrhutLkBOZpXyc5MKx8xe7G7N2oYOy6gmW3LUrs8XgL8tUGFrpZDeUaJT28SRFGU8FfZ0E4PRvmcNW41Vw5o1VKzRIu5xIVzGnRUJxaFrobaGhu6r01m7ilEd9jp_0=s52-w45-h52"
+    },
+    {
+      "iconId": "00002002",
+      "name": "Rowing Assistance",
+      "sourceName": "Rowing Assistance",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUEhMmlfQGf1c0tcAP6IJvHbWayjg1syTGCCzexMWa3qfUkNSi2IOrBRRystwELJ1C8ZzkgW_hurUKgMET-HJhstIsp8hkLSaCwNugZQypxlHslujjbfA0BKSvWVEeA4IZoOCXNj_3SIN0zUsVlb2mtIK3E=s52-w45-h52"
+    },
+    {
+      "iconId": "00002004",
+      "name": "Direct Hit Prevention",
+      "sourceName": "Direct Hit Block",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWaRx9bq7jXcJwcccMR9OVnjY_0YqwwiUnlEWWRuKK7m4o8oyTSH1L5b1bI5NpMv6HH7fuw9Yi3JxqaNq9yIqbb2SnGhNM12q1p8GWh3CqynvE1eVCUugzqMpU1zy5kWqhJglT1SIpppLxqjuz-fCIXO_I=s52-w45-h52"
+    },
+    {
+      "iconId": "00002005",
+      "name": "Casting Net",
+      "sourceName": "Casting Net",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVzd4G-_DPQ4aR2ON4C6AMk-Md5DeMMZ2aeDNVAM4hOrHGnLCwRsCqDIlUfGDqkLByPyOknA-II36amaAUvE6W18sBXaNMQ_vV4iG9Ol5MDs0zS-9s91quz62yqi4C8q06a8rbkHMyEEuT1QiPbr_I0ny4U=s52-w45-h52"
+    },
+    {
+      "iconId": "00002006",
+      "name": "Recreation Room",
+      "sourceName": "Recreation Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUi-iS_ztOX5mIKf6ZvduFxcr4sQ0y6fFf_sXC21qPjmWti_1MfUIGnEWR57-X2U7i1e4B70wJtGlZGowr_7c5vcnadZmFc2mna-Tqb4mg2mA0fxHV3P6rkj8PuodAR9Nm8PnzOJd-9DVNuRhcNv8nvFmY=s52-w45-h52"
+    },
+    {
+      "iconId": "00002007",
+      "name": "Aide's Cabin",
+      "sourceName": "Aide's Cabin",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUlQg0_6hSlZTgxKjBTht3tJ3y2ErYpDcD0_JxZtaMsurEpv0SApEd9xehGljiiw4iJZrxRAEL_YodW38Gwm2KIB0YVkvC2BOqF1B8ut-e4F0bTeXLJxAnhlj_9Dyz2QdhCeYpKUza1_AnBsGgVebdx6tSN=s52-w45-h52"
+    },
+    {
+      "iconId": "00002008",
+      "name": "Improved Rudder",
+      "sourceName": "Improved Rudder",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV8ha1aYmiSkIoyNCOFCJ7FEx6dUvGCLY4w1UQGRB7rsZNDBZAq9kk9_Vjmg7bMnv-T5cF82oPL396fYkthHEYSgI0qFEBWzHu_GXr1LuVMOpoQbt5PkuLxyO0S6_zAH89LAeRWQv-npOG1bkhDjvA6zBM=s52-w45-h52"
+    },
+    {
+      "iconId": "00002009",
+      "name": "Flotsam Search",
+      "sourceName": "Flotsam Search",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWz37y3udlC0fdrJ4WQ3qCArkc0acm_nNM9mCCd1D6sxM52oiAnUPfs-zBu0aNxdEQPuvn1ypoTTnkJS6c8BdvvPYYiy8W3ZN05B2jgghq9BIUztAs77JTpIOTeFzGj_dMhgCN5VuthmAK-Ag5F41Do3JKi=s52-w45-h52"
+    },
+    {
+      "iconId": "00002010",
+      "name": "High Lookout",
+      "sourceName": "High Lookout",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVhr-P6DwbWz1y-ZcKzr7O5N0a5lTXW8ph4HyKo1gEaPUVvG38cL8IfMntrPF6bWzNga9A5xiDfHnE0B1TBMeA8v3eNT0r-58plB8L_sR1aMibNUhglpNHNHoX4Fk5kU3E-Y9iqTPqbZV5DEKjZQRIHDzJ0=s52-w45-h52"
+    },
+    {
+      "iconId": "00002011",
+      "name": "Hauling Assistance",
+      "sourceName": "Hauling Assistance",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUhVWa7rRFfiST6GMS-_9W8EhKsutyXd9OpMNU32sOUlkeH924xamJPjxHejhxYrLW-zeCIo9fOEJCZB3RYoZqaM8DdnwPY409U-JrTXYZ_eRPQeUMpJWQx40b45NUjsnGc6hd-r21vEHoSXdfrlFCNu4M=s52-w45-h52"
+    },
+    {
+      "iconId": "00002012",
+      "name": "Lifeboat",
+      "sourceName": "Lifeboat",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVdLpOLH-m5QuLSCoMTvwp13V2UyZHyyQifL8c7j9tKSa4qdw-KyTbmZUU_mI2MmO2PHMTBcw8bFtC0XSQvo2Od6RHNjjQAp2WGi-WectgDfJJzkQUDW2sXC36iQy3-h560yzxeKb8iX0lGuyWFJaGnSJaL=s52-w45-h52"
+    },
+    {
+      "iconId": "00002013",
+      "name": "Shipwright's Quarters",
+      "sourceName": "Shipwright's Quarters",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVm-b3cC16UsROAeWJVxo2EBXX8-eC1gz1kLl-Nz0egZ6-RZjAScRVdqx3n9y6KtNYvxb1a8oRJeL_3zq6BiyCqcKD0YCU0SOhsBb_2vw7tqQZgZ0Lctx5munar9HsymxrKw54ngU5KCGwYUBpyDDAmtfM=s52-w45-h52"
+    },
+    {
+      "iconId": "00002014",
+      "name": "Sail Sewing Skill",
+      "sourceName": "Sail Sewing Skill",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVUj53NX2rJRc9AW54b45q5zhn1BWSR-KmhqmNDA0UoxdAgOSmSbwEZC6kgK6NQzbxb30iX7342b07l4LqU_PD7ABwXuVjKw59hmyCb0AErl0AzAEGyQPW0vmAzeAjD4ZPwAQDJ8RlZX9IAhwNJzNBwGCrT=s52-w45-h52"
+    },
+    {
+      "iconId": "00002015",
+      "name": "Military Camouflage",
+      "sourceName": "Military Camouflage",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXP3Du8PVSDvDsqi0t3JYOfYmBbSal9jDH7U8fH0ojzCTQ9Q4CRlJkGq_Y7rfsmnauayzzQmUUtSDU_RIq0WqE2TSpX5K7dpyHaEGuPlo0u1S7iU9sfF9DriHEKA16Tq_0O6tKsHw5NUPNioiwbw_3shmID=s52-w45-h52"
+    },
+    {
+      "iconId": "00002016",
+      "name": "Library",
+      "sourceName": "Library",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXXqPVDX_fBSGh62cQTBgPt1e7UxjzK_tcSSGaQrYJEcSUacam_GMjtxlGvFYSZV1LT0t4ccm1fwBz-4dTdNfQGA-2wKlALjOj_L9KW59p1yMhBej7cdu5X8qFNB2J4znQIt8SY9iLWn0nMk5mIg7C3jgGf=s52-w45-h52"
+    },
+    {
+      "iconId": "00002017",
+      "name": "Reference Room",
+      "sourceName": "Reference Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUawBhZk4S0SkFgwV-4Yz2uwRq6iUQlvQUVPe2mpHCfbT1vsyo3RkULbaAdPfNA08G3ryyBjDbzTaWJ_pV5_ndyfj_6Wy3pbw673CdHfSM8GSuJueMPDyDtCg1qsd6JWLEaZJ6-wDVuUTF_GWUipQGvpLcT=s52-w45-h52"
+    },
+    {
+      "iconId": "00002018",
+      "name": "Food Storage",
+      "sourceName": "Food Storage",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVW9rNl5QN1VTQFTwhAOI3QKxDbVD6cfDOBzgurkVZ_w2zrbGzRYwAj0wUdIDvUWCrEuSDjZ6HIRgFviU-gu6ul-8Zvob9La1OAYiaUhhMOHOWBu3cYa3UNCDF-93RY6_A6Z4Om7akozapIh0gdLtowKmu1=s52-w45-h52"
+    },
+    {
+      "iconId": "00002020",
+      "name": "Moored Mine",
+      "sourceName": "Moored Mine",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXD6jWXiH2parMxpPuTskCmJLk4-NxRWAscvhh-QysRu-ryENom-E-6r0N07-IDBgy53yJjZgLr4B7FhDj_lvb4X5_p4M1TOBE7SnK_yr-42IlP2VPlhRebydO9BAK2qByMRSh8UKRjb_UrUseKk0OT_JRx=s52-w45-h52"
+    },
+    {
+      "iconId": "00002021",
+      "name": "Camouflaged Hold",
+      "sourceName": "Camouflaged Hold",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXpIyPtK9QKeitBhCMRf9kZGM9R77sVpyooItGtpJNsi1zppubyJOsEdjMCE-C99UVgIIyr0rtSagmEwRLOSUrqalV08UkEeaiv2STnwB4OK_mlZPl4ijv5ejKVM8FpzdasXNCPpOyWctv4ROiUVb5l2nYN=s52-w45-h52"
+    },
+    {
+      "iconId": "00002022",
+      "name": "Improved Hold",
+      "sourceName": "Improved Hold",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXxbmpTsxG3tE_oZGsnMHx9m9984KILxBpye1w3jIqg1BS-NGRqnuqAeYVBe5K01RAOhtt0ZRRWO9ztr2_87m-c5HtZschcyTvRmXwvTxc3JamGuAG0jggVkWpWn_RMQS_InH6OnQrNf4GuQt60tSyEnhEc=s52-w45-h52"
+    },
+    {
+      "iconId": "00002023",
+      "name": "Galley",
+      "sourceName": "Galley",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXIUAiQaywhlEbF0GMrIHnC46ggLffiNHqm9SEO8gAQr7YsMX-zfehT9u8CwGrYkoyLwA6EZZo-PpZO5VGGX-W0tI1dTKQZEDkNL0TBw1HTaspdJEXOb_xscIfqctgEy_ZbcjFRlLd-Ar86HEgdJzIsr7Y=s52-w45-h52"
+    },
+    {
+      "iconId": "00002024",
+      "name": "Workshop",
+      "sourceName": "Workshop",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXuHAnhcm2UJ8Lh-U51Mbg2wZ4ndcIUVUkSJQ5GBCXZn7TIogq9syd4hlL0ptyiM5-0IH8X2LG7Cu4JqeTjCewJuz8vph1ApS6-zfrSF-RqwPmMl0-r7gfIzffYnxho07RxfPcA0go1XrMzmYX9Sq1EXzzz=s52-w45-h52"
+    },
+    {
+      "iconId": "00002025",
+      "name": "Wind-Resistant Mast",
+      "sourceName": "Wind-Resistant Mast",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVC9e_jEV2yZgJZkvUkjSF-4KLjvDbDAmiEyyYbn4-PsUw5kbXv3Q9tXhlII8V3xtwS6B_7Tl1CWmSknfiCLKXItxiT5HZ2Abv_mu6vPdd7aY74V0oLr_lrq8rKmoWT3cnNwh-cH-Zx5zX-JJLhkr6gNX7S=s52-w45-h52"
+    },
+    {
+      "iconId": "00002026",
+      "name": "Wave-Resistant Armouring",
+      "sourceName": "Wave-Resistant Armouring",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUWySXerdppBKwRN19sUTSITVqoF-pm3qN8ANrMCnKsMQVY9zVR7_XAJX3HL4qvXRUUJVGYS91u6FW2M_pLq3vSYqut9gmNxjvmMujGSeOamJarZeK1pnWfKx3X0B49cIgBv10pVCq9HPh0loYqLmZJo2ZE=s52-w45-h52"
+    },
+    {
+      "iconId": "00002027",
+      "name": "Fireproof Wall",
+      "sourceName": "Fireproof Wall",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW8ARGqws9WWdVzFL6k6543nFWBHgCaGO86DDAzLPpJn3K9ArJk9ler66uYNMwNu-UYLwb-zVturIqnKzmPEdIa10geOAKhPyufqppYPFErjxoBiG9pAb83QNlby0WYDfITfh16oy_p9snTTATSF6n0nXUh=s52-w45-h52"
+    },
+    {
+      "iconId": "00002028",
+      "name": "Earthquake-proof Hold",
+      "sourceName": "Shock-Resistant Hold",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXnbu1SsyrJkC9EbLDu4OkCceWhEZWhFqvC3ZvF5tMXuNRiMI4cbqAryqtd44hamK5WI_bDyiDWE8hT42I0htu1x45hUvUKZ9VnpzFaB1-3U3xYYG01LEG_fl6kaWkrulVBNkE119kuaeU_BI_Xatapqutr=s52-w45-h52"
+    },
+    {
+      "iconId": "00002029",
+      "name": "Domestic Livestock Room",
+      "sourceName": "Domestic Livestock Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVZjV9lOIeRdW9uYdm4oFF65AHhxZCuyLSJ6p690BGfAj1uKv_2f_6f1rCc7EpHuBgVDBZrDQbtAZNqBfCMBDhtRnuX-74C2rdQqdcQHGydA7N43geGTkkcUJJzNULweIFGMqbLSBbWGH5UBtUVyeOIW0I=s52-w45-h52"
+    },
+    {
+      "iconId": "00002030",
+      "name": "Sanitation Room",
+      "sourceName": "Sanitation Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXUWt3hGZA4ADNmNSVwolMcx2n-U2iCkauULNZzRWHZZuWSVHTItktI4tfGz1DImBRRrJ_tblPEKq8DHy57yijL2g-t2lwy-BTd3gRLwsNRlzIAE1Wfw_nb0vY-tcDY6oWDhZGuxq0fca5y7YDkYa15brY=s52-w45-h52"
+    },
+    {
+      "iconId": "00002031",
+      "name": "Everyday Item Storage",
+      "sourceName": "Everyday Item Storage",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVDuwXKy0mfX__xb4ZRm3nIEBGudPYp86z8__AflUdqNFjckovxeUBed7HRbddoxKHZhYRJAzaY9SZ28hD2wIGAU1TiwlOsAUSuXj4r--bV2lgq2rqW-1PKmXjO9z7G2IElpZRsktCDW0xc1GpSDwXAWho=s52-w45-h52"
+    },
+    {
+      "iconId": "00002032",
+      "name": "Manufactured Item Storage",
+      "sourceName": "Manufactured Item Storage",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWOnJWbDB3zjaKbUWaDGp8_u0idHWqIbz5pr_3G01PIeJeKB9F3f8AcqCYHd4egXnsXbhZ7ckIV2zm6XiWQyzmbaUZ0zETN3I8S7Ly_8krlhf2mF7U0juaRIWsUxfETTzP9T1itRAgyJc3RSppmYWvlj9iw=s52-w45-h52"
+    },
+    {
+      "iconId": "00002033",
+      "name": "General Luxury Goods Storage",
+      "sourceName": "General Luxury Goods Storage",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUNQ-T8Yx7TG8qRpPNqBTVoUc2NdjLhkKczHGXJrmZhzKb2S0dZ5F69tlN0cvaASKxLKDVE2gTU53yQ05RkEsPQzMCNvWZM609Z-u-cBUCscX78V_VvuTd8yUE9Vgc5YR3_H2y_Rf1f_K6RgmQNQGx5l_s=s52-w45-h52"
+    },
+    {
+      "iconId": "00002034",
+      "name": "Quality Luxury Goods Storage",
+      "sourceName": "Quality Luxury Goods Storage",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU-KmEwrnRlTfPlZrdbOiRXZto_EMOwbkcpMYlkBCCeL9eh_50-o-2QG-CoxrmQxvzhotHdmi_OFFq3DPTsa4PcHCQk7UzepkOrlN429WCU2Ny3iGmxE2HZe0ebFECA1SUOSAzxpePnd8L0_-9w_70rmZo-=s52-w45-h52"
+    },
+    {
+      "iconId": "00002035",
+      "name": "Quality Cabin",
+      "sourceName": "Quality Cabin",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXkldfYxZMYb8x933Rgi7L60db-Pte4bmP2Ud8aHKTO4f5rA-HjKAShM74QsLFTvc_qXOIgiZSjaVGYuDFOG13vXTI0zUj2qRgDGMJvRl9mjH87b8IrzszcYaZxtaGj_xk7kKz2S8uSmiBrcRUy8b9SRx6F=s52-w45-h52"
+    },
+    {
+      "iconId": "00002036",
+      "name": "Paymaster Cabin",
+      "sourceName": "Paymaster Cabin",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVzJJe0oeE0kPAmiTvLwUhsP7wJB7lOYep2RPqEReOKarctFN5OlZKndjOJoUvf33sJwF-bWe8RlHu2_V3tjT5J8jMo8XAeiyTjluJR43e_Ol5z1hivDKf1Qg2PurOtotp2FUS11xtjwL1ozuXdbPPYV2lN=s52-w45-h52"
+    },
+    {
+      "iconId": "00002037",
+      "name": "Special Lab",
+      "sourceName": "Special Lab",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVSD0odJfjntOgcG9RyrqMABXdfaxxvQ5rjEeZaHjs52buq0jH4OajCTSpDlElfHub7HUbOQtM5GcM4pMcmLeJ-EXRxSIcBBBoRTK3czwmALiURoKsgITwX_rpYJDeuevUBTj7lx6zvXX4_8a8AiiyV7cQ=s52-w45-h52"
+    },
+    {
+      "iconId": "00002038",
+      "name": "Cooking Room",
+      "sourceName": "Cooking Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVrPaJQqQc63T03qBrKw_FuLYhNhBJYQc8cStrkF6NZKDlGNzKZfDHV0IZKoasPm59aQivAgOFfMUoP8X6sRjj0hvc7CrFoZ6zD2GKs4vtDPtq3Hw2rzEiv9C2gjrIysJVMbOvr8CLC_WnAvl-sRHIkF1I=s52-w45-h52"
+    },
+    {
+      "iconId": "00002039",
+      "name": "Manufacture Lab",
+      "sourceName": "Manufacture Lab",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV1NCy7LiumUSRYt2s_-EHAbPu3aRDrfkXOCzXY5II-xa0UEJ-FToJYco04racWUy2yoJEHJBHr7Fb56kyr5VbtpfLAQVHX3jAnq5mqg9wi6mEVGGXmHIUZXEFVzrPwUdGrUdlVf0ma3nqcAKrbX-qYahI=s52-w45-h52"
+    },
+    {
+      "iconId": "00002040",
+      "name": "Heavy Bombing",
+      "sourceName": "Heavy Bombing",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUM2iagmbB02zmXDo4uRO4n2dKFgAJ-T8rOcMKxXdDpHBf64JobgNz1Lq-wIdIVRv5TapFk_f7iaCQCsrF2p1yZiXENNAgDlcEry7GkJustVGKsCyiNLkoG17sxbX8plRhEWNyfxKEYGd7WZW1wtv3ReBJL=s52-w45-h52"
+    },
+    {
+      "iconId": "00002041",
+      "name": "Explosive Shell",
+      "sourceName": "Explosive Shell",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXJddbrswa3hs-Y1HYCpE-nTixRKkZ4PpkbADoszXIjPXW2KziN4P2PT1OT9W24e1c0GjFxcTt_8xnYuqAzNM9zODJbm_IwOff01y9ouovT4079J_azod3H1gQfWRXq4wAUXJ0C5S9c3ErCfPikE6Li8o8f=s52-w45-h52"
+    },
+    {
+      "iconId": "00002042",
+      "name": "Armouring Deterioration Bullet",
+      "sourceName": "Armouring Deterioration Bullet",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWX5pRtfdWiKK_RUsGKVryuBLXIxcjuZiB7AhOii3EX6_qaQhIRdLIRodf7uj-Bj1jzJ0eknkwj6wyQ_ZDXBziReEKLNRW__XYcMgEv-Ut2TNwsHIzoeEvnfXXm5me9yh6IuW5L78rqJ3lVh2hO23ooGw7p=s52-w45-h52"
+    },
+    {
+      "iconId": "00002043",
+      "name": "Armour Piercing Bullet",
+      "sourceName": "Armour Piercing Bullet",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUZ3EJKaNW5-q3TClt378zhiTlL2gkiSucPseAJDKEvhg69OAGc37N45mrbtYDtgPRZtXZArb20_R4385U-ZMkJKMMSn1NZ-_kDctAVDtHcEdwxzhiHEkmzXqHGDreul8TeXCMePge31kpT7j0yDIddk-71=s52-w45-h52"
+    },
+    {
+      "iconId": "00002044",
+      "name": "Special Smoke Bomb",
+      "sourceName": "Special Smoke Bomb",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWcjpVAOVGVXUeLOFIItzpN2_FNEbgBGUHnJsuFNLCMKI1gb28JAgwURwpHbILXjchHyl2zICIXNBla1N7khK8YI5Zhh9-QKokRJViXpEZmNhIipkSjKw2CxGBN7lzokwPJh8rfYBizKTEbmf_Kdc0BJCk=s52-w45-h52"
+    },
+    {
+      "iconId": "00002045",
+      "name": "Intensive Charge",
+      "sourceName": "Intensive Charge",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU80QMa8glnyAkNoBi1-WCDWiIkOcMosE3KDmDpBcsYjLQ4qRq8mCIcEf0Mv6GdVQBihUCPbnGDTvAimd-0A_DuLLkXA9yJ-bMWZr4z_GVjv38GQ8sVE7Zomm6J2G8a9jgU-jdVbPUNivLeOZxiJ0047d2Z=s52-w45-h52"
+    },
+    {
+      "iconId": "00002046",
+      "name": "Improved Gun Port",
+      "sourceName": "Improved Gun Port",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWBTnCUk2DW3_6sqXGhS6mUKlCb4PwanRcYsIj-f1SrwjFosJQX5f_pVju1H4RQOmVUiY79R4byNGv9VQoIjsA4TqEv6fiOBliEesMbM_Evt0invY2OxQok86fnXG0PQ-oSO4583YHNUxdy3QrJr6EEUf0=s52-w45-h52"
+    },
+    {
+      "iconId": "00002060",
+      "name": "Demolition Work",
+      "sourceName": "Demolition Work",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVMKzE_d24Qw-xIuYGVCtgvAi0XEkXXPUW7T-OIm3cEbZ6BI2GLZ6KAv-liXHBO67C8yi2gGEnjZQ8dyqqNx4rc8WFpIx-e5HtQp1ZLDr8PkiF96Jxt4dwEAFxCoJoGDWyZ2wLIaf_Rms0zON0UWoscXXo=s52-w45-h52"
+    },
+    {
+      "iconId": "00002061",
+      "name": "Secret Blast",
+      "sourceName": "Secret Blast",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUIAkdIUC8xE-Ty1fRZ5rkMhnAykX57WXwTKR9NUXRQrPqTySkXXqNb9w-hhFShF_zbDxpijNZ0bEhdGXLyJqE4qZa3e7WqZZKl9M_57LBStJSgSKL5Smesv_-64XvCB-LRcTNpuq2huvMfg3HIAv_PBHrQ=s52-w45-h52"
+    },
+    {
+      "iconId": "00002062",
+      "name": "Pre-emptive Attack",
+      "sourceName": "Pre-emptive Attack",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW5WbTatBkDnTq1kYb9AIwCvYB_mWoR6s54Xe_hok-URccVk9PZfMN9deVMXcLt3B1dRQ7orV2yeLGw_dPZZm3RKstQ_eY2BGvMmBvqdr8lHcBInknsGRfYS7gf2FnsJ8y1psVBFJGR6IlCHL7AR1M6xXcd=s52-w45-h52"
+    },
+    {
+      "iconId": "00002063",
+      "name": "Special Sterncastle",
+      "sourceName": "Special Sterncastle",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU2ryVBFE91C_XwW2bsma8kk5Ta-Cxi7s231RB4IVY-L77cu6PK-DtMfJ-pQNLTD8LDuwO4eH1ZcTtW3wfojS5hBB7DgtgoNNFFkeoJJB-ToWG7vq7csQIuJdF-yJHsy_AE4kM6xVk2j-MrICAZWROpjomZ=s52-w45-h52"
+    },
+    {
+      "iconId": "00002064",
+      "name": "Attack Prevention Net",
+      "sourceName": "Attack Prevention Net",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVnqjBWZBl4zdHfoWI0e80dOspHYGWKJoFcylI4q4WEb9Bd0H0LokiUI4RcKp8OW9CV6-45nYrT6BaadJlsKAERtLFnQvOP2bs4WtXNqCBaNKkp1dsaaxYTlD0urXEaPRjrC_9ouKQMRWCpeKa1KxUVAQpv=s52-w45-h52"
+    },
+    {
+      "iconId": "00002065",
+      "name": "Swordplay Training Room",
+      "sourceName": "Swordplay Training Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xX-PzXP4S2pSfhPgClERVh9rhd7zktuU3QOPqygkKQ_e5hkgJQ7Xo020gKaefJlbknS0fo8Vrq3CnEcGnr6LkTy4kIJ_WlLs5NsEZ4b8H-TUhcTsotyHRZg1cu_kfjtkdYnlkPZomOsoNtG-aAqC8W2Ep4=s52-w45-h52"
+    },
+    {
+      "iconId": "00002066",
+      "name": "Shooting Room",
+      "sourceName": "Shooting Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW3IouQqcmSIdiRN7OPB4xTCavdOuTyZ8FMvvSWxhc_NcV7-Xsqmamg5GHZcirdMNvKGhQJSipHTzqoyNxpIHeusjEl6xnYvA9EAweYwlw2RRb5n7YFR0hWWNXlokoXDq9yATCltz4rNytXblVAnGStpsc=s52-w45-h52"
+    },
+    {
+      "iconId": "00002067",
+      "name": "Melee Room",
+      "sourceName": "Melee Room",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXfdBVW7hvsXH0bAHNGQsRd5s1x-qvwNGwq9fjo3seXXr-iMsxKk6UwB66QTfxXtDTFAfQWsRn9LxivRp5amIaOF6f7ErWGC8Ca_7Gj31Q6peZDWs7verRs8DgQ80tRjqmLdSwCnI844J5js8PJbMXVL5GL=s52-w45-h52"
+    },
+    {
+      "iconId": "00002080",
+      "name": "Improved Ram",
+      "sourceName": "Improved Ram",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXHPpCTrCkSKwYfmedTMiwabtKwCEPqaArnsyIZ4h1xjgOl8I2aHhw4_kNMTURUeHteSBcgxXjtmr3yESqZabTJ-8o4lthfU5tIAg_sRduPBNOWvnsDytjsA1TRl4sJwEqIvqEGCGz15Bsb1NzDio_cefe7=s52-w45-h52"
+    },
+    {
+      "iconId": "00002081",
+      "name": "Special Ram",
+      "sourceName": "Special Ram",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUQKyL2T2bH6_umLcTxbHAfp5AQhg5f-RGRmiXda9o9sZZtaluYvWSHhWQp3Uf1JlMODOU0e7EhJ5keJHIyioB4XCWvyyuMgkk7pBnEwhz_40S9KHbuPip7DpKmK3gPRtzHU4deMzk5PFqHqnTaDkocJGH9=s52-w45-h52"
+    },
+    {
+      "iconId": "00002082",
+      "name": "Ramming Tactics",
+      "sourceName": "Ramming Tactics",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXTcTsPH0Z8lMgo_t2c8ZxfeH2HgeuQLqM4TThmCSj80CtROPBD768Z0kShe-18rBOqkpggi7Q_I_7lfteAIToRFfwiNx_fSnFffFWR_xdt0xGRYC4vMnmUW8bgHfnuhLdhuMBgHHAY9GCYEjMAeoq7438c=s52-w45-h52"
+    },
+    {
+      "iconId": "00002083",
+      "name": "Set Fire",
+      "sourceName": "Set Fire",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWUeVpVDvMxzcIoLT5_uAoIJMIce4eC-bXCAP55S9Qm_79AnE5s2e4nvG7V3ceK8kJFzM7noy6bEEy5v-8mEJz4oHWxAwtCuGRUCfB2GZJ84ucD8y_QWSh1H8sySgFJI8HwnAmcFZo1efPLHS__p1v1bVTD=s52-w45-h52"
+    },
+    {
+      "iconId": "00002100",
+      "name": "Cooperation Enhancement",
+      "sourceName": "Cooperation Enhancement",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVPC2qkYjUnlweHYcAR2Ek8JZKhwBZ90sJ8AQl82c1C_sSuQBJUoN4i8uVFJOHxqcAU2qL2ASJyxulEPbKzhd8uLXDbY7OgmBC0Tzf2vXrWW8zAGoUX2J6DqoByeEKtRtJhCCiDfS99zrAGjeWhy6yxTfh1=s52-w45-h52"
+    },
+    {
+      "iconId": "00002101",
+      "name": "Command Post",
+      "sourceName": "Command Post",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV7uU21TpZk0PHPlcsX-9GHk7QDIQEPvdJMBtBemDO99b4pl_M42IgF2jJsFd6ijRfUvb-8dY2Ypz3DZmM4ChPMJi3YfBGOVsmM0BcIQ0R-BuRiFJaRbZuJvds0e7DA1S30BphHZGLmXp_uivWhuE7Cwa4=s52-w45-h52"
+    },
+    {
+      "iconId": "00002102",
+      "name": "Repair Support",
+      "sourceName": "Repair Support",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVjzn0yui66qos30OEdORSBdy1QH93AeLbWzcn3xfFlQRAeUAPcpm4nYcRxjZpB9rsQPeBNMGxMq-WZHmRJQrENAqJ8Xc-0bnEmgEeIyxrv2x9RuMtbhPnooAT5PWN5Y8Z3v365me1A2JB3VLIKkdcjbfoc=s52-w45-h52"
+    },
+    {
+      "iconId": "00002103",
+      "name": "Intensive Repair",
+      "sourceName": "Intensive Repair",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWoqj6J486TFtxOE7ipj9JIxw81buW654lcK6kJVOyohlY1GIrqGB7JfwgFgnkqtwOOIv9wujNBPMAGF18XDmnLjF-Sh-gwf3zKMkpx-Aoi6BHdEEtcpTmn1c0MULtFHacv2fLpypeu8vyKs6OokFrketmR=s52-w45-h52"
+    },
+    {
+      "iconId": "00002104",
+      "name": "Medical Support",
+      "sourceName": "Medical Support",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVxmlcOgHgMegxPofpdHLurMPVggJ-gpRqO-gfb-Q9enuJHu-9ZmayS7j6TxR46DoODHvgIdLdS2BXnjun5PkCgqmA3DYZUj-mi2cev274bydbeEf1kWdPc_VygxejkTo_8zBg8nxoTr4lDBMm2wvnS5ESV=s52-w45-h52"
+    },
+    {
+      "iconId": "00002105",
+      "name": "Bullet-proof Armouring",
+      "sourceName": "Bullet-proof Armouring",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWzN9hCtpazWkHmid3Fhwp_1PwALT-ybWShCZA74x702tsVPJ05iB1PKPDZnaq0vNiNSepmR5i46ldDjJocrmlDRJYB5XjPCORODZnHB89Xsn14ZlZHTddednAo--4Rm23CnrPr6WCR0SCyDfFYw3gFZWY-=s52-w45-h52"
+    },
+    {
+      "iconId": "00002106",
+      "name": "Drainage Pump",
+      "sourceName": "Drainage Pump",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVi_YspsxuZlgd-RPmo1ZCkzSpnnaiMvIfBKbel5I_GEDckS2DnDQjT_Owx_apTqrUQDfyvDWfskfbjjiokKdUJPuyxqUkJukvLqD9wcBl02B-u6-n337_xQyGhTi8LmEEjfW2nieVPOwJAC6QiSMFa8hvX=s52-w45-h52"
+    },
+    {
+      "iconId": "00002120",
+      "name": "Sea Mine Search",
+      "sourceName": "Sea Mine Search",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXI7QmsqRfzQXYaN52CaxyG34fMsUC7GwT1etBRkdeO307qNkB4bCHKgvRi7aIo468IZnWCakYiz7Y0t9kcfpvHJpyOja7LgAPYhDQ8Nyfhim47HcZwJAeNTKCdUJOarA67zJhn_2L1BW3Kq47sISeV_h9S=s52-w45-h52"
+    },
+    {
+      "iconId": "00002121",
+      "name": "Sea Mine Removal",
+      "sourceName": "Sea Mine Removal",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xX59NAx2cWb_EDprz6zKFzIS9zBkAyUCj0VTRuzEUuPf4YTlAjULSRWGkkGrkxis7OJYhQquVl3XT0HiUmpmeIn5X8q5OTzbMMyfFyDJcxi7j-BygUuFafpsPlrlh7yWdIErhcoCheq_LIaKIrypi2VDHTZ=s52-w45-h52"
+    },
+    {
+      "iconId": "00002122",
+      "name": "Special Sea Mine",
+      "sourceName": "Special Sea Mine",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUcE-aIRJ0GMFZ4-2rRU_gA61vyFM6-nAPKbwlKXVYXcqS9sBycGbWZczhYxsFtULI6WJxK2OH3l1Z1wMjGMvnv3t6VigUc9Ra3v_SWQAouxvJFzYasiHMb_O2AvX6fGk1WEtjYxlzkGhjElSg28cgz6os=s52-w45-h52"
+    },
+    {
+      "iconId": "00002123",
+      "name": "Roaring Sea Mine",
+      "sourceName": "Roaring Sea Mine",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU4OFdo_bhYMfLhVc4hXlAYQAdVEesEdCRfJU2xqd1xq2ma7HazM8qTFEKTihfqVX8aYKBKu9brwSWB-LSqwTF89bxhUTJGmnWBkgLIIU8PnWy9qqygJkQ2cug5LLYWz6q6fCz0rfZer9Opq5dg9faNt_4=s52-w45-h52"
+    },
+    {
+      "iconId": "00002125",
+      "name": "Improved Sea Mine",
+      "sourceName": "Improved Sea Mine",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU6JJd1ctmWAHDtyTx_QrS63IiJ3FW0xyf-wrVLvmp6FtlN5AcaO24V_uM_xQkbIvvFpNmUf6nZvAplb7hE5l7kJBb5xvCAVW55vkAfKMkFQv2VFWeUHn5gULI7kaT5fVmHjAp7mQEsOJrRZlUSz3ZiIEE=s52-w45-h52"
+    },
+    {
+      "iconId": "00002126",
+      "name": "Assault Deck Battle",
+      "sourceName": "Assault Deck Battle",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXN8RV-LI-WT8cAuN0ZXrdFxuxZpKfjq0OcFG6OUu5fZHoN1lBMsg-Z0T7zVigckvJd0nKyttvWXhbhaMXHZ4om286_3RhLP7AdHpCDHFobxtDxWEP7tlnRjJ9AD7dmiev8w7Niag2Zc0pB8-Qr1Nr5azhL=s52-w45-h52"
+    },
+    {
+      "iconId": "00002127",
+      "name": "Evade Melee Battle",
+      "sourceName": "Evade Melee Battle",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW5xNuaHzgDcMvRM-GK_PWTEnGrqjGSEqIAy2hJJQ0c19NOnDpec6U4XKYlmG9Wj4cBYH3DatWU-YH1o5-8yE4Jvgydr-jhSJE6JmJcYoXUtgFjD-hRQO9CyxZUz1SVgY0Pc6Nv2OgnS4oX3xc3m8ZFwMA=s52-w45-h52"
+    },
+    {
+      "iconId": "00002128",
+      "name": "Welcome Melee Battle",
+      "sourceName": "Welcome Melee Battle",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xW9gorLVaTPHSmimj5DltRFCKRyrgKR-r3TZjg9a_IZjegUa5ZgJ2hzoLwj9j3MJZBb6YzL2FawQWGKW-crCfqxmF91w3yihMFe8gyxGDDps9BHLBqupVCy3udxc6-aJJRBs9CibWI2JZow8Kk4UO8gp93y=s52-w45-h52"
+    },
+    {
+      "iconId": "00002129",
+      "name": "Deck Barrier",
+      "sourceName": "Deck Barrier",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xV6W-SubH3LBk3bPS8TgPWriqHRdFHB6ZLZj5aiHgfQb_F_bEpHH2O38AwcfZwcWg6ushPLrTXDPqjZmvQ8-IILP-7T5LcuHkaEYcr-ndrr_cWGFXc0MfvB8i5Xs0ZVuWUL6aOH1r2gc9OOEEj3UKZDmsm7=s52-w45-h52"
+    },
+    {
+      "iconId": "00002130",
+      "name": "Watertight Bulkhead",
+      "sourceName": "Watertight Bulkhead",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVOglcXikLyFWa9WOUKsHTw6zw77Xo64OY5QpvrWMaMnu2k-HID0BM7CxZck4BscTj2V9qdVvO6xZZxFng3e0zUV0INiDOEvi6IGZ38SmG2KDGesQwIsG-4348gSzOdCBGm3-FVJFpoyq5fzv2okq9yYqY=s52-w45-h52"
+    },
+    {
+      "iconId": "00002131",
+      "name": "Nanban Trade Preference",
+      "sourceName": "Nanban Trade Preference",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXFm1rvd2RropfE7OQ0RaX0Gpc1a-s-BuSE0RhzH8ab_LY1mZYAcvDawPhucKrBHxXwsCywJIeRgV99iXtdZ3F6Ep7cjEFu0CKBhZedr4lZw3HjWdr_eT9DFEsBzl2yViJ6tdeG6UAGwlrpzfV1gMhMqVB8=s52-w45-h52"
+    },
+    {
+      "iconId": "00002132",
+      "name": "Steam Engine",
+      "sourceName": "Steam Engine",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xUib0RSgkz1GUF-j-PUmZneo2ibwY2ZRzvobdQVVi_fXUlPTH0p47OiIgF7W41BYbvlovxczL83D3DSVuLCfW5kQY1oIAQOPguk9XaD87AOOq1ZxpRhww1Ep8J_RQdQ1hiDJf27tmQGbHinYH_SPlfvg97K=s52-w45-h52"
+    },
+    {
+      "iconId": "00002133",
+      "name": "Ship Lights in Foggy Seas",
+      "sourceName": "Ship Lights in Foggy Seas",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVYyjepZ1mDSq1sL4gRaSo8zEuPNgglBnKxA1A4rgFZj9LDyOMJTy65TQJUf2dPZ0nrSMAGr7elmbJ5OpI1m0SBFzi3Vyc9KBlRYkeBeBrii0D9fvAQ1C91KGb1LLvN7QHWfe7RTrRV1lX-hakTQ4Jl7r76=s52-w45-h52"
+    },
+    {
+      "iconId": "00002134",
+      "name": "Monster Battle Armament",
+      "sourceName": "Monster Battle Armament",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xVMErGUjFqOryca2QDNm58RMkncGZtV-cRSYz4OqBtxQ5NUqfawfm6W5-SwFce2QCscSiAfNrxkelr_gm6yzwXvWWQGvX7FCPhoPdWqFKEfpuHf311S35UFiPrVapj-GPEY6JYnyXI8G4XdhjkcR2Zka-7D=s52-w45-h52"
+    },
+    {
+      "iconId": "00002900",
+      "name": "Gunboat Refit",
+      "sourceName": "Gunboat Refit",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xXur6_Ke_7JBaEKGgsKFHf3u95R-aHQbQRuXqz-Dl5M51X2R_hXWN0AsCYsUmfsFw1pFET90JFp5Pjs68p5WcpgZmTalfz_bI-wJ3ndL2hW6Ls_V_fC33j-5UzFHLBv0lHYCtYVGDudW0K0fw3FyLd8xPE=s52-w45-h52"
+    },
+    {
+      "iconId": "00002901",
+      "name": "Armoured Ship Refit",
+      "sourceName": "Armoured Ship Refit",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWBl8nkkrNQvXsCRC6sEeP1gWR2-Kd5xFLaPM_req3JYuKZ_7-L_nNdzz_b1VI4QO11oGOuCZnqOQ_VrBU_RDeazIno-RN64LtMZipONB8lcAETS_fWArvWN1n1Xdzef3sSs-AcuAWTF8LJBpdqnROQaOM=s52-w45-h52"
+    },
+    {
+      "iconId": "00002902",
+      "name": "Melee Battle Ship Refit",
+      "sourceName": "Melee Battle Ship Refit",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xWpSpUEHYNf80V_6kbMAA6IVdP2Xy2Ke-tDo1lrZ01aGCaN4_2ejFeF-3nLEi6UC25WCXel4k9QwDY1Eft58Vm8IOqEcgwtYJ1w_PBuQarfRpuh-94wV44mjDmxfk9d7-Jrs8K_BWlGqTIzEgmKbAcuQCnP=s52-w45-h52"
+    },
+    {
+      "iconId": "00002904",
+      "name": "Exploration Ship Refit",
+      "sourceName": "Exploration Ship Refit",
+      "sourceUrl": "https://lh3.googleusercontent.com/docsubipk/AP9E6xU-csaC_NoGWcLg-VkhUWyX4XgZ9wq4dG6Aip0meN5-djKD-A5Hn603tmqw85KizcidUL6YreVNowHMBz26cP9PcAhcdlmssPrUJwzARsanRrOgqRx628uEJ5fkYtWegGt8PssE9TDxveVZbNGFl0YqpJM=s52-w45-h52"
+    }
   ]
 }

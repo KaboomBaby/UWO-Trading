@@ -1,6 +1,5 @@
 import optionalSkillsData from "./ship-skills-optional.json";
 import originalSkillsData from "./ship-skills-original.json";
-import iconStatusData from "./ship-skill-icon-status.json";
 import type { ShipSkill } from "../types/listing";
 
 export type ShipSkillRecord = ShipSkill & {
@@ -33,12 +32,6 @@ export function getShipSkill(iconId: string) {
   return skillByIconId.get(iconId);
 }
 
-const remoteIconIds = new Set(iconStatusData.remoteIconIds);
-
 export function shipSkillIconUrl(iconId: string) {
-  if (remoteIconIds.has(iconId)) {
-    return getShipSkill(iconId)?.icon ?? "";
-  }
-
-  return `/ship-skill-icons/${iconId}.png`;
+  return getShipSkill(iconId)?.icon ?? `/ship-skill-icons/${iconId}.png`;
 }
