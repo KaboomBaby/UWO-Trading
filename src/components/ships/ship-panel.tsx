@@ -194,19 +194,6 @@ export function ShipPanel({ details }: { details: ShipDetails }) {
           </p>
         )}
       </section>
-
-      <dl className="mt-5 grid gap-3 border-t border-white/10 pt-4 text-sm sm:grid-cols-2">
-        <div className="flex justify-between gap-3">
-          <dt className="text-slate-400">Req. building days</dt>
-          <dd className="font-semibold text-white">{details.buildingDays}</dd>
-        </div>
-        <div className="flex justify-between gap-3">
-          <dt className="text-slate-400">Required hull</dt>
-          <dd className="text-right font-semibold text-white">
-            {details.requiredHull}
-          </dd>
-        </div>
-      </dl>
     </section>
   );
 }

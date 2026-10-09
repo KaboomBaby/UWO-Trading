@@ -46,8 +46,6 @@ const shipDetails = {
     tradeLevel: 61,
     battleLevel: 27,
   },
-  buildingDays: 28,
-  requiredHull: "Large Flush Deck Style Hull",
   originalSkill: {
     name: originalSkill.name,
     iconId: originalSkill.iconId,

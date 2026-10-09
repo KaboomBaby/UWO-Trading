@@ -66,8 +66,6 @@ export type ShipDetails = {
     tradeLevel: number;
     battleLevel: number;
   };
-  buildingDays: number;
-  requiredHull: string;
   originalSkill: ShipSkill | null;
   optionalSkills: ShipSkill[];
 };

@@ -186,12 +186,39 @@ describe("listing detail page", () => {
     expect(screen.getByText("28 / 5")).toBeInTheDocument();
     expect(screen.getByText("Sailors required")).toBeInTheDocument();
     expect(screen.getByText("45")).toBeInTheDocument();
-    expect(screen.getByText("Req. building days")).toBeInTheDocument();
-    expect(screen.getByText("28")).toBeInTheDocument();
-    expect(screen.getByText("Large Flush Deck Style Hull")).toBeInTheDocument();
+    expect(screen.queryByText("Req. building days")).not.toBeInTheDocument();
+    expect(screen.queryByText("Required hull")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Large Flush Deck Style Hull"),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("Enhance Ship Handling")).toBeInTheDocument();
     expect(screen.getByText("Emergency Acceleration")).toBeInTheDocument();
     expect(screen.getAllByText("Original").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders legacy rows while ignoring retired shipbuilding fields", async () => {
+    const legacyShipDetails = {
+      ...testShipDetailsWithSkills,
+      buildingDays: 99,
+      requiredHull: "Legacy Flush Deck Style Hull",
+    };
+    repository.get.mockResolvedValueOnce({
+      ...knownListing,
+      shipDetails: legacyShipDetails,
+    });
+    renderApp("/listings/adventurer-frigate");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Adventurer Frigate (Heavy)",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Durability")).toBeInTheDocument();
+    expect(screen.queryByText("Req. building days")).not.toBeInTheDocument();
+    expect(screen.queryByText("Required hull")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Legacy Flush Deck Style Hull"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows an expired notice while retaining the listing", async () => {

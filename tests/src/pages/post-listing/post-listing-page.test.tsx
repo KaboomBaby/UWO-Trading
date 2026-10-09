@@ -93,11 +93,6 @@ async function fillShipSpecifications(
   await user.type(screen.getByLabelText("Adventure Lv"), "42");
   await user.type(screen.getByLabelText("Trade Lv"), "61");
   await user.type(screen.getByLabelText("Battle Lv"), "27");
-  await user.type(screen.getByLabelText("Req. building days"), "28");
-  await user.type(
-    screen.getByLabelText("Required ship hull"),
-    "Large Flush Deck Style Hull",
-  );
 }
 
 describe("post listing page", () => {
@@ -212,8 +207,12 @@ describe("post listing page", () => {
     expect(screen.getByLabelText("Ship type")).toBeInTheDocument();
     expect(screen.getByLabelText("Ship class")).toBeInTheDocument();
     expect(screen.getByLabelText("Sailors required")).toBeInTheDocument();
-    expect(screen.getByLabelText("Req. building days")).toBeInTheDocument();
-    expect(screen.getByLabelText("Required ship hull")).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Req. building days"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Required ship hull"),
+    ).not.toBeInTheDocument();
   });
 
   it("requires complete ship specifications before creating a Ships listing", async () => {
@@ -326,6 +325,9 @@ describe("post listing page", () => {
       screen.getByRole("heading", { name: "Trading Schooner is ready" }),
     ).toHaveFocus();
     expect(repository.create).toHaveBeenCalledTimes(1);
+    const createdInput = repository.create.mock.calls[0]?.[0];
+    expect(createdInput?.shipDetails).not.toHaveProperty("buildingDays");
+    expect(createdInput?.shipDetails).not.toHaveProperty("requiredHull");
     expect(repository.create).toHaveBeenCalledWith({
       title: "Trading Schooner",
       category: "ships",

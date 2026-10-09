@@ -127,12 +127,8 @@ function validateShipDetails(
     return;
   }
 
-  if (
-    !isNonnegativeInteger(details.durability) ||
-    !isNonnegativeInteger(details.buildingDays)
-  ) {
-    errors.shipDetails =
-      "Durability and required building days must be whole numbers of zero or more.";
+  if (!isNonnegativeInteger(details.durability)) {
+    errors.shipDetails = "Durability must be a whole number of zero or more.";
     return;
   }
   if (
@@ -151,11 +147,6 @@ function validateShipDetails(
       "Sailing requirements must be whole numbers of zero or more.";
     return;
   }
-  if (!details.requiredHull.trim()) {
-    errors.shipDetails = "Required ship hull is required.";
-    return;
-  }
-
   const optionalSkills = details.optionalSkills ?? [];
   if (optionalSkills.length > 5) {
     errors.shipDetails = "Choose at most five Optional ship skills.";

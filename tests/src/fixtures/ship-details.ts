@@ -30,8 +30,6 @@ export const testShipDetails: ShipDetails = {
     tradeLevel: 61,
     battleLevel: 27,
   },
-  buildingDays: 28,
-  requiredHull: "Large Flush Deck Style Hull",
   originalSkill: null,
   optionalSkills: [],
 };

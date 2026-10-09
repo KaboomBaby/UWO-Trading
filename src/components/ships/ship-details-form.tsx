@@ -34,8 +34,6 @@ export type ShipFormState = {
   adventureLevel: string;
   tradeLevel: string;
   battleLevel: string;
-  buildingDays: string;
-  requiredHull: string;
   originalSkill: string;
   optionalSkills: string[];
 };
@@ -60,8 +58,6 @@ export const emptyShipForm: ShipFormState = {
   adventureLevel: "",
   tradeLevel: "",
   battleLevel: "",
-  buildingDays: "",
-  requiredHull: "",
   originalSkill: "",
   optionalSkills: ["", "", "", "", ""],
 };
@@ -98,7 +94,6 @@ const numberRequirements: Array<{
   { field: "adventureLevel", label: "Adventure Lv" },
   { field: "tradeLevel", label: "Trade Lv" },
   { field: "battleLevel", label: "Battle Lv" },
-  { field: "buildingDays", label: "Required building days" },
 ];
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -156,9 +151,6 @@ export function validateShipForm(form: ShipFormState): ShipFormErrors {
   if (!form.type) errors.type = "Ship type is required.";
   if (!form.shipClass) errors.shipClass = "Ship class is required.";
   if (!form.role.trim()) errors.role = "Ship role is required.";
-  if (!form.requiredHull.trim()) {
-    errors.requiredHull = "Required ship hull is required.";
-  }
   const selectedSkills = [form.originalSkill, ...form.optionalSkills].filter(
     Boolean,
   );
@@ -204,8 +196,6 @@ export function shipDetailsFromForm(form: ShipFormState): ShipDetails {
       tradeLevel: Number(form.tradeLevel),
       battleLevel: Number(form.battleLevel),
     },
-    buildingDays: Number(form.buildingDays),
-    requiredHull: form.requiredHull.trim(),
     originalSkill: (() => {
       const skill = form.originalSkill
         ? getOriginalShipSkill(form.originalSkill)
@@ -249,8 +239,6 @@ export function shipFormFromDetails(
     adventureLevel: String(details.sailingRequirements.adventureLevel),
     tradeLevel: String(details.sailingRequirements.tradeLevel),
     battleLevel: String(details.sailingRequirements.battleLevel),
-    buildingDays: String(details.buildingDays),
-    requiredHull: details.requiredHull,
     originalSkill: details.originalSkill?.iconId ?? "",
     optionalSkills: [
       details.optionalSkills[0]?.iconId ?? "",
@@ -576,36 +564,6 @@ export function ShipDetailsForm({
           </p>
         ) : null}
       </fieldset>
-
-      <div className="mt-6 grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)]">
-        <NumberField
-          errors={errors}
-          field="buildingDays"
-          form={form}
-          label="Req. building days"
-          onChange={onChange}
-        />
-        <div>
-          <label
-            className="text-sm font-semibold text-slate-200"
-            htmlFor="requiredHull"
-          >
-            Required ship hull
-          </label>
-          <input
-            aria-invalid={Boolean(errors.requiredHull)}
-            className={inputClassName}
-            id="requiredHull"
-            name="requiredHull"
-            onChange={(event) => onChange("requiredHull", event.target.value)}
-            placeholder="Large Flush Deck Style Hull"
-            required
-            type="text"
-            value={form.requiredHull}
-          />
-          <FieldError id="requiredHull-error" message={errors.requiredHull} />
-        </div>
-      </div>
     </section>
   );
 }

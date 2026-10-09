@@ -372,6 +372,18 @@ describe("local listing repository", () => {
     ).toBe("Ship skills must come from their matching game list.");
   });
 
+  it("ignores retired shipbuilding keys in legacy ship details", () => {
+    const legacyShipDetails = {
+      ...testShipDetails,
+      buildingDays: 99,
+      requiredHull: "Legacy Flush Deck Style Hull",
+    };
+
+    expect(
+      validateListingInput({ ...validInput, shipDetails: legacyShipDetails }),
+    ).toEqual({});
+  });
+
   it("validates that improvements are nonnegative whole numbers", () => {
     expect(
       validateListingInput({
