@@ -33,8 +33,17 @@ describe("application routes", () => {
   it("renders the post listing route", () => {
     renderApp("/post");
     expect(
-      screen.getByRole("heading", { name: /post a listing/i }),
+      screen.getByRole("heading", { name: /sign in to post a listing/i }),
     ).toBeInTheDocument();
+  });
+
+  it("renders the account route", () => {
+    renderApp("/account");
+    expect(
+      screen.getByRole("heading", { name: /sign in/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Email")).toBeInTheDocument();
+    expect(screen.getByLabelText("Password")).toBeInTheDocument();
   });
 
   it("renders a known listing detail route", async () => {

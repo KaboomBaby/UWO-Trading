@@ -18,6 +18,9 @@ import { getSupabaseClient } from "../../../src/lib/supabase-client";
 import type {
   CreateOfferInput,
   CreateListingInput,
+  Listing,
+  ListingCurrency,
+  Offer,
   ShipDetails,
 } from "../../../src/types/listing";
 import { testShipDetails } from "../fixtures/ship-details";
@@ -47,8 +50,30 @@ const validOfferInput: CreateOfferInput = {
   offerText: "Twelve Captain Tickets and a fitted cannon set.",
 };
 
+function localListingFixture(): Listing {
+  return {
+    id: "local-frigate",
+    title: "Local Schooner",
+    category: "ships",
+    price: 32_000_000,
+    currency: "ducats",
+    description: "A swift local fixture vessel.",
+    seller: "AmsterdamShipyard",
+    location: "Amsterdam",
+    server: "Maris",
+    contactNote: "",
+    imageEmoji: "🚢",
+    shipDetails: testShipDetails,
+    createdAt: "2026-10-01T12:00:00Z",
+    expiresAt: "2026-10-15T12:00:00Z",
+    soldAt: null,
+    collection: "current",
+  };
+}
+
 type ListingRow = {
   id: string;
+  owner_id: string | null;
   title: string;
   category: "ships";
   price: number | null;
@@ -64,6 +89,18 @@ type ListingRow = {
   expires_at: string;
   sold_at: string | null;
   collection: "current" | "legacy" | null;
+};
+
+type OfferRow = {
+  id: string;
+  listing_id: string;
+  offerer_name: string;
+  contact: string;
+  currency: ListingCurrency;
+  amount: number | null;
+  offer_text: string;
+  status: Offer["status"];
+  created_at: string;
 };
 
 type SupabaseResponse = {
@@ -85,6 +122,8 @@ type CapturedRequest = {
   order: { column: string; options: { ascending: boolean } } | null;
   singleMode: "single" | "maybeSingle" | null;
   insert: Record<string, unknown> | null;
+  update: Record<string, unknown> | null;
+  isDelete: boolean;
 };
 
 type QueryChain = {
@@ -97,6 +136,9 @@ type QueryChain = {
   ): QueryChain;
   maybeSingle(): Promise<SupabaseResponse>;
   single(): Promise<SupabaseResponse>;
+  select(columns?: string): QueryChain;
+  update(values: Record<string, unknown>): QueryChain;
+  delete(): QueryChain;
   then(
     onFulfilled?: (response: SupabaseResponse) => unknown,
     onRejected?: (reason: unknown) => unknown,
@@ -104,11 +146,12 @@ type QueryChain = {
 };
 
 function createMockSupabaseClient(initialResponse: SupabaseResponse) {
-  let response = initialResponse;
+  const responses: SupabaseResponse[] = [initialResponse];
   const requests: CapturedRequest[] = [];
 
   function currentResponse(): SupabaseResponse {
-    return { ...response };
+    if (responses.length <= 1) return { ...responses[0] };
+    return responses.shift() as SupabaseResponse;
   }
 
   function createFilter(request: CapturedRequest): QueryChain {
@@ -127,6 +170,18 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
       },
       order(column, options) {
         request.order = { column, options };
+        return filter;
+      },
+      select(columns = "*") {
+        request.select = columns;
+        return filter;
+      },
+      update(values) {
+        request.update = values;
+        return filter;
+      },
+      delete() {
+        request.isDelete = true;
         return filter;
       },
       maybeSingle() {
@@ -155,6 +210,8 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
         order: null,
         singleMode: null,
         insert: null,
+        update: null,
+        isDelete: false,
       };
       requests.push(request);
 
@@ -172,6 +229,14 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
             },
           };
         },
+        update(values: Record<string, unknown>) {
+          request.update = values;
+          return createFilter(request);
+        },
+        delete() {
+          request.isDelete = true;
+          return createFilter(request);
+        },
       };
     },
   };
@@ -187,6 +252,8 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
         order: null,
         singleMode: null,
         insert: null,
+        update: null,
+        isDelete: false,
       };
       requests.push(request);
       return {
@@ -206,13 +273,21 @@ function createMockSupabaseClient(initialResponse: SupabaseResponse) {
     client: rpcClient as unknown as SupabaseClient,
     requests,
     respond(nextResponse: SupabaseResponse) {
-      response = nextResponse;
+      responses.splice(0, responses.length, nextResponse);
+    },
+    respondMany(nextResponses: SupabaseResponse[]) {
+      responses.splice(1, 0, ...nextResponses);
     },
   };
 }
 
+function successfulResponse(data: unknown): SupabaseResponse {
+  return { data, error: null, status: 200, statusText: "OK" };
+}
+
 const dbListing: ListingRow = {
   id: "supabase-frigate",
+  owner_id: "player-account-1",
   title: "Supabase Frigate",
   category: "ships",
   price: 42_000_000,
@@ -232,6 +307,7 @@ const dbListing: ListingRow = {
 
 const expectedListing = {
   id: "supabase-frigate",
+  ownerId: "player-account-1",
   title: "Supabase Frigate",
   category: "ships",
   price: 42_000_000,
@@ -248,6 +324,18 @@ const expectedListing = {
   soldAt: null,
   collection: "legacy",
 } as const;
+
+const dbOffer: OfferRow = {
+  id: "supabase-offer",
+  listing_id: dbListing.id,
+  offerer_name: "Captain Offer",
+  contact: "In-game mail",
+  currency: "CT",
+  amount: 120,
+  offer_text: "Twelve Captain Tickets and a fitted cannon set.",
+  status: "pending",
+  created_at: "2026-10-02T12:00:00Z",
+};
 
 const getSupabaseClientMock = vi.mocked(getSupabaseClient);
 
@@ -405,29 +493,31 @@ describe("local listing repository", () => {
   it("manages a local listing through its private edit code", async () => {
     const repository = createLocalListingRepository([]);
     const created = await repository.create(validInput);
+    const createdEditCode = created.editCode;
+    if (!createdEditCode) throw new Error("Expected a local edit code");
 
-    expect(created.editCode).toMatch(/^[a-f0-9]{32}$/);
-    expect(await repository.findByEditCode(created.editCode)).toMatchObject({
+    expect(createdEditCode).toMatch(/^[a-f0-9]{32}$/);
+    expect(await repository.findByEditCode(createdEditCode)).toMatchObject({
       id: created.id,
     });
     expect(await repository.findByEditCode("wrong-code")).toBeUndefined();
 
-    const updated = await repository.update(created.editCode, {
+    const updated = await repository.update(createdEditCode, {
       ...validInput,
       title: "Updated Schooner",
     });
     expect(updated.title).toBe("Updated Schooner");
     expect(updated.shipDetails).toEqual(testShipDetails);
 
-    const sold = await repository.markSold(created.editCode);
+    const sold = await repository.markSold(createdEditCode);
     expect(sold.soldAt).toEqual(expect.any(String));
 
-    const renewed = await repository.renew(created.editCode);
+    const renewed = await repository.renew(createdEditCode);
     expect(new Date(renewed.expiresAt).getTime()).toBeGreaterThan(Date.now());
 
-    await repository.delete(created.editCode);
+    await repository.delete(createdEditCode);
     expect(await repository.get(created.id)).toBeUndefined();
-    await expect(repository.delete(created.editCode)).rejects.toThrow(
+    await expect(repository.delete(createdEditCode)).rejects.toThrow(
       "Listing edit code not found.",
     );
   });
@@ -435,6 +525,8 @@ describe("local listing repository", () => {
   it("creates and manages local offers and reports", async () => {
     const repository = createLocalListingRepository([]);
     const created = await repository.create(validInput);
+    const createdEditCode = created.editCode;
+    if (!createdEditCode) throw new Error("Expected a local edit code");
     const offerInput = {
       offererName: "Captain Offer",
       contact: "In-game mail",
@@ -446,17 +538,17 @@ describe("local listing repository", () => {
     await repository.createOffer(created.id, offerInput);
     await expect(repository.countOffers(created.id)).resolves.toBe(1);
 
-    const [offer] = await repository.listOffers(created.editCode);
+    const [offer] = await repository.listOffers(createdEditCode);
     expect(offer).toMatchObject({
       offererName: "Captain Offer",
       status: "pending",
     });
 
     await expect(
-      repository.acceptOffer(created.editCode, offer.id),
+      repository.acceptOffer(createdEditCode, offer.id),
     ).resolves.toMatchObject({ status: "accepted" });
     await expect(
-      repository.declineOffer(created.editCode, offer.id),
+      repository.declineOffer(createdEditCode, offer.id),
     ).resolves.toMatchObject({ status: "declined" });
 
     await repository.report(created.id, {
@@ -464,6 +556,68 @@ describe("local listing repository", () => {
       reason: "spam",
       details: "Duplicate posting.",
     });
+  });
+
+  it("manages local owner listings and offers without edit codes", async () => {
+    const ownedListing: Listing = {
+      ...localListingFixture(),
+      id: "owned-local-frigate",
+      ownerId: "player-account-1",
+    };
+    const legacyListing: Listing = {
+      ...ownedListing,
+      id: "legacy-local-frigate",
+      ownerId: null,
+    };
+    const repository = createLocalListingRepository([
+      ownedListing,
+      legacyListing,
+    ]);
+
+    await expect(repository.listOwned("player-account-1")).resolves.toEqual([
+      ownedListing,
+    ]);
+
+    const updated = await repository.updateOwned(
+      ownedListing.id,
+      "player-account-1",
+      { ...validInput, title: "Updated Owner Schooner" },
+    );
+    expect(updated.title).toBe("Updated Owner Schooner");
+
+    await repository.createOffer(ownedListing.id, validOfferInput);
+    const [offer] = await repository.listOffersOwned(
+      "player-account-1",
+      ownedListing.id,
+    );
+    if (!offer) throw new Error("Expected an owner-path offer");
+
+    await expect(
+      repository.acceptOwnedOffer(
+        "player-account-1",
+        ownedListing.id,
+        offer.id,
+      ),
+    ).resolves.toMatchObject({ status: "accepted" });
+    await expect(
+      repository.declineOwnedOffer(
+        "player-account-1",
+        ownedListing.id,
+        offer.id,
+      ),
+    ).resolves.toMatchObject({ status: "declined" });
+
+    await expect(
+      repository.markSoldOwned(ownedListing.id, "player-account-1"),
+    ).resolves.toMatchObject({ soldAt: expect.any(String) });
+    await expect(
+      repository.renewOwned(ownedListing.id, "player-account-1"),
+    ).resolves.toMatchObject({ expiresAt: expect.any(String) });
+    await repository.deleteOwned(ownedListing.id, "player-account-1");
+    expect(await repository.get(ownedListing.id)).toBeUndefined();
+    await expect(
+      repository.updateOwned("wrong-owner", "player-account-1", validInput),
+    ).rejects.toThrow("Owned listing was not found.");
   });
 
   it("accepts omitted and blank offer contact details without validation errors", () => {
@@ -493,6 +647,8 @@ describe("local listing repository", () => {
   it("normalizes omitted and blank offer contact to an empty string locally", async () => {
     const repository = createLocalListingRepository([]);
     const created = await repository.create(validInput);
+    const createdEditCode = created.editCode;
+    if (!createdEditCode) throw new Error("Expected a local edit code");
     const omittedContact = { ...validOfferInput };
     delete omittedContact.contact;
 
@@ -502,7 +658,7 @@ describe("local listing repository", () => {
       contact: "   ",
     });
 
-    const offers = await repository.listOffers(created.editCode);
+    const offers = await repository.listOffers(createdEditCode);
     expect(offers.map((offer) => offer.contact)).toEqual(["", ""]);
   });
 
@@ -635,12 +791,9 @@ describe("Supabase listing repository", () => {
     expect(await repository.get("missing")).toBeUndefined();
   });
 
-  it("validates before inserting, then maps the created row", async () => {
+  it("validates before calling create_owned_listing and returns no edit code", async () => {
     const mock = createMockSupabaseClient({
-      data: {
-        listing: dbListing,
-        edit_code: expect.any(String),
-      },
+      data: dbListing,
       error: null,
       status: 201,
       statusText: "Created",
@@ -653,16 +806,13 @@ describe("Supabase listing repository", () => {
     expect(mock.requests).toHaveLength(0);
 
     const created = await repository.create(validInput);
-    expect(created).toEqual({
-      ...expectedListing,
-      editCode: expect.any(String),
-    });
+    expect(created).toEqual(expectedListing);
+    expect(created.editCode).toBeUndefined();
 
     expect(mock.requests).toHaveLength(1);
     expect(mock.requests[0]?.rpc).toMatchObject({
-      functionName: "create_listing",
+      functionName: "create_owned_listing",
       args: {
-        edit_code: expect.any(String),
         title: validInput.title,
         category: validInput.category,
         price: validInput.price,
@@ -678,6 +828,121 @@ describe("Supabase listing repository", () => {
       },
     });
     expect(mock.requests[0]?.singleMode).toBe("single");
+    expect(mock.requests[0]?.rpc?.args).not.toHaveProperty("edit_code");
+  });
+
+  it("loads and mutates only listings owned by the account", async () => {
+    const mock = createMockSupabaseClient(successfulResponse([dbListing]));
+    const repository = createSupabaseListingRepository(mock.client);
+
+    await expect(repository.listOwned("player-account-1")).resolves.toEqual([
+      expectedListing,
+    ]);
+    expect(mock.requests[0]).toMatchObject({
+      table: "listings",
+      filters: [{ type: "eq", column: "owner_id", value: "player-account-1" }],
+    });
+
+    mock.respond(successfulResponse(dbListing));
+    await expect(
+      repository.updateOwned(dbListing.id, "player-account-1", validInput),
+    ).resolves.toEqual(expectedListing);
+    expect(mock.requests[1]).toMatchObject({
+      update: expect.objectContaining({ title: validInput.title }),
+      filters: [
+        { type: "eq", column: "id", value: dbListing.id },
+        { type: "eq", column: "owner_id", value: "player-account-1" },
+      ],
+      select: "*",
+      singleMode: "maybeSingle",
+    });
+
+    mock.respond(successfulResponse(dbListing));
+    await expect(
+      repository.markSoldOwned(dbListing.id, "player-account-1"),
+    ).resolves.toEqual(expectedListing);
+    expect(mock.requests[2]?.update).toMatchObject({
+      sold_at: expect.any(String),
+    });
+
+    mock.respond(successfulResponse(dbListing));
+    await expect(
+      repository.renewOwned(dbListing.id, "player-account-1"),
+    ).resolves.toEqual(expectedListing);
+    expect(mock.requests[3]?.update).toMatchObject({
+      expires_at: expect.any(String),
+    });
+
+    mock.respond(successfulResponse(null));
+    await expect(
+      repository.deleteOwned(dbListing.id, "player-account-1"),
+    ).resolves.toBeUndefined();
+    expect(mock.requests[4]).toMatchObject({
+      table: "listings",
+      isDelete: true,
+      filters: [
+        { type: "eq", column: "id", value: dbListing.id },
+        { type: "eq", column: "owner_id", value: "player-account-1" },
+      ],
+    });
+  });
+
+  it("uses owner paths for listing offers", async () => {
+    const listMock = createMockSupabaseClient(
+      successfulResponse({ id: dbListing.id, owner_id: dbListing.owner_id }),
+    );
+    listMock.respondMany([successfulResponse([dbOffer])]);
+    const listRepository = createSupabaseListingRepository(listMock.client);
+
+    await expect(
+      listRepository.listOffersOwned("player-account-1", dbListing.id),
+    ).resolves.toEqual([
+      {
+        id: dbOffer.id,
+        listingId: dbOffer.listing_id,
+        offererName: dbOffer.offerer_name,
+        contact: dbOffer.contact,
+        currency: dbOffer.currency,
+        amount: dbOffer.amount,
+        offerText: dbOffer.offer_text,
+        status: dbOffer.status,
+        createdAt: dbOffer.created_at,
+      },
+    ]);
+    expect(listMock.requests[0]).toMatchObject({
+      table: "listings",
+      filters: [
+        { type: "eq", column: "id", value: dbListing.id },
+        { type: "eq", column: "owner_id", value: "player-account-1" },
+      ],
+    });
+    expect(listMock.requests[1]).toMatchObject({
+      table: "offers",
+      filters: [{ type: "eq", column: "listing_id", value: dbListing.id }],
+    });
+
+    const acceptMock = createMockSupabaseClient(
+      successfulResponse({ id: dbListing.id, owner_id: dbListing.owner_id }),
+    );
+    acceptMock.respondMany([
+      successfulResponse({ ...dbOffer, status: "accepted" }),
+    ]);
+    const acceptRepository = createSupabaseListingRepository(acceptMock.client);
+    await expect(
+      acceptRepository.acceptOwnedOffer(
+        "player-account-1",
+        dbListing.id,
+        dbOffer.id,
+      ),
+    ).resolves.toMatchObject({ status: "accepted" });
+    expect(acceptMock.requests[1]).toMatchObject({
+      table: "offers",
+      update: { status: "accepted" },
+      filters: [
+        { type: "eq", column: "id", value: dbOffer.id },
+        { type: "eq", column: "listing_id", value: dbListing.id },
+      ],
+    });
   });
 
   it("manages a listing through verified edit-code RPCs", async () => {

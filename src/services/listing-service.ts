@@ -24,6 +24,15 @@ export interface ListingRepository {
   list(query?: ListingQuery): Promise<Listing[]>;
   get(id: string): Promise<Listing | undefined>;
   create(input: CreateListingInput): Promise<CreatedListing>;
+  listOwned(ownerId: string): Promise<Listing[]>;
+  updateOwned(
+    listingId: string,
+    ownerId: string,
+    input: UpdateListingInput,
+  ): Promise<Listing>;
+  markSoldOwned(listingId: string, ownerId: string): Promise<Listing>;
+  renewOwned(listingId: string, ownerId: string): Promise<Listing>;
+  deleteOwned(listingId: string, ownerId: string): Promise<void>;
   findByEditCode(editCode: string): Promise<Listing | undefined>;
   update(editCode: string, input: UpdateListingInput): Promise<Listing>;
   markSold(editCode: string): Promise<Listing>;
@@ -33,6 +42,17 @@ export interface ListingRepository {
   listOffers(editCode: string): Promise<Offer[]>;
   acceptOffer(editCode: string, offerId: string): Promise<Offer>;
   declineOffer(editCode: string, offerId: string): Promise<Offer>;
+  listOffersOwned(ownerId: string, listingId: string): Promise<Offer[]>;
+  acceptOwnedOffer(
+    ownerId: string,
+    listingId: string,
+    offerId: string,
+  ): Promise<Offer>;
+  declineOwnedOffer(
+    ownerId: string,
+    listingId: string,
+    offerId: string,
+  ): Promise<Offer>;
   countOffers(listingId: string): Promise<number>;
   report(listingId: string, input: CreateReportInput): Promise<void>;
 }
@@ -280,6 +300,7 @@ export class SupabaseListingRepositoryError extends Error {
 
 type ListingRow = {
   id: string;
+  owner_id: string | null;
   title: string;
   category: ListingCategory;
   price: number | null;
@@ -295,11 +316,6 @@ type ListingRow = {
   expires_at: string;
   sold_at: string | null;
   collection: ListingCollection | null;
-};
-
-type CreateListingRpcResult = {
-  listing: ListingRow;
-  edit_code: string;
 };
 
 type OfferRow = {
@@ -326,6 +342,7 @@ function assertSuccessfulResponse(
 function mapListingRow(row: ListingRow): Listing {
   return {
     id: row.id,
+    ownerId: row.owner_id,
     title: row.title,
     category: row.category,
     price: row.price,
@@ -399,6 +416,45 @@ function listingRpcArguments(editCode: string, input: CreateListingInput) {
   };
 }
 
+function ownedListingRpcArguments(input: CreateListingInput) {
+  return {
+    title: input.title.trim(),
+    category: input.category,
+    currency: input.currency,
+    price: input.price,
+    description: input.description.trim(),
+    seller: input.seller.trim(),
+    location: input.location.trim(),
+    server_name: input.server.trim(),
+    contact_note: input.contactNote?.trim() ?? "",
+    image_emoji: input.imageEmoji ?? "📦",
+    ship_details: input.shipDetails ?? null,
+    collection: input.collection ?? "current",
+  };
+}
+
+function listingUpdateArguments(input: UpdateListingInput) {
+  return {
+    title: input.title.trim(),
+    category: input.category,
+    currency: input.currency,
+    price: input.price,
+    description: input.description.trim(),
+    seller: input.seller.trim(),
+    location: input.location.trim(),
+    server: input.server.trim(),
+    contact_note: input.contactNote?.trim() ?? "",
+    image_emoji: input.imageEmoji ?? "📦",
+    ship_details: input.shipDetails ?? null,
+    collection: input.collection ?? "current",
+  };
+}
+
+function requireOwnedListingRow(row: ListingRow | null) {
+  if (!row) throw new Error("Owned listing was not found.");
+  return row;
+}
+
 export function createSupabaseListingRepository(
   client: SupabaseClient,
 ): ListingRepository {
@@ -456,20 +512,91 @@ export function createSupabaseListingRepository(
       return data ? mapListingRow(data as ListingRow) : undefined;
     },
 
+    async listOwned(ownerId: string) {
+      const { data, error } = await client
+        .from("listings")
+        .select("*")
+        .eq("owner_id", ownerId)
+        .order("created_at", { ascending: false });
+
+      assertSuccessfulResponse("load owned listings", error);
+      return (data ?? []).map(mapListingRow);
+    },
+
     async create(input: CreateListingInput) {
       const errors = validateListingInput(input);
       if (Object.keys(errors).length > 0) {
         throw new ListingValidationError(errors);
       }
 
-      const editCode = generateListingEditCode();
       const { data, error } = await client
-        .rpc("create_listing", listingRpcArguments(editCode, input))
+        .rpc("create_owned_listing", ownedListingRpcArguments(input))
         .single();
 
       assertSuccessfulResponse("create listing", error);
-      const result = data as CreateListingRpcResult;
-      return { ...mapListingRow(result.listing), editCode: result.edit_code };
+      return mapListingRow(requireOwnedListingRow(data as ListingRow | null));
+    },
+
+    async updateOwned(
+      listingId: string,
+      ownerId: string,
+      input: UpdateListingInput,
+    ) {
+      const errors = validateListingInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+
+      const { data, error } = await client
+        .from("listings")
+        .update(listingUpdateArguments(input))
+        .eq("id", listingId)
+        .eq("owner_id", ownerId)
+        .select("*")
+        .maybeSingle();
+
+      assertSuccessfulResponse("update owned listing", error);
+      return mapListingRow(requireOwnedListingRow(data as ListingRow | null));
+    },
+
+    async markSoldOwned(listingId: string, ownerId: string) {
+      const { data, error } = await client
+        .from("listings")
+        .update({ sold_at: new Date().toISOString() })
+        .eq("id", listingId)
+        .eq("owner_id", ownerId)
+        .select("*")
+        .maybeSingle();
+
+      assertSuccessfulResponse("mark owned listing sold", error);
+      return mapListingRow(requireOwnedListingRow(data as ListingRow | null));
+    },
+
+    async renewOwned(listingId: string, ownerId: string) {
+      const { data, error } = await client
+        .from("listings")
+        .update({
+          expires_at: new Date(
+            Date.now() + 14 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+        })
+        .eq("id", listingId)
+        .eq("owner_id", ownerId)
+        .select("*")
+        .maybeSingle();
+
+      assertSuccessfulResponse("renew owned listing", error);
+      return mapListingRow(requireOwnedListingRow(data as ListingRow | null));
+    },
+
+    async deleteOwned(listingId: string, ownerId: string) {
+      const { error } = await client
+        .from("listings")
+        .delete()
+        .eq("id", listingId)
+        .eq("owner_id", ownerId);
+
+      assertSuccessfulResponse("delete owned listing", error);
     },
 
     async findByEditCode(editCode: string) {
@@ -572,6 +699,89 @@ export function createSupabaseListingRepository(
       return mapOfferRow(data as OfferRow);
     },
 
+    async listOffersOwned(ownerId: string, listingId: string) {
+      const { data: ownedListing, error: listingError } = await client
+        .from("listings")
+        .select("id")
+        .eq("id", listingId)
+        .eq("owner_id", ownerId)
+        .maybeSingle();
+
+      assertSuccessfulResponse("load owned listing for offers", listingError);
+      requireOwnedListingRow(ownedListing as ListingRow | null);
+
+      const { data, error } = await client
+        .from("offers")
+        .select("*")
+        .eq("listing_id", listingId)
+        .order("created_at", { ascending: false });
+
+      assertSuccessfulResponse("load owned listing offers", error);
+      return (data ?? []).map((row) => mapOfferRow(row as OfferRow));
+    },
+
+    async acceptOwnedOffer(
+      ownerId: string,
+      listingId: string,
+      offerId: string,
+    ) {
+      const { data: ownedListing, error: listingError } = await client
+        .from("listings")
+        .select("id")
+        .eq("id", listingId)
+        .eq("owner_id", ownerId)
+        .maybeSingle();
+
+      assertSuccessfulResponse(
+        "load owned listing for offer update",
+        listingError,
+      );
+      requireOwnedListingRow(ownedListing as ListingRow | null);
+
+      const { data, error } = await client
+        .from("offers")
+        .update({ status: "accepted" })
+        .eq("id", offerId)
+        .eq("listing_id", listingId)
+        .select("*")
+        .maybeSingle();
+
+      assertSuccessfulResponse("accept owned listing offer", error);
+      if (!data) throw new Error("Owned listing offer was not found.");
+      return mapOfferRow(data as OfferRow);
+    },
+
+    async declineOwnedOffer(
+      ownerId: string,
+      listingId: string,
+      offerId: string,
+    ) {
+      const { data: ownedListing, error: listingError } = await client
+        .from("listings")
+        .select("id")
+        .eq("id", listingId)
+        .eq("owner_id", ownerId)
+        .maybeSingle();
+
+      assertSuccessfulResponse(
+        "load owned listing for offer update",
+        listingError,
+      );
+      requireOwnedListingRow(ownedListing as ListingRow | null);
+
+      const { data, error } = await client
+        .from("offers")
+        .update({ status: "declined" })
+        .eq("id", offerId)
+        .eq("listing_id", listingId)
+        .select("*")
+        .maybeSingle();
+
+      assertSuccessfulResponse("decline owned listing offer", error);
+      if (!data) throw new Error("Owned listing offer was not found.");
+      return mapOfferRow(data as OfferRow);
+    },
+
     async countOffers(listingId: string) {
       const { data, error } = await client
         .rpc("listing_offer_count", { listing_id: listingId })
@@ -641,6 +851,14 @@ export function createLocalListingRepository(
       return listing ? { ...listing } : undefined;
     },
 
+    async listOwned(ownerId: string) {
+      return listings
+        .filter((listing) => listing.ownerId === ownerId)
+        .slice()
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .map((listing) => ({ ...listing }));
+    },
+
     async create(input: CreateListingInput) {
       const errors = validateListingInput(input);
       if (Object.keys(errors).length > 0) {
@@ -675,6 +893,77 @@ export function createLocalListingRepository(
         (item) => editCodes.get(item.id) === editCode,
       );
       return listing ? { ...listing } : undefined;
+    },
+
+    async updateOwned(
+      listingId: string,
+      ownerId: string,
+      input: UpdateListingInput,
+    ) {
+      const errors = validateListingInput(input);
+      if (Object.keys(errors).length > 0) {
+        throw new ListingValidationError(errors);
+      }
+
+      const index = listings.findIndex(
+        (listing) => listing.id === listingId && listing.ownerId === ownerId,
+      );
+      if (index === -1) throw new Error("Owned listing was not found.");
+
+      listings[index] = {
+        ...listings[index],
+        ...input,
+        price: input.price,
+        currency: input.currency,
+        title: input.title.trim(),
+        description: input.description.trim(),
+        seller: input.seller.trim(),
+        location: input.location.trim(),
+        server: input.server.trim(),
+        contactNote: input.contactNote?.trim() ?? "",
+        imageEmoji: input.imageEmoji ?? "📦",
+        shipDetails: input.shipDetails ?? null,
+        collection: input.collection ?? "current",
+      };
+      return { ...listings[index] };
+    },
+
+    async markSoldOwned(listingId: string, ownerId: string) {
+      const index = listings.findIndex(
+        (listing) => listing.id === listingId && listing.ownerId === ownerId,
+      );
+      if (index === -1) throw new Error("Owned listing was not found.");
+
+      listings[index] = {
+        ...listings[index],
+        soldAt: listings[index].soldAt ?? new Date().toISOString(),
+      };
+      return { ...listings[index] };
+    },
+
+    async renewOwned(listingId: string, ownerId: string) {
+      const index = listings.findIndex(
+        (listing) => listing.id === listingId && listing.ownerId === ownerId,
+      );
+      if (index === -1) throw new Error("Owned listing was not found.");
+
+      listings[index] = {
+        ...listings[index],
+        expiresAt: new Date(
+          Date.now() + 14 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+      };
+      return { ...listings[index] };
+    },
+
+    async deleteOwned(listingId: string, ownerId: string) {
+      const index = listings.findIndex(
+        (listing) => listing.id === listingId && listing.ownerId === ownerId,
+      );
+      if (index === -1) throw new Error("Owned listing was not found.");
+
+      const [listing] = listings.splice(index, 1);
+      editCodes.delete(listing.id);
     },
 
     async update(editCode: string, input: UpdateListingInput) {
@@ -801,6 +1090,55 @@ export function createLocalListingRepository(
       );
       if (!listing || index === -1) {
         throw new Error("Listing edit code or offer was not found.");
+      }
+
+      offers[index] = { ...offers[index], status: "declined" };
+      return { ...offers[index] };
+    },
+
+    async listOffersOwned(ownerId: string, listingId: string) {
+      const listing = listings.find(
+        (item) => item.id === listingId && item.ownerId === ownerId,
+      );
+      if (!listing) throw new Error("Owned listing was not found.");
+
+      return offers
+        .filter((offer) => offer.listingId === listing.id)
+        .map((offer) => ({ ...offer }));
+    },
+
+    async acceptOwnedOffer(
+      ownerId: string,
+      listingId: string,
+      offerId: string,
+    ) {
+      const listing = listings.find(
+        (item) => item.id === listingId && item.ownerId === ownerId,
+      );
+      const index = offers.findIndex(
+        (offer) => offer.id === offerId && offer.listingId === listing?.id,
+      );
+      if (!listing || index === -1) {
+        throw new Error("Owned listing or offer was not found.");
+      }
+
+      offers[index] = { ...offers[index], status: "accepted" };
+      return { ...offers[index] };
+    },
+
+    async declineOwnedOffer(
+      ownerId: string,
+      listingId: string,
+      offerId: string,
+    ) {
+      const listing = listings.find(
+        (item) => item.id === listingId && item.ownerId === ownerId,
+      );
+      const index = offers.findIndex(
+        (offer) => offer.id === offerId && offer.listingId === listing?.id,
+      );
+      if (!listing || index === -1) {
+        throw new Error("Owned listing or offer was not found.");
       }
 
       offers[index] = { ...offers[index], status: "declined" };

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
+import { useAuth } from "../../lib/auth-context";
 import { useListingRepository } from "../../lib/listing-repository-context";
 import { isExpiredAt, useCurrentTime } from "../../lib/use-current-time";
 import { shipSkillIconUrl } from "../../data/ship-skills";
@@ -50,6 +52,8 @@ type PendingOfferAction = {
   offerId: string;
   action: "accept" | "decline";
 };
+
+type ActiveListingMode = "owner" | "legacy";
 
 const currencyLabels = {
   ducats: "Ducats",
@@ -241,8 +245,13 @@ function errorMessage(error: unknown, action: string) {
 }
 
 export function ManageListingsPage() {
+  const { isInitializing, userId } = useAuth();
   const repository = useListingRepository();
   const currentTime = useCurrentTime();
+  const [ownedListings, setOwnedListings] = useState<Listing[]>([]);
+  const [isLoadingOwned, setIsLoadingOwned] = useState(false);
+  const [ownedError, setOwnedError] = useState<string | null>(null);
+  const [activeMode, setActiveMode] = useState<ActiveListingMode>("legacy");
   const [editCode, setEditCode] = useState("");
   const [activeEditCode, setActiveEditCode] = useState("");
   const [listing, setListing] = useState<Listing | null>(null);
@@ -282,6 +291,84 @@ export function ManageListingsPage() {
     }
   }, [listing?.id]);
 
+  useEffect(() => {
+    if (isInitializing) return;
+
+    if (!userId) {
+      const resetTimeoutId = window.setTimeout(() => {
+        setOwnedListings([]);
+        setOwnedError(null);
+        setIsLoadingOwned(false);
+        setListing(null);
+        setForm(null);
+        setActiveEditCode("");
+      }, 0);
+
+      return () => window.clearTimeout(resetTimeoutId);
+    }
+
+    let active = true;
+    const loadTimeoutId = window.setTimeout(() => {
+      if (!active) return;
+
+      setIsLoadingOwned(true);
+      setOwnedError(null);
+      repository
+        .listOwned(userId)
+        .then((listings) => {
+          if (active) setOwnedListings(listings);
+        })
+        .catch((error) => {
+          if (active) {
+            setOwnedListings([]);
+            setOwnedError(errorMessage(error, "load your listings"));
+          }
+        })
+        .finally(() => {
+          if (active) setIsLoadingOwned(false);
+        });
+    }, 0);
+
+    return () => {
+      active = false;
+      window.clearTimeout(loadTimeoutId);
+    };
+  }, [isInitializing, repository, userId]);
+
+  async function activateListing(
+    nextListing: Listing,
+    mode: ActiveListingMode,
+    nextEditCode = "",
+  ): Promise<void> {
+    shouldFocusSummaryRef.current = true;
+    setActiveMode(mode);
+    setActiveEditCode(nextEditCode);
+    setListing(nextListing);
+    setForm(formStateFromListing(nextListing));
+    setErrors({});
+    setActionError(null);
+    setActionFeedback(null);
+    setIsConfirmingDelete(false);
+    setOffers([]);
+    setOffersError(null);
+    setOfferFeedback(null);
+    setIsLoadingOffers(false);
+    setPendingOfferAction(null);
+
+    setIsLoadingOffers(true);
+    try {
+      setOffers(
+        mode === "owner" && userId
+          ? await repository.listOffersOwned(userId, nextListing.id)
+          : await repository.listOffers(nextEditCode),
+      );
+    } catch (error) {
+      setOffersError(errorMessage(error, "load offers"));
+    } finally {
+      setIsLoadingOffers(false);
+    }
+  }
+
   async function handleLookup(
     event: React.FormEvent<HTMLFormElement>,
   ): Promise<void> {
@@ -311,23 +398,7 @@ export function ManageListingsPage() {
         return;
       }
 
-      shouldFocusSummaryRef.current = true;
-      setActiveEditCode(nextEditCode);
-      setListing(nextListing);
-      setForm(formStateFromListing(nextListing));
-      setErrors({});
-      setActionError(null);
-      setActionFeedback(null);
-      setIsConfirmingDelete(false);
-
-      setIsLoadingOffers(true);
-      try {
-        setOffers(await repository.listOffers(nextEditCode));
-      } catch (error) {
-        setOffersError(errorMessage(error, "load offers"));
-      } finally {
-        setIsLoadingOffers(false);
-      }
+      await activateListing(nextListing, "legacy", nextEditCode);
     } catch (error) {
       setLookupError(errorMessage(error, "load this listing"));
     } finally {
@@ -397,18 +468,28 @@ export function ManageListingsPage() {
   function listingActionDidSucceed(listing: Listing, message: string) {
     setListing(listing);
     setForm(formStateFromListing(listing));
+    if (activeMode === "owner") {
+      setOwnedListings((current) =>
+        current.map((item) => (item.id === listing.id ? listing : item)),
+      );
+    }
     setActionError(null);
     setActionFeedback(message);
   }
 
   async function refreshOffers(): Promise<void> {
-    if (!activeEditCode || isLoadingOffers || pendingOfferAction) return;
+    if ((!listing || activeMode === "legacy") && !activeEditCode) return;
+    if (!listing || isLoadingOffers || pendingOfferAction) return;
 
     setIsLoadingOffers(true);
     setOffersError(null);
     setOfferFeedback(null);
     try {
-      setOffers(await repository.listOffers(activeEditCode));
+      setOffers(
+        activeMode === "owner" && userId
+          ? await repository.listOffersOwned(userId, listing.id)
+          : await repository.listOffers(activeEditCode),
+      );
     } catch (error) {
       setOffersError(errorMessage(error, "load offers"));
     } finally {
@@ -420,7 +501,8 @@ export function ManageListingsPage() {
     offer: Offer,
     action: PendingOfferAction["action"],
   ): Promise<void> {
-    if (!activeEditCode || isLoadingOffers || pendingOfferAction) return;
+    if ((!listing || activeMode === "legacy") && !activeEditCode) return;
+    if (!listing || isLoadingOffers || pendingOfferAction) return;
 
     setPendingOfferAction({ offerId: offer.id, action });
     setOffersError(null);
@@ -428,8 +510,12 @@ export function ManageListingsPage() {
     try {
       const updatedOffer =
         action === "accept"
-          ? await repository.acceptOffer(activeEditCode, offer.id)
-          : await repository.declineOffer(activeEditCode, offer.id);
+          ? activeMode === "owner" && userId
+            ? await repository.acceptOwnedOffer(userId, listing.id, offer.id)
+            : await repository.acceptOffer(activeEditCode, offer.id)
+          : activeMode === "owner" && userId
+            ? await repository.declineOwnedOffer(userId, listing.id, offer.id)
+            : await repository.declineOffer(activeEditCode, offer.id);
       setOffers((current) =>
         current.map((item) =>
           item.id === updatedOffer.id ? updatedOffer : item,
@@ -462,10 +548,11 @@ export function ManageListingsPage() {
 
     setPendingAction("save");
     try {
-      const updatedListing = await repository.update(
-        activeEditCode,
-        updateInputFromForm(form),
-      );
+      const input = updateInputFromForm(form);
+      const updatedListing =
+        activeMode === "owner" && userId && listing
+          ? await repository.updateOwned(listing.id, userId, input)
+          : await repository.update(activeEditCode, input);
       listingActionDidSucceed(updatedListing, "Changes saved.");
     } catch (error) {
       setActionError(errorMessage(error, "save this listing"));
@@ -481,7 +568,10 @@ export function ManageListingsPage() {
     setActionError(null);
     setActionFeedback(null);
     try {
-      const updatedListing = await repository.markSold(activeEditCode);
+      const updatedListing =
+        activeMode === "owner" && userId && listing
+          ? await repository.markSoldOwned(listing.id, userId)
+          : await repository.markSold(activeEditCode);
       listingActionDidSucceed(updatedListing, "Listing marked as SOLD.");
     } catch (error) {
       setActionError(errorMessage(error, "mark this listing sold"));
@@ -497,7 +587,10 @@ export function ManageListingsPage() {
     setActionError(null);
     setActionFeedback(null);
     try {
-      const updatedListing = await repository.renew(activeEditCode);
+      const updatedListing =
+        activeMode === "owner" && userId && listing
+          ? await repository.renewOwned(listing.id, userId)
+          : await repository.renew(activeEditCode);
       listingActionDidSucceed(
         updatedListing,
         "Listing renewed for 14 more days.",
@@ -515,7 +608,12 @@ export function ManageListingsPage() {
     setPendingAction("delete");
     setActionError(null);
     try {
-      await repository.delete(activeEditCode);
+      if (activeMode === "owner" && userId && listing) {
+        await repository.deleteOwned(listing.id, userId);
+      } else {
+        await repository.delete(activeEditCode);
+      }
+      const deletedListingTitle = listing?.title;
       setListing(null);
       setForm(null);
       setOffers([]);
@@ -525,7 +623,14 @@ export function ManageListingsPage() {
       setEditCode("");
       setErrors({});
       setIsConfirmingDelete(false);
-      setDeletedEditCode(activeEditCode);
+      if (activeMode === "owner") {
+        setOwnedListings((current) =>
+          current.filter((item) => item.id !== listing?.id),
+        );
+        setActionFeedback(`${deletedListingTitle} was permanently deleted.`);
+      } else {
+        setDeletedEditCode(activeEditCode);
+      }
     } catch (error) {
       setActionError(errorMessage(error, "delete this listing"));
     } finally {
@@ -541,9 +646,112 @@ export function ManageListingsPage() {
         </p>
         <h1 className="mt-4 text-3xl font-semibold text-white">My listings</h1>
         <p className="mt-3 text-slate-300">
-          Enter the edit code saved when your listing was posted. Expired
-          listings remain available here so they can be renewed.
+          Account-owned listings appear automatically below, including expired
+          listings. The legacy edit-code path remains available for older
+          listings.
         </p>
+
+        {isInitializing ? (
+          <p className="mt-6 text-sm text-slate-300" role="status">
+            Loading your account…
+          </p>
+        ) : userId ? (
+          <section
+            aria-labelledby="owned-listings-heading"
+            className="mt-6 rounded-2xl border border-white/10 bg-ink/70 p-5"
+          >
+            <h2
+              className="text-xl font-semibold text-white"
+              id="owned-listings-heading"
+            >
+              Your account listings
+            </h2>
+            {isLoadingOwned ? (
+              <p className="mt-3 text-sm text-slate-300" role="status">
+                Loading your listings…
+              </p>
+            ) : null}
+            {ownedError ? (
+              <p
+                className="mt-3 rounded-lg border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-100"
+                role="alert"
+              >
+                {ownedError}
+              </p>
+            ) : null}
+            {!isLoadingOwned && !ownedError && ownedListings.length === 0 ? (
+              <p className="mt-3 text-sm text-slate-300">
+                You have no account-owned listings yet.
+              </p>
+            ) : null}
+            {ownedListings.length > 0 ? (
+              <ul className="mt-4 grid gap-3">
+                {ownedListings.map((ownedListing) => (
+                  <li
+                    className={`rounded-xl border p-4 ${
+                      activeMode === "owner" && listing?.id === ownedListing.id
+                        ? "border-amber-glow/60 bg-amber-glow/10"
+                        : "border-white/10 bg-white/5"
+                    }`}
+                    key={ownedListing.id}
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-lg font-semibold text-white">
+                          {ownedListing.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-300">
+                          {formatListingPrice(
+                            ownedListing.price,
+                            ownedListing.currency,
+                          )}{" "}
+                          ·{" "}
+                          {ownedListing.soldAt
+                            ? "Sold"
+                            : isExpiredAt(ownedListing.expiresAt, currentTime)
+                              ? "Expired"
+                              : "Active"}
+                        </p>
+                      </div>
+                      <button
+                        className={secondaryButtonClassName}
+                        onClick={() =>
+                          void activateListing(ownedListing, "owner")
+                        }
+                        type="button"
+                      >
+                        {activeMode === "owner" &&
+                        listing?.id === ownedListing.id
+                          ? "Keep managing"
+                          : "Manage listing"}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        ) : (
+          <div className="mt-6 rounded-2xl border border-amber-glow/40 bg-amber-glow/10 p-5">
+            <h2 className="text-lg font-semibold text-white">
+              Sign in for automatic management
+            </h2>
+            <p className="mt-2 text-sm text-amber-100">
+              Account-owned listings appear here without an edit code. You can
+              still use the legacy lookup below for an older listing.
+            </p>
+            <Link
+              className={`${primaryButtonClassName} mt-4 inline-flex`}
+              to="/account?next=/manage"
+            >
+              Sign in
+            </Link>
+          </div>
+        )}
+
+        <h2 className="mt-8 text-xl font-semibold text-white">
+          Legacy edit-code lookup
+        </h2>
 
         <form
           aria-label="Find listing by edit code"

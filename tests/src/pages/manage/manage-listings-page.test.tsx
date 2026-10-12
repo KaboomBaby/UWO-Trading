@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -14,6 +15,11 @@ const repository = vi.hoisted(() => ({
   list: vi.fn(),
   get: vi.fn(),
   create: vi.fn(),
+  listOwned: vi.fn(),
+  updateOwned: vi.fn(),
+  markSoldOwned: vi.fn(),
+  renewOwned: vi.fn(),
+  deleteOwned: vi.fn(),
   findByEditCode: vi.fn(),
   update: vi.fn(),
   markSold: vi.fn(),
@@ -22,11 +28,21 @@ const repository = vi.hoisted(() => ({
   listOffers: vi.fn(),
   acceptOffer: vi.fn(),
   declineOffer: vi.fn(),
+  listOffersOwned: vi.fn(),
+  acceptOwnedOffer: vi.fn(),
+  declineOwnedOffer: vi.fn(),
 }));
+
+const useAuthMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../../../../src/services/listing-service", () => ({
   createLocalListingRepository: () => repository,
   createSupabaseListingRepository: () => repository,
+}));
+
+vi.mock("../../../../src/lib/auth-context", () => ({
+  AuthProvider: ({ children }: { children?: ReactNode }) => children,
+  useAuth: useAuthMock,
 }));
 
 const editCode = "0123456789abcdef0123456789abcdef";
@@ -104,14 +120,32 @@ async function loadListing(user: ReturnType<typeof userEvent.setup>) {
 describe("manage listings page", { timeout: 10_000 }, () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthMock.mockReturnValue({
+      email: "owner@example.com",
+      isInitializing: false,
+      isSupabaseEnabled: true,
+      register: vi.fn(),
+      session: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      userId: "player-account-1",
+    });
+    repository.listOwned.mockResolvedValue([]);
     repository.findByEditCode.mockResolvedValue(expiredListing);
     repository.update.mockResolvedValue(expiredListing);
     repository.markSold.mockResolvedValue(expiredListing);
     repository.renew.mockResolvedValue(expiredListing);
     repository.delete.mockResolvedValue(undefined);
     repository.listOffers.mockResolvedValue([]);
+    repository.updateOwned.mockResolvedValue(expiredListing);
+    repository.markSoldOwned.mockResolvedValue(expiredListing);
+    repository.renewOwned.mockResolvedValue(expiredListing);
+    repository.deleteOwned.mockResolvedValue(undefined);
+    repository.listOffersOwned.mockResolvedValue([]);
     repository.acceptOffer.mockResolvedValue(pendingDucatOffer);
     repository.declineOffer.mockResolvedValue(pendingDucatOffer);
+    repository.acceptOwnedOffer.mockResolvedValue(pendingDucatOffer);
+    repository.declineOwnedOffer.mockResolvedValue(pendingDucatOffer);
   });
 
   afterEach(cleanup);
@@ -126,12 +160,145 @@ describe("manage listings page", { timeout: 10_000 }, () => {
       "href",
       "/manage",
     );
-    expect(
-      screen.getByText(
-        /expired listings remain available here so they can be renewed/i,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Your account listings")).toBeInTheDocument();
+    expect(screen.getByText("Legacy edit-code lookup")).toBeInTheDocument();
     expect(screen.queryByLabelText("Title")).not.toBeInTheDocument();
+  });
+
+  it("automatically lists owner listings and loads offers through owner paths", async () => {
+    const user = userEvent.setup({ delay: null });
+    repository.listOwned.mockResolvedValueOnce([
+      { ...expiredListing, ownerId: "player-account-1" },
+    ]);
+    repository.listOffersOwned.mockResolvedValueOnce([pendingDucatOffer]);
+    renderManagePage();
+
+    expect(
+      await screen.findByRole("heading", { name: "Adventurer Frigate" }),
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/Expired/)).toBeInTheDocument();
+    expect(repository.listOwned).toHaveBeenCalledWith("player-account-1");
+
+    await user.click(screen.getByRole("button", { name: "Manage listing" }));
+    expect(await screen.findByText("Captain Silver")).toBeInTheDocument();
+    expect(repository.listOffersOwned).toHaveBeenCalledWith(
+      "player-account-1",
+      expiredListing.id,
+    );
+    expect(repository.findByEditCode).not.toHaveBeenCalled();
+  });
+
+  it("manages an owner listing without an edit code", async () => {
+    const user = userEvent.setup({ delay: null });
+    const ownedListing = { ...expiredListing, ownerId: "player-account-1" };
+    repository.listOwned.mockResolvedValue([ownedListing]);
+    repository.updateOwned.mockResolvedValueOnce({
+      ...ownedListing,
+      title: "Updated Adventurer Frigate",
+    });
+    repository.markSoldOwned.mockResolvedValueOnce({
+      ...ownedListing,
+      soldAt: "2026-10-06T12:00:00Z",
+    });
+    repository.renewOwned.mockResolvedValueOnce({
+      ...ownedListing,
+      expiresAt: "2026-10-20T12:00:00Z",
+    });
+    repository.deleteOwned.mockResolvedValueOnce(undefined);
+    renderManagePage();
+
+    await user.click(
+      await screen.findByRole("button", { name: "Manage listing" }),
+    );
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(await screen.findByText("Changes saved.")).toBeInTheDocument();
+    // The summary loads from the repository without a legacy code lookup.
+    expect(repository.findByEditCode).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Mark SOLD" }));
+    expect(
+      await screen.findByText("Listing marked as SOLD."),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Renew (+14 days)" }));
+    expect(
+      await screen.findByText("Listing renewed for 14 more days."),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Delete listing" }));
+    await user.click(
+      screen.getByRole("button", { name: "Yes, delete this listing" }),
+    );
+    expect(repository.updateOwned).toHaveBeenCalledWith(
+      expiredListing.id,
+      "player-account-1",
+      expect.objectContaining({ title: expiredListing.title }),
+    );
+    expect(repository.markSoldOwned).toHaveBeenCalledWith(
+      expiredListing.id,
+      "player-account-1",
+    );
+    expect(repository.renewOwned).toHaveBeenCalledWith(
+      expiredListing.id,
+      "player-account-1",
+    );
+    expect(repository.deleteOwned).toHaveBeenCalledWith(
+      expiredListing.id,
+      "player-account-1",
+    );
+  });
+
+  it("accepts and declines owner-path offers", async () => {
+    const user = userEvent.setup({ delay: null });
+    const ownedListing = { ...expiredListing, ownerId: "player-account-1" };
+    const secondOffer: Offer = {
+      ...pendingDucatOffer,
+      id: "offer-second",
+      offererName: "Second Mate",
+    };
+    repository.listOwned.mockResolvedValue([ownedListing]);
+    repository.listOffersOwned.mockResolvedValue([
+      pendingDucatOffer,
+      secondOffer,
+    ]);
+    repository.acceptOwnedOffer.mockResolvedValueOnce({
+      ...pendingDucatOffer,
+      status: "accepted",
+    });
+    repository.declineOwnedOffer.mockResolvedValueOnce({
+      ...secondOffer,
+      status: "declined",
+    });
+    renderManagePage();
+
+    await user.click(
+      await screen.findByRole("button", { name: "Manage listing" }),
+    );
+    expect(await screen.findByText("Captain Silver")).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Accept offer from Captain Silver" }),
+    );
+    expect(
+      await screen.findByText("Offer from Captain Silver accepted."),
+    ).toBeInTheDocument();
+    expect(repository.acceptOwnedOffer).toHaveBeenCalledWith(
+      "player-account-1",
+      expiredListing.id,
+      pendingDucatOffer.id,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Decline offer from Second Mate" }),
+    );
+    expect(
+      await screen.findByText("Offer from Second Mate declined."),
+    ).toBeInTheDocument();
+    expect(repository.declineOwnedOffer).toHaveBeenCalledWith(
+      "player-account-1",
+      expiredListing.id,
+      secondOffer.id,
+    );
   });
 
   it("shows loading and a clear error for a missing or invalid edit code", async () => {

@@ -233,9 +233,11 @@ describe("listing detail page", () => {
     expect(
       await screen.findByRole("heading", { name: "Adventurer Frigate" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("This listing has expired")).toBeInTheDocument();
     expect(
-      screen.getByText(/It expired on October 4, 2026/),
+      await screen.findByText("This listing has expired"),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/It expired on October 4, 2026/),
     ).toBeInTheDocument();
     expect(screen.getByText(knownListing.description)).toBeInTheDocument();
     expect(screen.getByText("48,000,000 ducats")).toBeInTheDocument();

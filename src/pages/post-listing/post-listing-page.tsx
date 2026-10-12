@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { useAuth } from "../../lib/auth-context";
 import { useListingRepository } from "../../lib/listing-repository-context";
 import {
   ShipDetailsForm,
@@ -132,6 +133,7 @@ const inputClassName =
   "mt-2 w-full rounded-lg border border-white/15 bg-ink px-3 py-2 text-white placeholder:text-slate-500 focus:border-amber-glow focus:outline-none focus:ring-2 focus:ring-amber-glow/30";
 
 export function PostListingPage() {
+  const { isInitializing, userId } = useAuth();
   const repository = useListingRepository();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<ListingFormErrors>({});
@@ -220,6 +222,7 @@ export function PostListingPage() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSubmitting) return;
+    if (!userId) return;
 
     const nextErrors = validate(form);
     setErrors(nextErrors);
@@ -275,6 +278,8 @@ export function PostListingPage() {
       if (!navigator.clipboard?.writeText) {
         throw new Error("Clipboard is unavailable.");
       }
+      if (!createdListing.editCode)
+        throw new Error("Edit code is unavailable.");
       await navigator.clipboard.writeText(createdListing.editCode);
       setEditCodeCopyState("copied");
     } catch {
@@ -303,41 +308,54 @@ export function PostListingPage() {
             It was saved through the active listing repository and is ready to
             browse.
           </p>
-          <div className="mt-6 rounded-xl border border-amber-glow/60 bg-amber-glow/10 p-4">
-            <p className="text-sm font-semibold uppercase tracking-wide text-amber-glow">
-              Save this edit code now
-            </p>
-            <p className="mt-2 text-sm text-amber-100" role="alert">
-              This code is shown only here and cannot be recovered. Keep a safe
-              copy because it is required to manage, renew, or delete this
-              listing.
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <code className="rounded-lg border border-white/20 bg-ink px-3 py-2 font-mono text-lg tracking-wider text-white">
-                {createdListing.editCode}
-              </code>
-              <button
-                className="rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90"
-                onClick={copyEditCode}
-                type="button"
-              >
-                Copy code
-              </button>
-            </div>
-            {editCodeCopyState !== "idle" ? (
-              <p className="mt-3 text-sm" role="status">
-                {editCodeCopyState === "copied"
-                  ? "Edit code copied."
-                  : "Unable to copy the edit code. Select and copy it manually."}
+          {createdListing.editCode ? (
+            <div className="mt-6 rounded-xl border border-amber-glow/60 bg-amber-glow/10 p-4">
+              <p className="text-sm font-semibold uppercase tracking-wide text-amber-glow">
+                Save this legacy edit code now
               </p>
-            ) : null}
-          </div>
+              <p className="mt-2 text-sm text-amber-100" role="alert">
+                This code is shown only here and cannot be recovered. Keep a
+                safe copy because it is required to manage this legacy demo
+                listing.
+              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <code className="rounded-lg border border-white/20 bg-ink px-3 py-2 font-mono text-lg tracking-wider text-white">
+                  {createdListing.editCode}
+                </code>
+                <button
+                  className="rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90"
+                  onClick={copyEditCode}
+                  type="button"
+                >
+                  Copy code
+                </button>
+              </div>
+              {editCodeCopyState !== "idle" ? (
+                <p className="mt-3 text-sm" role="status">
+                  {editCodeCopyState === "copied"
+                    ? "Edit code copied."
+                    : "Unable to copy the edit code. Select and copy it manually."}
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="mt-6 rounded-xl border border-emerald-400/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+              This listing belongs to your account. Manage, renew, or delete it
+              from My listings—no edit code is needed.
+            </p>
+          )}
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               to={`/listings/${createdListing.id}`}
               className="rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90"
             >
               View posted listing
+            </Link>
+            <Link
+              className="rounded-lg border border-white/20 px-4 py-2 font-semibold text-white transition hover:bg-white/10"
+              to="/manage"
+            >
+              Manage without a code
             </Link>
             <button
               className="rounded-lg border border-white/20 px-4 py-2 font-semibold text-white transition hover:bg-white/10"
@@ -347,6 +365,42 @@ export function PostListingPage() {
               Post another listing
             </button>
           </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (isInitializing) {
+    return (
+      <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
+        <p className="text-slate-300" role="status">
+          Checking your account before posting…
+        </p>
+      </section>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-glow">
+            Account required
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold text-white">
+            Sign in to post a listing
+          </h1>
+          <p className="mt-3 text-slate-300">
+            Player accounts keep your listings and offers private to you. An
+            in-game name is still required on the listing form, but only
+            signed-in players can publish new marketplace listings.
+          </p>
+          <Link
+            className="mt-6 inline-flex rounded-lg bg-amber-glow px-4 py-2 font-semibold text-ink transition hover:opacity-90"
+            to="/account?next=/post"
+          >
+            Sign in or create an account
+          </Link>
         </div>
       </section>
     );

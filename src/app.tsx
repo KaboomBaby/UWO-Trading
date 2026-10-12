@@ -1,11 +1,13 @@
 import { Route, Routes } from "react-router-dom";
 
 import { AppShell } from "./components/layout/app-shell";
+import { AuthProvider } from "./lib/auth-context";
 import { CommerceRepositoryProvider } from "./lib/commerce-repository-context";
 import { ListingRepositoryProvider } from "./lib/listing-repository-context";
 import { MarketRepositoryProvider } from "./lib/market-repository-context";
 import { TradingRepositoryProvider } from "./lib/trading-repository-context";
 import { BrowsePage } from "./pages/browse/browse-page";
+import { AccountPage } from "./pages/auth/account-page";
 import { ComponentsPage } from "./pages/components/components-page";
 import { HomePage } from "./pages/home/home-page";
 import { ListingDetailPage } from "./pages/listing-detail/listing-detail-page";
@@ -22,46 +24,49 @@ import { MarketPricesPage } from "./pages/trading/market-prices/market-prices-pa
 
 export function App() {
   return (
-    <ListingRepositoryProvider>
-      <MarketRepositoryProvider>
-        <TradingRepositoryProvider>
-          <CommerceRepositoryProvider>
-            <AppShell>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/browse" element={<BrowsePage />} />
-                <Route
-                  path="/listings/:listingId"
-                  element={<ListingDetailPage />}
-                />
-                <Route path="/post" element={<PostListingPage />} />
-                <Route path="/manage" element={<ManageListingsPage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/ports" element={<PortsPage />} />
-                <Route path="/components" element={<ComponentsPage />} />
-                <Route path="/market/prices" element={<MarketPricesPage />} />
-                <Route
-                  path="/trading/price-alerts"
-                  element={<PriceAlertsPage />}
-                />
-                <Route
-                  path="/trading/leaderboards"
-                  element={<LeaderboardsPage />}
-                />
-                <Route
-                  path="/account/wishlist-watchlists"
-                  element={<WishlistWatchlistsPage />}
-                />
-                <Route
-                  path="/guilds/storefront"
-                  element={<GuildStorefrontPage />}
-                />
-                <Route path="/shops" element={<ShopCatalogPage />} />
-              </Routes>
-            </AppShell>
-          </CommerceRepositoryProvider>
-        </TradingRepositoryProvider>
-      </MarketRepositoryProvider>
-    </ListingRepositoryProvider>
+    <AuthProvider>
+      <ListingRepositoryProvider>
+        <MarketRepositoryProvider>
+          <TradingRepositoryProvider>
+            <CommerceRepositoryProvider>
+              <AppShell>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/account" element={<AccountPage />} />
+                  <Route path="/browse" element={<BrowsePage />} />
+                  <Route
+                    path="/listings/:listingId"
+                    element={<ListingDetailPage />}
+                  />
+                  <Route path="/post" element={<PostListingPage />} />
+                  <Route path="/manage" element={<ManageListingsPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/ports" element={<PortsPage />} />
+                  <Route path="/components" element={<ComponentsPage />} />
+                  <Route path="/market/prices" element={<MarketPricesPage />} />
+                  <Route
+                    path="/trading/price-alerts"
+                    element={<PriceAlertsPage />}
+                  />
+                  <Route
+                    path="/trading/leaderboards"
+                    element={<LeaderboardsPage />}
+                  />
+                  <Route
+                    path="/account/wishlist-watchlists"
+                    element={<WishlistWatchlistsPage />}
+                  />
+                  <Route
+                    path="/guilds/storefront"
+                    element={<GuildStorefrontPage />}
+                  />
+                  <Route path="/shops" element={<ShopCatalogPage />} />
+                </Routes>
+              </AppShell>
+            </CommerceRepositoryProvider>
+          </TradingRepositoryProvider>
+        </MarketRepositoryProvider>
+      </ListingRepositoryProvider>
+    </AuthProvider>
   );
 }

@@ -102,6 +102,7 @@ export type ListingQuery = {
 
 export type Listing = {
   id: string;
+  ownerId?: string | null;
   title: string;
   category: ListingCategory;
   price: number | null;
@@ -135,7 +136,7 @@ export type CreateListingInput = {
 };
 
 export type UpdateListingInput = CreateListingInput;
-export type CreatedListing = Listing & { editCode: string };
+export type CreatedListing = Listing & { editCode?: string };
 
 export type OfferStatus = "pending" | "accepted" | "declined";
 

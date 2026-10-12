@@ -1,5 +1,6 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -18,8 +19,15 @@ const repository = vi.hoisted(() => ({
   report: vi.fn(),
 }));
 
+const useAuthMock = vi.hoisted(() => vi.fn());
+
 vi.mock("../../../../src/services/listing-service", () => ({
   createLocalListingRepository: () => repository,
+}));
+
+vi.mock("../../../../src/lib/auth-context", () => ({
+  AuthProvider: ({ children }: { children?: ReactNode }) => children,
+  useAuth: useAuthMock,
 }));
 
 const createdListing: CreatedListing = {
@@ -98,6 +106,16 @@ async function fillShipSpecifications(
 describe("post listing page", { timeout: 10_000 }, () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthMock.mockReturnValue({
+      email: "captain@example.com",
+      isInitializing: false,
+      isSupabaseEnabled: true,
+      register: vi.fn(),
+      session: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      userId: "player-account-1",
+    });
     repository.create.mockResolvedValue(createdListing);
     repository.get.mockResolvedValue(createdListing);
     repository.countOffers.mockResolvedValue(0);
@@ -120,6 +138,34 @@ describe("post listing page", { timeout: 10_000 }, () => {
     expect(
       screen.queryByText(/supabase integration pending/i),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows a sign-in gate and never submits while signed out", async () => {
+    const user = userEvent.setup({ delay: null });
+    useAuthMock.mockReturnValue({
+      email: null,
+      isInitializing: false,
+      isSupabaseEnabled: true,
+      register: vi.fn(),
+      session: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      userId: null,
+    });
+    renderPostPage();
+
+    expect(
+      screen.getByRole("heading", { name: "Sign in to post a listing" }),
+    ).toBeInTheDocument();
+    const signInLink = screen.getByRole("link", {
+      name: "Sign in or create an account",
+    });
+    expect(signInLink).toHaveAttribute("href", "/account?next=/post");
+    expect(
+      screen.queryByRole("form", { name: "Post listing form" }),
+    ).not.toBeInTheDocument();
+    await user.click(signInLink);
+    expect(repository.create).not.toHaveBeenCalled();
   });
 
   it("offers every supported currency with human-readable labels", () => {
@@ -351,6 +397,28 @@ describe("post listing page", { timeout: 10_000 }, () => {
     ).toBeInTheDocument();
   });
 
+  it("omits edit-code recovery UI for account-owned listings", async () => {
+    const user = userEvent.setup({ delay: null });
+    repository.create.mockResolvedValueOnce({
+      ...createdListing,
+      editCode: undefined,
+      ownerId: "player-account-1",
+    });
+    renderPostPage();
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(screen.getByText(/no edit code is needed/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Manage without a code" }),
+    ).toHaveAttribute("href", "/manage");
+    expect(
+      screen.queryByText(/Save this legacy edit code/i),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("UWO-EDIT-7F2K")).not.toBeInTheDocument();
+  });
+
   it("shows the edit code once with a recovery warning and copy support", async () => {
     const user = userEvent.setup({ delay: null });
     const clipboardWriteText = vi.fn().mockResolvedValue(undefined);
@@ -366,7 +434,7 @@ describe("post listing page", { timeout: 10_000 }, () => {
 
       expect(screen.getAllByText("UWO-EDIT-7F2K")).toHaveLength(1);
       expect(screen.getByRole("alert")).toHaveTextContent(
-        /cannot be recovered.*manage, renew, or delete/i,
+        /cannot be recovered.*manage this legacy demo listing/i,
       );
       expect(
         screen.getByRole("button", { name: "Copy code" }),

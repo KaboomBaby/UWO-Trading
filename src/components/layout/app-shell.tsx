@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import { useAuth } from "../../lib/auth-context";
+
 type AppShellProps = {
   children: React.ReactNode;
 };
@@ -12,10 +14,12 @@ const navigation = [
 ];
 
 export function AppShell({ children }: AppShellProps) {
+  const { email, isInitializing, signOut, userId } = useAuth();
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-ink/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center gap-6 px-4 py-4 sm:px-6">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-4 sm:px-6">
           <Link
             to="/"
             className="flex items-center gap-3 text-lg font-semibold text-white"
@@ -25,7 +29,7 @@ export function AppShell({ children }: AppShellProps) {
             </span>
             <span>UWO Market</span>
           </Link>
-          <nav className="ml-auto flex items-center gap-1 text-sm sm:gap-2">
+          <nav className="order-3 flex w-full items-center gap-1 overflow-x-auto text-sm sm:gap-2 lg:order-2 lg:ml-auto lg:w-auto">
             {navigation.map((item) => (
               <Link
                 key={item.to}
@@ -36,6 +40,34 @@ export function AppShell({ children }: AppShellProps) {
               </Link>
             ))}
           </nav>
+          <div className="order-2 ml-auto flex min-w-0 items-center gap-2 lg:order-3 lg:ml-0">
+            {isInitializing ? (
+              <span className="text-xs text-slate-400">Checking session…</span>
+            ) : userId ? (
+              <>
+                <span
+                  className="max-w-[9rem] truncate text-xs text-slate-300 sm:max-w-48"
+                  title={email ?? undefined}
+                >
+                  {email}
+                </span>
+                <button
+                  className="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+                  onClick={() => void signOut().catch(() => undefined)}
+                  type="button"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                className="rounded-lg bg-amber-glow px-3 py-2 text-xs font-semibold text-ink transition hover:opacity-90"
+                to="/account"
+              >
+                Sign in
+              </Link>
+            )}
+          </div>
         </div>
       </header>
       <main className="flex-1">{children}</main>
