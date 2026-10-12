@@ -12,6 +12,20 @@ const shipClassLabels = {
   heavy: "Heavy",
 } as const satisfies Record<ShipClass, string>;
 
+type ShipArtName = "battle" | "galley" | "trade";
+type ShipArtFit = "cover" | "contain";
+
+const shipArtSources: Record<ShipArtName, { fit: ShipArtFit; src: string }> = {
+  battle: { fit: "cover", src: "/ship-art/battle.webp" },
+  galley: { fit: "contain", src: "/ship-art/galley.webp" },
+  trade: { fit: "contain", src: "/ship-art/trade.webp" },
+};
+
+const shipTypeArtSources: Partial<Record<ShipType, ShipArtName>> = {
+  battle: "battle",
+  trade: "trade",
+};
+
 export function formatShipType(type: ShipType) {
   return shipTypeLabels[type];
 }
@@ -72,6 +86,42 @@ export function ShipTypeIcon({
   );
 }
 
+export function ShipArt({ name }: { name: ShipArtName }) {
+  const source = shipArtSources[name];
+  const objectFitClass =
+    source.fit === "cover" ? "object-cover" : "object-contain";
+
+  return (
+    <img
+      alt=""
+      className={`h-full w-full ${objectFitClass} object-center`}
+      data-ship-art={name}
+      decoding="async"
+      draggable={false}
+      loading="lazy"
+      src={source.src}
+    />
+  );
+}
+
+export function ShipTypeArt({ type }: { type: ShipType }) {
+  const artName = shipTypeArtSources[type];
+
+  if (artName) return <ShipArt name={artName} />;
+
+  return (
+    <div
+      aria-hidden="true"
+      className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sea-blue/30 to-ink p-5"
+      data-ship-art={type}
+    >
+      <div className="flex h-24 w-36 items-center justify-center rounded-xl border-2 border-amber-glow/75 bg-ink/90 p-1 shadow-[0_0_24px_rgba(242,183,75,0.16)]">
+        <div className="h-full w-full rounded-lg border border-amber-glow/45 bg-gradient-to-br from-sea-blue/35 to-ink" />
+      </div>
+    </div>
+  );
+}
+
 type ShipStatIconName =
   | "verticalSail"
   | "horizontalSail"
@@ -87,6 +137,44 @@ type ShipStatIconName =
   | "adventure"
   | "trade"
   | "battle";
+
+type ShipStatImageName = ShipStatIconName | "durability";
+
+const shipStatImageSources = {
+  verticalSail: "/ship-stat-icons/vertical-sail.png",
+  horizontalSail: "/ship-stat-icons/horizontal-sail.png",
+  rowPower: "/ship-stat-icons/row-power.png",
+  turnSpeed: "/ship-stat-icons/turn-speed.png",
+  waveResistance: "/ship-stat-icons/wave-resistance.png",
+  armour: "/ship-stat-icons/armour.png",
+  durability: "/ship-stat-icons/durability.png",
+  improvements: "/ship-stat-icons/improvements.png",
+  crew: "/ship-stat-icons/crew.png",
+  sailors: "/ship-stat-icons/crew.png",
+  cannons: "/ship-stat-icons/cannons.png",
+  cargo: "/ship-stat-icons/cargo.png",
+  adventure: "/ship-stat-icons/req-adventure.png",
+  trade: "/ship-stat-icons/req-trade.png",
+  battle: "/ship-stat-icons/req-battle.png",
+} as const satisfies Record<ShipStatImageName, string>;
+
+export function ShipStatImage({
+  name,
+  className = "h-5 w-5",
+}: {
+  name: ShipStatImageName;
+  className?: string;
+}) {
+  return (
+    <img
+      alt=""
+      className={`${className} rounded-[0.25rem] bg-[#101c31] object-contain`}
+      decoding="async"
+      loading="lazy"
+      src={shipStatImageSources[name]}
+    />
+  );
+}
 
 export function ShipStatIcon({ name }: { name: ShipStatIconName }) {
   return (

@@ -1,12 +1,184 @@
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Link } from "react-router-dom";
 
+import { shipSkillIconUrl } from "../../data/ship-skills";
+import type { ShipDetails, ShipSkill } from "../../types/listing";
 import type { Listing } from "../../types/listing";
 import { formatListingPrice } from "../../types/listing";
 import {
-  ShipTypeIcon,
+  ShipStatImage,
+  ShipTypeArt,
   formatShipClass,
   formatShipType,
 } from "../ships/ship-visuals";
+
+type CompactShipStat = {
+  label: string;
+  name: Parameters<typeof ShipStatImage>[0]["name"];
+  value: string | number;
+};
+
+function getCompactShipStats(details: ShipDetails): CompactShipStat[] {
+  return [
+    {
+      label: "Vertical sail",
+      name: "verticalSail",
+      value: details.performance.verticalSail,
+    },
+    {
+      label: "Horizontal sail",
+      name: "horizontalSail",
+      value: details.performance.horizontalSail,
+    },
+    {
+      label: "Row power",
+      name: "rowPower",
+      value: details.performance.rowPower,
+    },
+    {
+      label: "Turn speed",
+      name: "turnSpeed",
+      value: details.performance.turnSpeed,
+    },
+    {
+      label: "Wave resistance",
+      name: "waveResistance",
+      value: details.performance.waveResistance,
+    },
+    { label: "Armour", name: "armour", value: details.performance.armour },
+    { label: "Durability", name: "durability", value: details.durability },
+    {
+      label: "Improvements",
+      name: "improvements",
+      value: `${details.improvements} / 5`,
+    },
+    { label: "Crew", name: "crew", value: details.hold.crew },
+    { label: "Cannons", name: "cannons", value: details.hold.cannons },
+    { label: "Cargo", name: "cargo", value: details.hold.cargo },
+    {
+      label: "Sailors required",
+      name: "sailors",
+      value: details.hold.sailorsRequired,
+    },
+    {
+      label: "Adventure Lv",
+      name: "adventure",
+      value: details.sailingRequirements.adventureLevel,
+    },
+    {
+      label: "Trade Lv",
+      name: "trade",
+      value: details.sailingRequirements.tradeLevel,
+    },
+    {
+      label: "Battle Lv",
+      name: "battle",
+      value: details.sailingRequirements.battleLevel,
+    },
+  ];
+}
+
+function ShipSkillIcon({ skill }: { skill: ShipSkill }) {
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
+  const longPressTimeoutRef = useRef<number | undefined>(undefined);
+
+  const clearLongPressTimer = useCallback(() => {
+    window.clearTimeout(longPressTimeoutRef.current);
+    longPressTimeoutRef.current = undefined;
+  }, []);
+
+  useEffect(() => clearLongPressTimer, [clearLongPressTimer]);
+
+  function startLongPress(event: ReactPointerEvent<HTMLSpanElement>) {
+    if (event.pointerType === "mouse") return;
+
+    event.preventDefault();
+    clearLongPressTimer();
+    longPressTimeoutRef.current = window.setTimeout(() => {
+      setTooltipVisible(true);
+    }, 450);
+  }
+
+  function endLongPress() {
+    clearLongPressTimer();
+    setTooltipVisible(false);
+  }
+
+  return (
+    <span
+      aria-label={skill.name}
+      className="relative flex h-8 w-8 items-center justify-center rounded-md border border-white/15 bg-black/35"
+      onBlur={() => setTooltipVisible(false)}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        clearLongPressTimer();
+        setTooltipVisible(true);
+      }}
+      onFocus={() => setTooltipVisible(true)}
+      onPointerCancel={endLongPress}
+      onPointerDown={startLongPress}
+      onPointerLeave={endLongPress}
+      onPointerUp={endLongPress}
+      onMouseEnter={() => setTooltipVisible(true)}
+      onMouseLeave={() => setTooltipVisible(false)}
+      role="img"
+      tabIndex={0}
+    >
+      <img
+        alt=""
+        className="h-7 w-7 object-contain"
+        decoding="async"
+        loading="lazy"
+        src={shipSkillIconUrl(skill.iconId)}
+      />
+      {isTooltipVisible ? (
+        <span className="pointer-events-none absolute bottom-[calc(100%+0.375rem)] left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md border border-amber-glow/40 bg-ink px-2 py-1 text-[0.68rem] font-semibold text-white shadow-lg">
+          {skill.name}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function CompactShipSpecifications({ details }: { details: ShipDetails }) {
+  const stats = getCompactShipStats(details);
+  const skills = [details.originalSkill, ...details.optionalSkills].filter(
+    (skill): skill is ShipSkill => skill !== null,
+  );
+
+  return (
+    <ul
+      aria-label="Ship specifications and skills"
+      className="grid grid-cols-3 gap-1.5 text-[0.7rem] text-slate-200 sm:grid-cols-4"
+    >
+      {stats.map((stat) => (
+        <li
+          aria-label={`${stat.label}: ${stat.value}`}
+          className="flex min-w-0 items-center justify-center gap-1 rounded-lg border border-white/10 bg-white/5 px-1.5 py-1"
+          key={stat.label}
+        >
+          <ShipStatImage name={stat.name} />
+          <span className="font-semibold tabular-nums">{stat.value}</span>
+        </li>
+      ))}
+      {skills.map((skill) => (
+        <li
+          className="flex min-w-0 items-center justify-center rounded-lg border border-amber-glow/20 bg-amber-glow/10 px-1.5 py-1"
+          key={`${skill.iconId}-card`}
+        >
+          <ShipSkillIcon skill={skill} />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function ListingCard({ listing }: { listing: Listing }) {
   return (
@@ -14,17 +186,17 @@ export function ListingCard({ listing }: { listing: Listing }) {
       to={`/listings/${listing.id}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-amber-glow/70 hover:bg-white/10"
     >
-      <div className="flex h-36 items-center justify-center bg-gradient-to-br from-sea-blue/25 to-ink/90 text-5xl">
+      <div className="relative flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-sea-blue/25 to-ink/90 text-5xl">
         {listing.shipDetails ? (
-          <ShipTypeIcon
-            className="h-20 w-20 text-amber-glow"
-            type={listing.shipDetails.type}
-          />
+          <ShipTypeArt type={listing.shipDetails.type} />
         ) : (
           <span aria-hidden="true">{listing.imageEmoji}</span>
         )}
+        {listing.shipDetails ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-ink/85 to-transparent" />
+        ) : null}
       </div>
-      <div className="flex flex-1 flex-col gap-3 p-5">
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-lg font-semibold text-white">{listing.title}</h3>
           <span className="flex flex-wrap justify-end gap-2">
@@ -52,6 +224,9 @@ export function ListingCard({ listing }: { listing: Listing }) {
         <p className="text-xl font-semibold text-amber-glow">
           {formatListingPrice(listing.price, listing.currency)}
         </p>
+        {listing.shipDetails ? (
+          <CompactShipSpecifications details={listing.shipDetails} />
+        ) : null}
         <dl className="mt-auto grid gap-2 text-sm text-slate-300">
           <div className="flex items-center gap-2">
             <dt className="sr-only">Seller</dt>
