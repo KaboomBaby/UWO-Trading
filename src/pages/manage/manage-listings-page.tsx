@@ -786,7 +786,7 @@ export function ManageListingsPage() {
                           <div>
                             <dt className="text-slate-400">Contact</dt>
                             <dd className="mt-1 font-medium text-white">
-                              {offer.contact}
+                              {offer.contact || "In-game name only"}
                             </dd>
                           </div>
                           <div>

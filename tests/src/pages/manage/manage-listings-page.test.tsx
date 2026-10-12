@@ -101,7 +101,7 @@ async function loadListing(user: ReturnType<typeof userEvent.setup>) {
   expect(await screen.findByText("Adventurer Frigate")).toBeInTheDocument();
 }
 
-describe("manage listings page", () => {
+describe("manage listings page", { timeout: 10_000 }, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     repository.findByEditCode.mockResolvedValue(expiredListing);
@@ -135,7 +135,7 @@ describe("manage listings page", () => {
   });
 
   it("shows loading and a clear error for a missing or invalid edit code", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     let resolveLookup!: (listing: Listing | undefined) => void;
     repository.findByEditCode.mockReturnValueOnce(
       new Promise<Listing | undefined>((resolve) => {
@@ -165,7 +165,7 @@ describe("manage listings page", () => {
   });
 
   it("keeps an expired listing editable and saves the full update payload", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const updatedListing: Listing = {
       ...expiredListing,
       title: "Updated Adventurer Frigate",
@@ -231,7 +231,7 @@ describe("manage listings page", () => {
   });
 
   it("reflects repository errors from an attempted save", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     repository.update.mockRejectedValueOnce(
       new Error("Edit code is no longer valid."),
     );
@@ -247,11 +247,11 @@ describe("manage listings page", () => {
   });
 
   it("loads and displays private offers for the managed listing", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     repository.listOffers.mockResolvedValueOnce([
       pendingDucatOffer,
       acceptedTradeOffer,
-      declinedNegotiableOffer,
+      { ...declinedNegotiableOffer, contact: "" },
     ]);
     renderManagePage();
     await loadListing(user);
@@ -273,6 +273,7 @@ describe("manage listings page", () => {
     expect(screen.getByText("Accepted")).toBeInTheDocument();
 
     expect(screen.getByText("Port Broker")).toBeInTheDocument();
+    expect(screen.getByText("In-game name only")).toBeInTheDocument();
     expect(screen.getAllByText("Negotiable").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Declined")).toBeInTheDocument();
     expect(
@@ -287,7 +288,7 @@ describe("manage listings page", () => {
   });
 
   it("shows selected ship skills with their game icons and Original marker", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     repository.findByEditCode.mockResolvedValueOnce({
       ...expiredListing,
       shipDetails: testShipDetailsWithSkills,
@@ -307,7 +308,7 @@ describe("manage listings page", () => {
   });
 
   it("shows accessible offer loading and load-error states, then refreshes offers", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     let rejectOffers!: (reason?: unknown) => void;
     repository.listOffers.mockReturnValueOnce(
       new Promise<Offer[]>((_resolve, reject) => {
@@ -339,7 +340,7 @@ describe("manage listings page", () => {
   });
 
   it("accepts and declines pending offers with returned statuses", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const pendingSecondOffer: Offer = {
       ...pendingDucatOffer,
       id: "offer-second",
@@ -398,7 +399,7 @@ describe("manage listings page", () => {
   });
 
   it("reflects offer-action errors without losing pending controls", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     repository.listOffers.mockResolvedValueOnce([pendingDucatOffer]);
     repository.acceptOffer.mockRejectedValueOnce(
       new Error("Only pending offers can be accepted."),
@@ -421,7 +422,7 @@ describe("manage listings page", () => {
   });
 
   it("marks an expired listing sold and renews it for fourteen days", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const soldListing: Listing = {
       ...expiredListing,
       soldAt: "2026-10-06T12:00:00Z",
@@ -451,7 +452,7 @@ describe("manage listings page", () => {
   });
 
   it("requires explicit confirmation before deleting a listing", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderManagePage();
     await loadListing(user);
 

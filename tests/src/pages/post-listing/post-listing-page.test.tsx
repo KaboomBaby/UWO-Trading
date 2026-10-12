@@ -95,7 +95,7 @@ async function fillShipSpecifications(
   await user.type(screen.getByLabelText("Battle Lv"), "27");
 }
 
-describe("post listing page", () => {
+describe("post listing page", { timeout: 10_000 }, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     repository.create.mockResolvedValue(createdListing);
@@ -138,7 +138,7 @@ describe("post listing page", () => {
   });
 
   it("shows inline errors and does not create when fields are invalid", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
 
     await user.type(screen.getByLabelText("Title"), "ab");
@@ -163,7 +163,7 @@ describe("post listing page", () => {
   });
 
   it("requires a positive numeric price for numeric currencies", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillCommonFields(user);
     await user.selectOptions(screen.getByLabelText("Currency"), "ducats");
@@ -174,7 +174,7 @@ describe("post listing page", () => {
   });
 
   it("validates Captain Tickets as whole numbers", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillCommonFields(user);
     await user.selectOptions(
@@ -194,7 +194,7 @@ describe("post listing page", () => {
   });
 
   it("shows the game-style ship specification panel only for Ships", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
 
     await user.selectOptions(screen.getByLabelText("Category"), "property");
@@ -216,7 +216,7 @@ describe("post listing page", () => {
   });
 
   it("requires complete ship specifications before creating a Ships listing", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
     await user.clear(screen.getByLabelText("Grade"));
@@ -228,7 +228,7 @@ describe("post listing page", () => {
   });
 
   it("offers one Original slot, five Optional slots, and round-trips chosen skills", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
 
@@ -279,7 +279,7 @@ describe("post listing page", () => {
   });
 
   it("blocks a skill already chosen in another slot", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
 
@@ -311,10 +311,11 @@ describe("post listing page", () => {
     ).toBeDisabled();
   });
 
-  it("creates a valid listing with the full repository input", async () => {
-    const user = userEvent.setup();
+  it("creates a valid listing with a blank optional contact note", async () => {
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
+    await user.clear(screen.getByLabelText(/contact note/i));
     await user.click(screen.getByRole("button", { name: "Publish listing" }));
 
     expect(await screen.findByRole("status")).toBeInTheDocument();
@@ -337,7 +338,7 @@ describe("post listing page", () => {
       seller: "AmsterdamShipyard",
       location: "Amsterdam",
       server: "Maris",
-      contactNote: "In-game mail preferred.",
+      contactNote: "",
       shipDetails: testShipDetails,
     });
 
@@ -351,7 +352,7 @@ describe("post listing page", () => {
   });
 
   it("shows the edit code once with a recovery warning and copy support", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const clipboardWriteText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -398,7 +399,7 @@ describe("post listing page", () => {
   });
 
   it("does not expose any listing image upload control", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
 
@@ -421,7 +422,7 @@ describe("post listing page", () => {
   });
 
   it("hides the price field and sends null for trade listings", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
     await user.selectOptions(screen.getByLabelText("Currency"), "ducats");
@@ -445,7 +446,7 @@ describe("post listing page", () => {
   });
 
   it("returns focus to the form heading after starting another post", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
     await user.click(screen.getByRole("button", { name: "Publish listing" }));

@@ -674,7 +674,8 @@ function OfferSection({
                   className="text-sm font-semibold text-slate-200"
                   htmlFor="offer-contact"
                 >
-                  Contact details
+                  Contact details{" "}
+                  <span className="font-normal text-slate-400">(optional)</span>
                 </label>
                 <input
                   aria-describedby={
@@ -688,7 +689,6 @@ function OfferSection({
                     updateOfferField("contact", event.target.value)
                   }
                   placeholder="In-game mail or Discord"
-                  required
                   type="text"
                   value={form.contact}
                 />

@@ -8,6 +8,7 @@ import {
   ListingValidationError,
   SupabaseListingRepositoryError,
   validateListingInput,
+  validateOfferInput,
 } from "../../../src/services/listing-service";
 import {
   ListingRepositoryProvider,
@@ -15,6 +16,7 @@ import {
 } from "../../../src/lib/listing-repository-context";
 import { getSupabaseClient } from "../../../src/lib/supabase-client";
 import type {
+  CreateOfferInput,
   CreateListingInput,
   ShipDetails,
 } from "../../../src/types/listing";
@@ -36,6 +38,13 @@ const validInput: CreateListingInput = {
   server: "Maris",
   contactNote: "Mail me at the Amsterdam dock.",
   shipDetails: testShipDetails,
+};
+
+const validOfferInput: CreateOfferInput = {
+  offererName: "Captain Offer",
+  currency: "CT",
+  amount: 120,
+  offerText: "Twelve Captain Tickets and a fitted cannon set.",
 };
 
 type ListingRow = {
@@ -457,6 +466,46 @@ describe("local listing repository", () => {
     });
   });
 
+  it("accepts omitted and blank offer contact details without validation errors", () => {
+    const omittedContact = { ...validOfferInput };
+    delete omittedContact.contact;
+
+    expect(validateOfferInput(omittedContact)).toEqual({});
+    expect(validateOfferInput({ ...validOfferInput, contact: "   " })).toEqual(
+      {},
+    );
+  });
+
+  it("does not count contact as an invalid offer field", () => {
+    const omittedContact = { ...validOfferInput };
+    delete omittedContact.contact;
+    const errors = validateOfferInput({
+      ...omittedContact,
+      offererName: " ",
+      amount: null,
+      offerText: "Short",
+    });
+
+    expect(Object.keys(errors)).toEqual(["offererName", "amount", "offerText"]);
+    expect(errors.contact).toBeUndefined();
+  });
+
+  it("normalizes omitted and blank offer contact to an empty string locally", async () => {
+    const repository = createLocalListingRepository([]);
+    const created = await repository.create(validInput);
+    const omittedContact = { ...validOfferInput };
+    delete omittedContact.contact;
+
+    await repository.createOffer(created.id, omittedContact);
+    await repository.createOffer(created.id, {
+      ...validOfferInput,
+      contact: "   ",
+    });
+
+    const offers = await repository.listOffers(created.editCode);
+    expect(offers.map((offer) => offer.contact)).toEqual(["", ""]);
+  });
+
   it("validates currency-specific prices", () => {
     expect(
       validateListingInput({ ...validInput, currency: "negotiable" }),
@@ -682,6 +731,29 @@ describe("Supabase listing repository", () => {
       contact_note: validInput.contactNote,
       ship_details: testShipDetails,
     });
+  });
+
+  it("normalizes omitted and blank offer contact to an empty string for Supabase", async () => {
+    const mock = createMockSupabaseClient({
+      data: null,
+      error: null,
+      status: 201,
+      statusText: "Created",
+    });
+    const repository = createSupabaseListingRepository(mock.client);
+    const omittedContact = { ...validOfferInput };
+    delete omittedContact.contact;
+
+    await repository.createOffer("supabase-frigate", omittedContact);
+    await repository.createOffer("supabase-frigate", {
+      ...validOfferInput,
+      contact: "   ",
+    });
+
+    expect(mock.requests.map((request) => request.insert?.contact)).toEqual([
+      "",
+      "",
+    ]);
   });
 
   it("wraps Supabase errors with operation and PostgREST context", async () => {

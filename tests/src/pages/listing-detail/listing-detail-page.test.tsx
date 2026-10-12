@@ -56,13 +56,15 @@ function renderApp(path: string) {
 
 async function fillValidOffer(
   user: ReturnType<typeof userEvent.setup>,
-  options: { currency?: string } = {},
+  options: { currency?: string; includeContact?: boolean } = {},
 ) {
   await user.type(screen.getByLabelText("Your in-game name"), "HarborTrader");
-  await user.type(
-    screen.getByLabelText("Contact details"),
-    "In-game mail: HarborTrader",
-  );
+  if (options.includeContact ?? true) {
+    await user.type(
+      screen.getByLabelText(/contact details \(optional\)/i),
+      "In-game mail: HarborTrader",
+    );
+  }
   if (options.currency) {
     await user.selectOptions(
       screen.getByLabelText("Offer currency"),
@@ -280,8 +282,8 @@ describe("listing detail page", () => {
     ).toBeInTheDocument();
   });
 
-  it("validates required offer fields before submission", async () => {
-    const user = userEvent.setup();
+  it("validates required offer fields before submission without requiring contact", async () => {
+    const user = userEvent.setup({ delay: null });
     renderApp("/listings/adventurer-frigate");
 
     await screen.findByRole("heading", { name: "Adventurer Frigate" });
@@ -291,26 +293,29 @@ describe("listing detail page", () => {
       screen.getByText("In-game name must be at least 2 characters."),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Contact details are required."),
-    ).toBeInTheDocument();
-    expect(
       screen.getByText("Amount is required for this currency."),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Describe your offer in at least 10 characters."),
     ).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveTextContent(
-      /Please fix 4 fields below before sending this offer./,
+      /Please fix 3 fields below before sending this offer./,
     );
+    expect(
+      screen.queryByText("Contact details are required."),
+    ).not.toBeInTheDocument();
     expect(repository.createOffer).not.toHaveBeenCalled();
   });
 
-  it("submits a numeric offer and confirms without exposing other offers", async () => {
-    const user = userEvent.setup();
+  it("submits a numeric offer with blank optional contact details", async () => {
+    const user = userEvent.setup({ delay: null });
     renderApp("/listings/adventurer-frigate");
 
     await screen.findByRole("heading", { name: "Adventurer Frigate" });
-    await fillValidOffer(user);
+    expect(
+      screen.getByLabelText(/contact details \(optional\)/i),
+    ).not.toHaveAttribute("required");
+    await fillValidOffer(user, { includeContact: false });
     await user.click(screen.getByRole("button", { name: "Send offer" }));
 
     expect(
@@ -318,7 +323,7 @@ describe("listing detail page", () => {
     ).toBeInTheDocument();
     expect(repository.createOffer).toHaveBeenCalledWith("adventurer-frigate", {
       offererName: "HarborTrader",
-      contact: "In-game mail: HarborTrader",
+      contact: "",
       currency: "ducats",
       amount: 45_000_000,
       offerText: "Ready to purchase immediately at the harbor.",
@@ -328,7 +333,7 @@ describe("listing detail page", () => {
   });
 
   it("hides the amount field and submits null for trade offers", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderApp("/listings/adventurer-frigate");
 
     await screen.findByRole("heading", { name: "Adventurer Frigate" });
@@ -349,7 +354,7 @@ describe("listing detail page", () => {
   });
 
   it("requires a reporter name and reason before reporting", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderApp("/listings/adventurer-frigate");
 
     await screen.findByRole("heading", { name: "Adventurer Frigate" });
@@ -368,7 +373,7 @@ describe("listing detail page", () => {
   });
 
   it("submits a report and keeps report data confidential", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderApp("/listings/adventurer-frigate");
 
     await screen.findByRole("heading", { name: "Adventurer Frigate" });

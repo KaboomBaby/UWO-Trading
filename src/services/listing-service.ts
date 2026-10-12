@@ -223,7 +223,6 @@ export function validateOfferInput(input: CreateOfferInput) {
   if (input.offererName.trim().length < 2) {
     errors.offererName = "In-game name must be at least 2 characters.";
   }
-  if (!input.contact.trim()) errors.contact = "Contact details are required.";
   if (isNumericListingCurrency(input.currency)) {
     if (input.amount === null) {
       errors.amount = "Amount is required for this currency.";
@@ -532,7 +531,7 @@ export function createSupabaseListingRepository(
       const { error } = await client.from("offers").insert({
         listing_id: listingId,
         offerer_name: input.offererName.trim(),
-        contact: input.contact.trim(),
+        contact: input.contact?.trim() ?? "",
         currency: input.currency,
         amount: input.amount,
         offer_text: input.offerText.trim(),
@@ -758,7 +757,7 @@ export function createLocalListingRepository(
         id: crypto.randomUUID(),
         listingId,
         offererName: input.offererName.trim(),
-        contact: input.contact.trim(),
+        contact: input.contact?.trim() ?? "",
         currency: input.currency,
         amount: input.amount,
         offerText: input.offerText.trim(),

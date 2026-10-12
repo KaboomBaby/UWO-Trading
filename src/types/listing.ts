@@ -153,7 +153,7 @@ export type Offer = {
 
 export type CreateOfferInput = {
   offererName: string;
-  contact: string;
+  contact?: string;
   currency: ListingCurrency;
   amount: number | null;
   offerText: string;
