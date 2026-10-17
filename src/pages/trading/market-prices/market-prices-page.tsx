@@ -148,8 +148,8 @@ export function MarketPricesPage() {
           Market price index
         </h1>
         <p className="mt-4 text-base leading-relaxed text-slate-300">
-          Track commodity, equipment, ship, and property movement across major
-          ports before your next trade.
+          Track commodity, equipment, and ship movement across major ports
+          before your next trade.
         </p>
       </div>
 

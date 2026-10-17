@@ -53,23 +53,6 @@ export const mockListings: Listing[] = [
     collection: "current",
   },
   {
-    id: "seville-townhouse",
-    title: "Seville Townhouse",
-    category: "property",
-    price: 125_000_000,
-    currency: "ducats",
-    description:
-      "A prestigious residence near the trading district with secure storage access.",
-    seller: "SevilleEstate",
-    location: "Seville",
-    server: "Maris",
-    contactNote: "Contact in game.",
-    imageEmoji: "🏘️",
-    createdAt: "2026-09-29T09:00:00Z",
-    expiresAt: "2026-10-13T09:00:00Z",
-    collection: "current",
-  },
-  {
     id: "master-cannon-set",
     title: "Master Cannon Set",
     category: "equipment",

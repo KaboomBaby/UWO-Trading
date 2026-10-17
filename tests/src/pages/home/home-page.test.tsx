@@ -58,7 +58,6 @@ describe("HomePage", () => {
 
     const expectedCategories = [
       ["Ships", "ships"],
-      ["Property", "property"],
       ["Equipment", "equipment"],
       ["Resources", "resources"],
       ["Services", "services"],

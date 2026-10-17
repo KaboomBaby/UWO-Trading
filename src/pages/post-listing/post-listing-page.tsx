@@ -576,7 +576,7 @@ export function PostListingPage() {
               onChange={(event) =>
                 updateField("description", event.target.value)
               }
-              placeholder="Describe the ship, cargo, property, or service."
+              placeholder="Describe the ship, cargo, or service."
               required
               rows={5}
               value={form.description}

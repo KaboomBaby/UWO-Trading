@@ -15,12 +15,6 @@ const marketplaceCategories: MarketplaceCategory[] = [
     symbol: "⛵",
   },
   {
-    slug: "property",
-    name: "Property",
-    description: "Buildings and commercial space",
-    symbol: "🏛️",
-  },
-  {
     slug: "equipment",
     name: "Equipment",
     description: "Gear, cannons, and instruments",

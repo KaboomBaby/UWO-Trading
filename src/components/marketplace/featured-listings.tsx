@@ -11,7 +11,6 @@ type FeaturedListingsProps = {
 
 const categoryLabels: Record<Listing["category"], string> = {
   ships: "Ships",
-  property: "Property",
   equipment: "Equipment",
   resources: "Resources",
   services: "Services",

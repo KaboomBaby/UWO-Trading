@@ -86,7 +86,7 @@ export function SearchPage() {
         <div>
           <h1 className="text-3xl font-semibold text-white">Search results</h1>
           <p className="mt-2 text-slate-300">
-            Search ships, property, equipment, resources, and services.
+            Search ships, equipment, resources, and services.
           </p>
         </div>
         <p

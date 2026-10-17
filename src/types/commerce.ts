@@ -27,12 +27,7 @@ export type GuildStorefront = {
   imageEmoji: string;
 };
 
-export const SHOP_CATEGORIES = [
-  "ships",
-  "equipment",
-  "supplies",
-  "property",
-] as const;
+export const SHOP_CATEGORIES = ["ships", "equipment", "supplies"] as const;
 
 export type ShopCategory = (typeof SHOP_CATEGORIES)[number];
 

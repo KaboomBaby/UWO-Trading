@@ -243,7 +243,7 @@ describe("post listing page", { timeout: 10_000 }, () => {
     const user = userEvent.setup({ delay: null });
     renderPostPage();
 
-    await user.selectOptions(screen.getByLabelText("Category"), "property");
+    await user.selectOptions(screen.getByLabelText("Category"), "equipment");
     expect(screen.queryByLabelText("Ship type")).not.toBeInTheDocument();
     expect(
       screen.queryByLabelText("Sailing requirements"),

@@ -45,16 +45,6 @@ export const mockMarketPrices: MarketPrice[] = [
     trend: "stable",
     updatedAt: "2026-10-04T23:40:00Z",
   },
-  {
-    id: "seville-townhouse",
-    itemName: "Seville Townhouse",
-    category: "property",
-    port: "Seville",
-    price: 125_000_000,
-    changePercent: -4.1,
-    trend: "falling",
-    updatedAt: "2026-10-04T22:30:00Z",
-  },
 ];
 
 export const mockPriceAlerts: PriceAlert[] = [

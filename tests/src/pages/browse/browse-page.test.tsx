@@ -70,7 +70,6 @@ describe("BrowsePage", () => {
 
     const categoryLabels: Array<[string, string]> = [
       ["ships", "Ships"],
-      ["property", "Property"],
       ["equipment", "Equipment"],
       ["resources", "Resources"],
       ["services", "Services"],
@@ -90,7 +89,6 @@ describe("BrowsePage", () => {
     expect(calls.map((query) => query?.category)).toEqual([
       "all",
       "ships",
-      "property",
       "equipment",
       "resources",
       "services",

@@ -18,13 +18,13 @@ const explorationPoints = [
   {
     title: "Trade across categories",
     description:
-      "Move between ships, property, equipment, resources, and services in one marketplace.",
+      "Move between ships, equipment, resources, and services in one marketplace.",
     symbol: "🗺️",
   },
   {
     title: "List in minutes",
     description:
-      "Turn surplus cargo or unused property into a discoverable offer.",
+      "Turn surplus cargo or an unused ship into a discoverable offer.",
     symbol: "✍️",
   },
 ];
@@ -82,9 +82,9 @@ export function HomePage() {
             The open-sea marketplace for ambitious captains
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">
-            Discover ships, property, equipment, resources, and services from
-            players across the UWO economy. Compare fresh offers, make smart
-            trades, and put your own surplus to work.
+            Discover ships, equipment, resources, and services from players
+            across the UWO economy. Compare fresh offers, make smart trades, and
+            put your own surplus to work.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link

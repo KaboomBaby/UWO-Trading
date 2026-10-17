@@ -33,14 +33,6 @@ export const mockWatchlist: WatchlistItem[] = [
     changePercent: 6.4,
     note: "Export window is open.",
   },
-  {
-    id: "watch-townhouse",
-    itemName: "Seville Townhouse",
-    port: "Seville",
-    currentPrice: 125_000_000,
-    changePercent: -4.1,
-    note: "Watch for a correction.",
-  },
 ];
 
 export const mockGuildStorefronts: GuildStorefront[] = [
@@ -96,15 +88,5 @@ export const mockShopItems: ShopItem[] = [
     seller: "Port Royal Chandler",
     description: "Emergency hull materials for hostile routes.",
     imageEmoji: "🧰",
-  },
-  {
-    id: "shop-dock-office",
-    name: "Dock Office Lease",
-    category: "property",
-    price: 72_000_000,
-    stock: 1,
-    seller: "Seville Harbor Authority",
-    description: "A leased office beside the commercial docks.",
-    imageEmoji: "🏛️",
   },
 ];

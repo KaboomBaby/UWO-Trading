@@ -170,7 +170,7 @@ export function BrowsePage() {
         <div>
           <h1 className="text-3xl font-semibold text-white">Browse listings</h1>
           <p className="mt-2 text-slate-300">
-            Find ships, property, equipment, and crew-ready trade deals.
+            Find ships, equipment, resources, and crew-ready trade deals.
           </p>
         </div>
         <p

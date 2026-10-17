@@ -1,9 +1,4 @@
-export const PRICE_CATEGORIES = [
-  "commodities",
-  "equipment",
-  "ships",
-  "property",
-] as const;
+export const PRICE_CATEGORIES = ["commodities", "equipment", "ships"] as const;
 
 export type PriceCategory = (typeof PRICE_CATEGORIES)[number];
 export type PriceTrend = "rising" | "falling" | "stable";

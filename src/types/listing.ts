@@ -1,6 +1,5 @@
 export const LISTING_CATEGORIES = [
   "ships",
-  "property",
   "equipment",
   "resources",
   "services",

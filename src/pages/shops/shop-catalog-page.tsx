@@ -107,8 +107,7 @@ export function ShopCatalogPage() {
           Shop catalog
         </h1>
         <p className="mt-4 text-base leading-relaxed text-slate-300">
-          Browse ships, equipment, supplies, and property from trusted port
-          sellers.
+          Browse ships, equipment, and supplies from trusted port sellers.
         </p>
       </div>
 
