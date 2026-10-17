@@ -19,7 +19,7 @@ import {
 } from "../../types/listing";
 import { ShipPanel } from "../../components/ships/ship-panel";
 import {
-  ShipTypeIcon,
+  ShipTypeArt,
   formatShipClass,
 } from "../../components/ships/ship-visuals";
 
@@ -1180,13 +1180,17 @@ export function ListingDetailPage() {
         </p>
       ) : null}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
-        <div className="flex min-h-64 items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-          {shipDetails ? (
-            <ShipTypeIcon
-              className="h-28 w-28 text-amber-glow"
-              type={shipDetails.type}
-            />
-          ) : (
+        {shipDetails ? (
+          <div className="relative min-h-64 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+            <div className="absolute inset-0">
+              <ShipTypeArt
+                rowPower={shipDetails.performance.rowPower}
+                type={shipDetails.type}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex min-h-64 items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
             <span
               aria-label={`${listing.title} visual`}
               className="text-7xl sm:text-8xl"
@@ -1194,8 +1198,8 @@ export function ListingDetailPage() {
             >
               {listing.imageEmoji}
             </span>
-          )}
-        </div>
+          </div>
+        )}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-3 text-sm">
             {listing.soldAt ? (

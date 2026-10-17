@@ -75,12 +75,13 @@ describe("ListingCard", () => {
       type: "trade" as ShipType,
       label: "Trade",
       source: "trade.webp",
-      fit: "object-contain",
+      fit: "object-cover",
     },
     {
       type: "adventure" as ShipType,
       label: "Adventure",
-      source: null,
+      source: "adventure.webp",
+      fit: "object-cover",
     },
   ])(
     "uses the approved $type art treatment and summary for ship listings",
@@ -90,7 +91,11 @@ describe("ListingCard", () => {
           <ListingCard
             listing={{
               ...listing,
-              shipDetails: { ...testShipDetails, type },
+              shipDetails: {
+                ...testShipDetails,
+                type,
+                performance: { ...testShipDetails.performance, rowPower: 0 },
+              },
             }}
           />
         </MemoryRouter>,
@@ -102,25 +107,44 @@ describe("ListingCard", () => {
       expect(art).toBeInTheDocument();
       expect(screen.getByText(`${label} · Heavy`)).toBeInTheDocument();
       expect(container.querySelector("img[src$='galley.webp']")).toBeNull();
-
-      if (source) {
-        expect(art).toHaveAttribute("src", `/ship-art/${source}`);
-        expect(art).toHaveClass(fit);
-      } else {
-        expect(art?.querySelector("img, svg")).toBeNull();
-      }
+      expect(art).toHaveAttribute("src", `/ship-art/${source}`);
+      expect(art).toHaveClass(fit);
     },
   );
 
-  it("keeps integrated square galley art centered without cropping", () => {
+  it("renders galley art full-bleed like the rest of the fleet", () => {
     const { container } = render(<ShipArt name="galley" />);
     const art = container.querySelector<HTMLImageElement>(
       "[data-ship-art='galley']",
     );
 
     expect(art).toHaveAttribute("src", "/ship-art/galley.webp");
-    expect(art).toHaveClass("object-contain", "object-center");
-    expect(art).not.toHaveClass("object-cover");
+    expect(art).toHaveClass("object-cover", "object-center");
+    expect(art).not.toHaveClass("object-contain");
+  });
+
+  it("shows the rowing art when the ship has row power, whatever its type", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ListingCard
+          listing={{
+            ...listing,
+            shipDetails: {
+              ...testShipDetails,
+              type: "battle",
+              performance: { ...testShipDetails.performance, rowPower: 130 },
+            },
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    const art = container.querySelector<HTMLImageElement>(
+      "[data-ship-art='galley']",
+    );
+    expect(art).toHaveAttribute("src", "/ship-art/galley.webp");
+    expect(art).toHaveClass("object-cover");
+    expect(container.querySelector("img[src$='battle.webp']")).toBeNull();
   });
 
   it("renders every ship stat as a supplied icon and value without visible labels", () => {

@@ -12,16 +12,17 @@ const shipClassLabels = {
   heavy: "Heavy",
 } as const satisfies Record<ShipClass, string>;
 
-type ShipArtName = "battle" | "galley" | "trade";
-type ShipArtFit = "cover" | "contain";
+type ShipArtName = "adventure" | "battle" | "galley" | "trade";
 
-const shipArtSources: Record<ShipArtName, { fit: ShipArtFit; src: string }> = {
-  battle: { fit: "cover", src: "/ship-art/battle.webp" },
-  galley: { fit: "contain", src: "/ship-art/galley.webp" },
-  trade: { fit: "contain", src: "/ship-art/trade.webp" },
+const shipArtSources: Record<ShipArtName, string> = {
+  adventure: "/ship-art/adventure.webp",
+  battle: "/ship-art/battle.webp",
+  galley: "/ship-art/galley.webp",
+  trade: "/ship-art/trade.webp",
 };
 
-const shipTypeArtSources: Partial<Record<ShipType, ShipArtName>> = {
+const shipTypeArtSources: Record<ShipType, ShipArtName> = {
+  adventure: "adventure",
   battle: "battle",
   trade: "trade",
 };
@@ -87,39 +88,31 @@ export function ShipTypeIcon({
 }
 
 export function ShipArt({ name }: { name: ShipArtName }) {
-  const source = shipArtSources[name];
-  const objectFitClass =
-    source.fit === "cover" ? "object-cover" : "object-contain";
-
   return (
     <img
       alt=""
-      className={`h-full w-full ${objectFitClass} object-center`}
+      className="h-full w-full object-cover object-center"
       data-ship-art={name}
       decoding="async"
       draggable={false}
       loading="lazy"
-      src={source.src}
+      src={shipArtSources[name]}
     />
   );
 }
 
-export function ShipTypeArt({ type }: { type: ShipType }) {
-  const artName = shipTypeArtSources[type];
+export function ShipTypeArt({
+  rowPower,
+  type,
+}: {
+  rowPower?: number;
+  type: ShipType;
+}) {
+  if (rowPower !== undefined && rowPower > 0) {
+    return <ShipArt name="galley" />;
+  }
 
-  if (artName) return <ShipArt name={artName} />;
-
-  return (
-    <div
-      aria-hidden="true"
-      className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sea-blue/30 to-ink p-5"
-      data-ship-art={type}
-    >
-      <div className="flex h-24 w-36 items-center justify-center rounded-xl border-2 border-amber-glow/75 bg-ink/90 p-1 shadow-[0_0_24px_rgba(242,183,75,0.16)]">
-        <div className="h-full w-full rounded-lg border border-amber-glow/45 bg-gradient-to-br from-sea-blue/35 to-ink" />
-      </div>
-    </div>
-  );
+  return <ShipArt name={shipTypeArtSources[type]} />;
 }
 
 type ShipStatIconName =

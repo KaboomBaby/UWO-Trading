@@ -171,13 +171,18 @@ describe("listing detail page", () => {
       ...knownListing,
       shipDetails: testShipDetailsWithSkills,
     });
-    renderApp("/listings/adventurer-frigate");
+    const { container } = renderApp("/listings/adventurer-frigate");
 
     expect(
       await screen.findByRole("heading", {
         name: "Adventurer Frigate (Heavy)",
       }),
     ).toBeInTheDocument();
+    const art = container.querySelector<HTMLImageElement>(
+      "[data-ship-art='galley']",
+    );
+    expect(art).toHaveAttribute("src", "/ship-art/galley.webp");
+    expect(art).toHaveClass("object-cover");
     expect(
       screen.getByText("Grade 7 (High Speed Cargo Ship)"),
     ).toBeInTheDocument();

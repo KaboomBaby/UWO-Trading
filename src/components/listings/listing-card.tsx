@@ -188,7 +188,10 @@ export function ListingCard({ listing }: { listing: Listing }) {
     >
       <div className="relative flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-sea-blue/25 to-ink/90 text-5xl">
         {listing.shipDetails ? (
-          <ShipTypeArt type={listing.shipDetails.type} />
+          <ShipTypeArt
+            rowPower={listing.shipDetails.performance.rowPower}
+            type={listing.shipDetails.type}
+          />
         ) : (
           <span aria-hidden="true">{listing.imageEmoji}</span>
         )}
