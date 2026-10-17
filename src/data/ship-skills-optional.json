@@ -1,7 +1,7 @@
 {
   "harvested": "2026-10-08",
   "list": "Optional ship skills",
-  "note": "Complete list is 82 skills. Every skill uses a genuine 24x28 in-game icon harvested from Papaya Play post 5846.",
+  "note": "Complete list is 110 skills. Every skill uses a genuine 24x28 in-game icon harvested from Papaya Play post 5846.",
   "skills": [
     {
       "icon": "/ship-skill-icons/00002000.png",
@@ -392,6 +392,146 @@
       "icon": "/ship-skill-icons/00002134.png",
       "iconId": "00002134",
       "name": "Monster Battle Armament"
+    },
+    {
+      "icon": "/ship-skill-icons/00002135.png",
+      "iconId": "00002135",
+      "name": "Shock-Resistant Hold"
+    },
+    {
+      "icon": "/ship-skill-icons/00002136.png",
+      "iconId": "00002136",
+      "name": "Detonate Fire Ship"
+    },
+    {
+      "icon": "/ship-skill-icons/00002137.png",
+      "iconId": "00002137",
+      "name": "Evade Collision Attack"
+    },
+    {
+      "icon": "/ship-skill-icons/00002138.png",
+      "iconId": "00002138",
+      "name": "Diversion Cannon Fire"
+    },
+    {
+      "icon": "/ship-skill-icons/00002139.png",
+      "iconId": "00002139",
+      "name": "Reaction Rudder"
+    },
+    {
+      "icon": "/ship-skill-icons/00002140.png",
+      "iconId": "00002140",
+      "name": "Improved Deck"
+    },
+    {
+      "icon": "/ship-skill-icons/00002141.png",
+      "iconId": "00002141",
+      "name": "Improved Propulsion"
+    },
+    {
+      "icon": "/ship-skill-icons/00002142.png",
+      "iconId": "00002142",
+      "name": "Steady Leadership"
+    },
+    {
+      "icon": "/ship-skill-icons/00002143.png",
+      "iconId": "00002143",
+      "name": "High-speed Sailing"
+    },
+    {
+      "icon": "/ship-skill-icons/00002144.png",
+      "iconId": "00002144",
+      "name": "Destructive Melee"
+    },
+    {
+      "icon": "/ship-skill-icons/00002145.png",
+      "iconId": "00002145",
+      "name": "Improved Grapeshots"
+    },
+    {
+      "icon": "/ship-skill-icons/00002146.png",
+      "iconId": "00002146",
+      "name": "Mast Destruction"
+    },
+    {
+      "icon": "/ship-skill-icons/00002147.png",
+      "iconId": "00002147",
+      "name": "Rescue Team"
+    },
+    {
+      "icon": "/ship-skill-icons/00002148.png",
+      "iconId": "00002148",
+      "name": "Longitude Measurement"
+    },
+    {
+      "icon": "/ship-skill-icons/00002149.png",
+      "iconId": "00002149",
+      "name": "Fleet Unity"
+    },
+    {
+      "icon": "/ship-skill-icons/00002150.png",
+      "iconId": "00002150",
+      "name": "Fire-resistant Shipside"
+    },
+    {
+      "icon": "/ship-skill-icons/00002151.png",
+      "iconId": "00002151",
+      "name": "Sailor Wave Tactics"
+    },
+    {
+      "icon": "/ship-skill-icons/00002152.png",
+      "iconId": "00002152",
+      "name": "Luxury Goods Bonus"
+    },
+    {
+      "icon": "/ship-skill-icons/00002153.png",
+      "iconId": "00002153",
+      "name": "Pacific Mastery"
+    },
+    {
+      "icon": "/ship-skill-icons/00002154.png",
+      "iconId": "00002154",
+      "name": "Direct Hit Block"
+    },
+    {
+      "icon": "/ship-skill-icons/00002155.png",
+      "iconId": "00002155",
+      "name": "High-speed Transportation"
+    },
+    {
+      "icon": "/ship-skill-icons/00002156.png",
+      "iconId": "00002156",
+      "name": "High-Spirited Melee"
+    },
+    {
+      "icon": "/ship-skill-icons/00002157.png",
+      "iconId": "00002157",
+      "name": "Trust Building"
+    },
+    {
+      "icon": "/ship-skill-icons/00002158.png",
+      "iconId": "00002158",
+      "name": "Anti-Heavy Ship Cannons"
+    },
+    {
+      "icon": "/ship-skill-icons/00002159.png",
+      "iconId": "00002159",
+      "name": "Deep-Sea Cabin"
+    },
+    {
+      "icon": "/ship-skill-icons/00002160.png",
+      "iconId": "00002160",
+      "name": "Eastern Trade Preference"
+    },
+    {
+      "icon": "/ship-skill-icons/00002161.png",
+      "iconId": "00002161",
+      "name": "Deadeye Shot"
+    },
+    {
+      "icon": "/ship-skill-icons/00002162.png",
+      "iconId": "00002162",
+      "name": "Queen's Protection"
     },
     {
       "icon": "/ship-skill-icons/00002900.png",

@@ -1,7 +1,7 @@
 {
   "harvested": "2026-10-08",
   "list": "Original Ship skills",
-  "note": "49 skills. This is the pool for the 1 Original skill slot on a ship listing; it is a subset of the same skill universe as the Optional list (same names and icons).",
+  "note": "68 skills. This is the pool for the 1 Original skill slot on a ship listing; it is a subset of the same skill universe as the Optional list (same names and icons).",
   "skills": [
     {
       "icon": "/ship-skill-icons/00002000.png",
@@ -64,6 +64,16 @@
       "name": "Sail Sewing Skill"
     },
     {
+      "icon": "/ship-skill-icons/00002015.png",
+      "iconId": "00002015",
+      "name": "Military Camouflage"
+    },
+    {
+      "icon": "/ship-skill-icons/00002017.png",
+      "iconId": "00002017",
+      "name": "Reference Room"
+    },
+    {
       "icon": "/ship-skill-icons/00002018.png",
       "iconId": "00002018",
       "name": "Food Storage"
@@ -107,6 +117,41 @@
       "icon": "/ship-skill-icons/00002029.png",
       "iconId": "00002029",
       "name": "Domestic Livestock Room"
+    },
+    {
+      "icon": "/ship-skill-icons/00002030.png",
+      "iconId": "00002030",
+      "name": "Sanitation Room"
+    },
+    {
+      "icon": "/ship-skill-icons/00002031.png",
+      "iconId": "00002031",
+      "name": "Everyday Item Storage"
+    },
+    {
+      "icon": "/ship-skill-icons/00002032.png",
+      "iconId": "00002032",
+      "name": "Manufactured Item Storage"
+    },
+    {
+      "icon": "/ship-skill-icons/00002033.png",
+      "iconId": "00002033",
+      "name": "General Luxury Goods Storage"
+    },
+    {
+      "icon": "/ship-skill-icons/00002034.png",
+      "iconId": "00002034",
+      "name": "Quality Luxury Goods Storage"
+    },
+    {
+      "icon": "/ship-skill-icons/00002035.png",
+      "iconId": "00002035",
+      "name": "Quality Cabin"
+    },
+    {
+      "icon": "/ship-skill-icons/00002036.png",
+      "iconId": "00002036",
+      "name": "Paymaster Cabin"
     },
     {
       "icon": "/ship-skill-icons/00002037.png",
@@ -229,9 +274,34 @@
       "name": "Sea Mine Removal"
     },
     {
+      "icon": "/ship-skill-icons/00002126.png",
+      "iconId": "00002126",
+      "name": "Assault Deck Battle"
+    },
+    {
+      "icon": "/ship-skill-icons/00002127.png",
+      "iconId": "00002127",
+      "name": "Evade Melee Battle"
+    },
+    {
+      "icon": "/ship-skill-icons/00002128.png",
+      "iconId": "00002128",
+      "name": "Welcome Melee Battle"
+    },
+    {
       "icon": "/ship-skill-icons/00002129.png",
       "iconId": "00002129",
       "name": "Deck Barrier"
+    },
+    {
+      "icon": "/ship-skill-icons/00002130.png",
+      "iconId": "00002130",
+      "name": "Watertight Bulkhead"
+    },
+    {
+      "icon": "/ship-skill-icons/00002131.png",
+      "iconId": "00002131",
+      "name": "Nanban Trade Preference"
     },
     {
       "icon": "/ship-skill-icons/00002132.png",
@@ -247,6 +317,31 @@
       "icon": "/ship-skill-icons/00002134.png",
       "iconId": "00002134",
       "name": "Monster Battle Armament"
+    },
+    {
+      "icon": "/ship-skill-icons/00002135.png",
+      "iconId": "00002135",
+      "name": "Shock-Resistant Hold"
+    },
+    {
+      "icon": "/ship-skill-icons/00002136.png",
+      "iconId": "00002136",
+      "name": "Detonate Fire Ship"
+    },
+    {
+      "icon": "/ship-skill-icons/00002137.png",
+      "iconId": "00002137",
+      "name": "Evade Collision Attack"
+    },
+    {
+      "icon": "/ship-skill-icons/00002138.png",
+      "iconId": "00002138",
+      "name": "Diversion Cannon Fire"
+    },
+    {
+      "icon": "/ship-skill-icons/00002150.png",
+      "iconId": "00002150",
+      "name": "Fire-resistant Shipside"
     }
   ],
   "source": "https://uwo.papayaplay.com/uwo.do?tp=news.view&postid=5846"

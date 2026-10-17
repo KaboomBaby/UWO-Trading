@@ -4,6 +4,8 @@ import iconStatusData from "../../../src/data/ship-skill-icon-status.json";
 import {
   OPTIONAL_SHIP_SKILLS,
   ORIGINAL_SHIP_SKILLS,
+  getOptionalShipSkill,
+  getOriginalShipSkill,
   shipSkillIconUrl,
 } from "../../../src/data/ship-skills";
 
@@ -32,11 +34,11 @@ async function loadNodeFileSystem(): Promise<NodeFileSystem> {
 
 describe("ship skill icon integrity", () => {
   it("maps every unique app skill to one locally hosted Papaya icon", () => {
-    expect(ORIGINAL_SHIP_SKILLS).toHaveLength(49);
-    expect(OPTIONAL_SHIP_SKILLS).toHaveLength(82);
+    expect(ORIGINAL_SHIP_SKILLS).toHaveLength(68);
+    expect(OPTIONAL_SHIP_SKILLS).toHaveLength(110);
     expect(iconStatusData.source.entryCount).toBe(108);
-    expect(iconStatusData.mappedSkillCount).toBe(82);
-    expect(iconStatusData.unmatchedSourceNames).toHaveLength(26);
+    expect(iconStatusData.mappedSkillCount).toBe(108);
+    expect(iconStatusData.unmatchedSourceNames).toHaveLength(0);
     expect(iconStatusData.sourceEntries).toHaveLength(108);
 
     const sourceNames = new Set(
@@ -47,12 +49,12 @@ describe("ship skill icon integrity", () => {
       iconStatusData.sourceEntries.filter(
         (entry) => entry.mappedIconId !== null,
       ),
-    ).toHaveLength(82);
+    ).toHaveLength(108);
     expect(
       iconStatusData.sourceEntries.filter(
         (entry) => entry.mappedIconId === null,
       ),
-    ).toHaveLength(26);
+    ).toHaveLength(0);
 
     const uniqueSkills = new Map(
       [...ORIGINAL_SHIP_SKILLS, ...OPTIONAL_SHIP_SKILLS].map((skill) => [
@@ -60,18 +62,18 @@ describe("ship skill icon integrity", () => {
         skill,
       ]),
     );
-    expect(uniqueSkills.size).toBe(82);
+    expect(uniqueSkills.size).toBe(110);
 
     const manifestByIconId = new Map(
       iconStatusData.icons.map((icon) => [icon.iconId, icon]),
     );
-    expect(manifestByIconId.size).toBe(82);
+    expect(manifestByIconId.size).toBe(110);
     const sourceEntryByIconId = new Map(
       iconStatusData.sourceEntries
         .filter((entry) => entry.mappedIconId !== null)
         .map((entry) => [entry.mappedIconId, entry]),
     );
-    expect(sourceEntryByIconId.size).toBe(82);
+    expect(sourceEntryByIconId.size).toBe(108);
 
     for (const [iconId, skill] of uniqueSkills) {
       const expectedPath = `/ship-skill-icons/${iconId}.png`;
@@ -81,14 +83,71 @@ describe("ship skill icon integrity", () => {
       expect(manifestByIconId.get(iconId)).toEqual(
         expect.objectContaining({ name: skill.name }),
       );
-      expect(sourceEntryByIconId.get(iconId)).toEqual(
-        expect.objectContaining({
-          mappedName: skill.name,
-          sourceName: manifestByIconId.get(iconId)?.sourceName,
-          sourceUrl: manifestByIconId.get(iconId)?.sourceUrl,
-        }),
-      );
+      const sourceEntry = sourceEntryByIconId.get(iconId);
+      if (sourceEntry) {
+        expect(sourceEntry).toEqual(
+          expect.objectContaining({
+            mappedName: skill.name,
+            sourceName: manifestByIconId.get(iconId)?.sourceName,
+            sourceUrl: manifestByIconId.get(iconId)?.sourceUrl,
+          }),
+        );
+      } else {
+        // Add-only alias records (Shock-Resistant Hold, Direct Hit Block)
+        // carry their own icon slot for a sheet row that stays mapped to
+        // the canonical app name (Earthquake-proof Hold, Direct Hit
+        // Prevention); both names remain selectable.
+        const aliasedEntry = iconStatusData.sourceEntries.find(
+          (entry) =>
+            entry.sourceName === manifestByIconId.get(iconId)?.sourceName,
+        );
+        expect(aliasedEntry).toBeDefined();
+        expect(aliasedEntry?.mappedIconId).not.toBe(iconId);
+      }
     }
+  });
+
+  it("includes the completed skill additions in both pickers", () => {
+    const optionalNames = new Set(OPTIONAL_SHIP_SKILLS.map((s) => s.name));
+    const originalNames = new Set(ORIGINAL_SHIP_SKILLS.map((s) => s.name));
+
+    for (const name of [
+      "Shock-Resistant Hold",
+      "Detonate Fire Ship",
+      "Evade Collision Attack",
+      "Diversion Cannon Fire",
+      "Reaction Rudder",
+      "Improved Deck",
+      "Direct Hit Block",
+      "Fire-resistant Shipside",
+      "Queen's Protection",
+    ]) {
+      expect(optionalNames.has(name)).toBe(true);
+    }
+
+    for (const name of [
+      "Military Camouflage",
+      "Reference Room",
+      "Shock-Resistant Hold",
+      "Sanitation Room",
+      "Quality Cabin",
+      "Paymaster Cabin",
+      "Assault Deck Battle",
+      "Watertight Bulkhead",
+      "Nanban Trade Preference",
+      "Detonate Fire Ship",
+      "Fire-resistant Shipside",
+    ]) {
+      expect(originalNames.has(name)).toBe(true);
+    }
+
+    expect(getOptionalShipSkill("00002162")?.name).toBe("Queen's Protection");
+    expect(getOriginalShipSkill("00002150")?.name).toBe(
+      "Fire-resistant Shipside",
+    );
+    // The pre-existing names the add-only ruling protected are untouched.
+    expect(optionalNames.has("Earthquake-proof Hold")).toBe(true);
+    expect(optionalNames.has("Direct Hit Prevention")).toBe(true);
   });
 
   it("stores genuine nonempty 24x28 PNG files for every unique skill", async () => {
