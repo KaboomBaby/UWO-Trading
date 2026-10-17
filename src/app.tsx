@@ -8,6 +8,8 @@ import { MarketRepositoryProvider } from "./lib/market-repository-context";
 import { TradingRepositoryProvider } from "./lib/trading-repository-context";
 import { BrowsePage } from "./pages/browse/browse-page";
 import { AccountPage } from "./pages/auth/account-page";
+import { ForgotPasswordPage } from "./pages/auth/forgot-password-page";
+import { ResetPasswordPage } from "./pages/auth/reset-password-page";
 import { ComponentsPage } from "./pages/components/components-page";
 import { HomePage } from "./pages/home/home-page";
 import { ListingDetailPage } from "./pages/listing-detail/listing-detail-page";
@@ -33,6 +35,14 @@ export function App() {
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/account" element={<AccountPage />} />
+                  <Route
+                    path="/account/forgot"
+                    element={<ForgotPasswordPage />}
+                  />
+                  <Route
+                    path="/account/reset"
+                    element={<ResetPasswordPage />}
+                  />
                   <Route path="/browse" element={<BrowsePage />} />
                   <Route
                     path="/listings/:listingId"

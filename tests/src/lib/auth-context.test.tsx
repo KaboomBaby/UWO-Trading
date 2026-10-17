@@ -25,11 +25,24 @@ function AuthState() {
       <span>{auth.email ?? "signed-out"}</span>
       <span>{auth.userId ?? "no-user"}</span>
       <span>{auth.isInitializing ? "loading" : "ready"}</span>
+      <span>{auth.isSupabaseUnreachable ? "unreachable" : "reachable"}</span>
       <button
         onClick={() => void auth.signIn("owner@example.com", "secret6")}
         type="button"
       >
         sign in
+      </button>
+      <button
+        onClick={() => void auth.requestPasswordReset("owner@example.com")}
+        type="button"
+      >
+        request reset
+      </button>
+      <button
+        onClick={() => void auth.updatePassword("new-secret6")}
+        type="button"
+      >
+        update password
       </button>
       <button onClick={() => void auth.signOut()} type="button">
         sign out
@@ -133,6 +146,75 @@ describe("auth context", () => {
     );
 
     expect(screen.getByText("signed-out")).toBeInTheDocument();
+    expect(screen.getByText("ready")).toBeInTheDocument();
+  });
+
+  it("requests a password reset for the site reset page and updates the password", async () => {
+    const client = {
+      auth: {
+        getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+        onAuthStateChange: vi.fn().mockReturnValue({
+          data: { subscription: { unsubscribe: vi.fn() } },
+        }),
+        resetPasswordForEmail: vi.fn().mockResolvedValue({ error: null }),
+        signInWithPassword: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        updateUser: vi.fn().mockResolvedValue({ error: null }),
+      },
+    };
+    getSupabaseClientMock.mockReturnValue(client as unknown as SupabaseClient);
+
+    render(
+      <AuthProvider>
+        <AuthState />
+      </AuthProvider>,
+    );
+
+    expect(await screen.findByText("signed-out")).toBeInTheDocument();
+
+    await act(async () => {
+      screen.getByRole("button", { name: "request reset" }).click();
+    });
+    expect(client.auth.resetPasswordForEmail).toHaveBeenCalledWith(
+      "owner@example.com",
+      { redirectTo: `${window.location.origin}/account/reset` },
+    );
+
+    await act(async () => {
+      screen.getByRole("button", { name: "update password" }).click();
+    });
+    expect(client.auth.updateUser).toHaveBeenCalledWith({
+      password: "new-secret6",
+    });
+  });
+
+  it("marks the account service unreachable when the first session check fails", async () => {
+    const client = {
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: null },
+          error: new Error("Failed to fetch"),
+        }),
+        onAuthStateChange: vi.fn().mockReturnValue({
+          data: { subscription: { unsubscribe: vi.fn() } },
+        }),
+        resetPasswordForEmail: vi.fn(),
+        signInWithPassword: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        updateUser: vi.fn(),
+      },
+    };
+    getSupabaseClientMock.mockReturnValue(client as unknown as SupabaseClient);
+
+    render(
+      <AuthProvider>
+        <AuthState />
+      </AuthProvider>,
+    );
+
+    expect(await screen.findByText("unreachable")).toBeInTheDocument();
     expect(screen.getByText("ready")).toBeInTheDocument();
   });
 });

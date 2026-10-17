@@ -186,6 +186,17 @@ export function AccountPage() {
             />
           </div>
 
+          {mode === "sign-in" ? (
+            <div className="-mt-2 text-right">
+              <Link
+                className="text-sm font-semibold text-amber-glow transition hover:text-amber-100"
+                to="/account/forgot"
+              >
+                Forgot password?
+              </Link>
+            </div>
+          ) : null}
+
           {status ? (
             <p
               className="rounded-lg border border-emerald-400/40 bg-emerald-500/10 p-3 text-sm text-emerald-100"

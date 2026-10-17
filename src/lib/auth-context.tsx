@@ -18,16 +18,19 @@ type AuthContextValue = {
   email: string | null;
   isInitializing: boolean;
   isSupabaseEnabled: boolean;
+  isSupabaseUnreachable: boolean;
   register: (
     email: string,
     password: string,
   ) => Promise<AuthActionResult | undefined>;
+  requestPasswordReset: (email: string) => Promise<void>;
   session: Session | null;
   signIn: (
     email: string,
     password: string,
   ) => Promise<AuthActionResult | undefined>;
   signOut: () => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   userId: string | null;
 };
 
@@ -37,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const client = useMemo(() => getSupabaseClient(), []);
   const [session, setSession] = useState<Session | null>(null);
   const [isInitializing, setIsInitializing] = useState(() => client !== null);
+  const [isSupabaseUnreachable, setIsSupabaseUnreachable] = useState(false);
 
   useEffect(() => {
     if (!client) return;
@@ -45,11 +49,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     client.auth
       .getSession()
-      .then(({ data }) => {
-        if (active) setSession(data.session);
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) {
+          setSession(null);
+          setIsSupabaseUnreachable(true);
+          return;
+        }
+        setSession(data.session);
+        setIsSupabaseUnreachable(false);
       })
       .catch(() => {
-        if (active) setSession(null);
+        if (active) {
+          setSession(null);
+          setIsSupabaseUnreachable(true);
+        }
       })
       .finally(() => {
         if (active) setIsInitializing(false);
@@ -57,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data } = client.auth.onAuthStateChange((_, nextSession) => {
       setSession(nextSession);
+      if (nextSession) setIsSupabaseUnreachable(false);
       setIsInitializing(false);
     });
 
@@ -95,6 +110,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [client],
   );
 
+  const requestPasswordReset = useCallback(
+    async (email: string) => {
+      if (!client) {
+        throw new Error(
+          "Password reset is unavailable because Supabase is not configured.",
+        );
+      }
+
+      const redirectTo =
+        typeof window === "undefined"
+          ? undefined
+          : `${window.location.origin}/account/reset`;
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      });
+      if (error) throw error;
+    },
+    [client],
+  );
+
+  const updatePassword = useCallback(
+    async (password: string) => {
+      if (!client) {
+        throw new Error(
+          "Password update is unavailable because Supabase is not configured.",
+        );
+      }
+
+      const { error } = await client.auth.updateUser({ password });
+      if (error) throw error;
+    },
+    [client],
+  );
+
   const signOut = useCallback(async () => {
     if (!client) return;
 
@@ -108,13 +157,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: session?.user.email ?? null,
       isInitializing,
       isSupabaseEnabled: client !== null,
+      isSupabaseUnreachable,
       register,
+      requestPasswordReset,
       session,
       signIn,
       signOut,
+      updatePassword,
       userId: session?.user.id ?? null,
     }),
-    [client, isInitializing, register, session, signIn, signOut],
+    [
+      client,
+      isInitializing,
+      isSupabaseUnreachable,
+      register,
+      requestPasswordReset,
+      session,
+      signIn,
+      signOut,
+      updatePassword,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

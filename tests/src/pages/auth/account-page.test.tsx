@@ -17,6 +17,7 @@ const baseAuth = {
   email: null,
   isInitializing: false,
   isSupabaseEnabled: true,
+  isSupabaseUnreachable: false,
   session: null,
   userId: null,
 };
@@ -38,8 +39,10 @@ describe("account page", () => {
     useAuthMock.mockReturnValue({
       ...baseAuth,
       register: vi.fn(),
+      requestPasswordReset: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
+      updatePassword: vi.fn(),
     });
   });
 
@@ -75,5 +78,21 @@ describe("account page", () => {
       ),
     ).toBeInTheDocument();
     expect(register).toHaveBeenCalledWith("new@example.com", "secret6");
+  });
+
+  it("links sign-in users to password recovery", () => {
+    renderAccountPage();
+
+    expect(
+      screen.getByRole("link", { name: "Forgot password?" }),
+    ).toHaveAttribute("href", "/account/forgot");
+  });
+
+  it("does not show password recovery on the register form", () => {
+    renderAccountPage("/account?mode=register");
+
+    expect(
+      screen.queryByRole("link", { name: "Forgot password?" }),
+    ).not.toBeInTheDocument();
   });
 });
