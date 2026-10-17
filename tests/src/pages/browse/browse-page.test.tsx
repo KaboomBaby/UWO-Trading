@@ -150,6 +150,34 @@ describe("BrowsePage", () => {
     );
   });
 
+  it("offers a Tickets only toggle in Ships browsing and passes it to the repository", async () => {
+    const user = userEvent.setup();
+    mockRepository.list.mockResolvedValue([]);
+    renderBrowse("/browse?category=ships");
+    await screen.findByText("0 listings");
+
+    const toggle = screen.getByRole("button", { name: "Tickets only" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(toggle);
+    await waitFor(() =>
+      expect(mockRepository.list).toHaveBeenLastCalledWith(
+        expect.objectContaining({ category: "ships", ticketsOnly: true }),
+      ),
+    );
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("does not offer the Tickets only toggle outside Ships browsing", async () => {
+    mockRepository.list.mockResolvedValue([]);
+    renderBrowse("/browse");
+    await screen.findByText("0 listings");
+
+    expect(
+      screen.queryByRole("button", { name: "Tickets only" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders a clear empty state when the repository returns no listings", async () => {
     mockRepository.list.mockResolvedValue([]);
     renderBrowse();

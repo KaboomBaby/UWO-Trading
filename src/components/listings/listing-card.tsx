@@ -26,63 +26,88 @@ type CompactShipStat = {
 };
 
 function getCompactShipStats(details: ShipDetails): CompactShipStat[] {
-  return [
+  const candidates: Array<{
+    label: string;
+    name: CompactShipStat["name"];
+    value?: string | number;
+  }> = [
     {
       label: "Vertical sail",
       name: "verticalSail",
-      value: details.performance.verticalSail,
+      value: details.performance?.verticalSail,
     },
     {
       label: "Horizontal sail",
       name: "horizontalSail",
-      value: details.performance.horizontalSail,
+      value: details.performance?.horizontalSail,
     },
     {
       label: "Row power",
       name: "rowPower",
-      value: details.performance.rowPower,
+      value: details.performance?.rowPower,
     },
     {
       label: "Turn speed",
       name: "turnSpeed",
-      value: details.performance.turnSpeed,
+      value: details.performance?.turnSpeed,
     },
     {
       label: "Wave resistance",
       name: "waveResistance",
-      value: details.performance.waveResistance,
+      value: details.performance?.waveResistance,
     },
-    { label: "Armour", name: "armour", value: details.performance.armour },
+    { label: "Armour", name: "armour", value: details.performance?.armour },
     { label: "Durability", name: "durability", value: details.durability },
     {
       label: "Improvements",
       name: "improvements",
-      value: `${details.improvements} / 5`,
+      value:
+        details.improvements !== undefined
+          ? `${details.improvements} / 5`
+          : undefined,
     },
-    { label: "Crew", name: "crew", value: details.hold.crew },
-    { label: "Cannons", name: "cannons", value: details.hold.cannons },
-    { label: "Cargo", name: "cargo", value: details.hold.cargo },
+    { label: "Crew", name: "crew", value: details.hold?.crew },
+    { label: "Cannons", name: "cannons", value: details.hold?.cannons },
+    { label: "Cargo", name: "cargo", value: details.hold?.cargo },
     {
       label: "Sailors required",
       name: "sailors",
-      value: details.hold.sailorsRequired,
+      value: details.hold?.sailorsRequired,
     },
     {
       label: "Adventure Lv",
       name: "adventure",
-      value: details.sailingRequirements.adventureLevel,
+      value: details.sailingRequirements?.adventureLevel,
     },
     {
       label: "Trade Lv",
       name: "trade",
-      value: details.sailingRequirements.tradeLevel,
+      value: details.sailingRequirements?.tradeLevel,
     },
     {
       label: "Battle Lv",
       name: "battle",
-      value: details.sailingRequirements.battleLevel,
+      value: details.sailingRequirements?.battleLevel,
     },
   ];
+
+  return candidates.filter(
+    (stat): stat is CompactShipStat => stat.value !== undefined,
+  );
+}
+
+export function ShipTicketBadge() {
+  return (
+    <span className="inline-flex rounded-full border border-amber-glow/60 bg-amber-glow/15 px-2.5 py-1 text-[0.68rem] font-bold tracking-wider text-amber-glow">
+      SHIP TICKET
+    </span>
+  );
+}
+
+export function ticketDisplayName(details: ShipDetails): string | null {
+  return details.ticketNumber !== undefined
+    ? `Ship Exchange Ticket (No.${details.ticketNumber})`
+    : null;
 }
 
 function useNameTooltip() {
@@ -202,10 +227,25 @@ function ShipStatChip({ stat }: { stat: CompactShipStat }) {
 }
 
 function CompactShipSpecifications({ details }: { details: ShipDetails }) {
+  if (details.isTicket) {
+    const ticketName = ticketDisplayName(details);
+    return (
+      <div>
+        <ShipTicketBadge />
+        {ticketName ? (
+          <p className="mt-2 text-sm text-slate-200">{ticketName}</p>
+        ) : null}
+      </div>
+    );
+  }
+
   const stats = getCompactShipStats(details);
-  const skills = [details.originalSkill, ...details.optionalSkills].filter(
-    (skill): skill is ShipSkill => skill !== null,
-  );
+  const skills = [
+    details.originalSkill,
+    ...(details.optionalSkills ?? []),
+  ].filter((skill): skill is ShipSkill => skill != null);
+
+  if (stats.length === 0 && skills.length === 0) return null;
 
   return (
     <ul
@@ -236,7 +276,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
       <div className="relative flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-sea-blue/25 to-ink/90 text-5xl">
         {listing.shipDetails ? (
           <ShipTypeArt
-            rowPower={listing.shipDetails.performance.rowPower}
+            rowPower={listing.shipDetails.performance?.rowPower ?? 0}
             type={listing.shipDetails.type}
           />
         ) : (
@@ -265,8 +305,10 @@ export function ListingCard({ listing }: { listing: Listing }) {
             </span>
             {listing.shipDetails ? (
               <span className="rounded-full bg-amber-glow/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-glow">
-                {formatShipType(listing.shipDetails.type)} ·{" "}
-                {formatShipClass(listing.shipDetails.shipClass)}
+                {formatShipType(listing.shipDetails.type)}
+                {listing.shipDetails.shipClass
+                  ? ` · ${formatShipClass(listing.shipDetails.shipClass)}`
+                  : ""}
               </span>
             ) : null}
           </span>

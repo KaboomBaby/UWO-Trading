@@ -41,32 +41,34 @@ export type ShipSkill = {
 
 export type ShipDetails = {
   type: ShipType;
-  shipClass: ShipClass;
-  grade: number;
-  role: string;
-  performance: {
-    verticalSail: number;
-    horizontalSail: number;
-    rowPower: number;
-    turnSpeed: number;
-    waveResistance: number;
-    armour: number;
+  shipClass?: ShipClass;
+  isTicket?: boolean;
+  ticketNumber?: number;
+  grade?: number;
+  role?: string;
+  performance?: {
+    verticalSail?: number;
+    horizontalSail?: number;
+    rowPower?: number;
+    turnSpeed?: number;
+    waveResistance?: number;
+    armour?: number;
   };
-  improvements: number;
-  durability: number;
-  hold: {
-    crew: number;
-    cannons: number;
-    cargo: number;
-    sailorsRequired: number;
+  improvements?: number;
+  durability?: number;
+  hold?: {
+    crew?: number;
+    cannons?: number;
+    cargo?: number;
+    sailorsRequired?: number;
   };
-  sailingRequirements: {
-    adventureLevel: number;
-    tradeLevel: number;
-    battleLevel: number;
+  sailingRequirements?: {
+    adventureLevel?: number;
+    tradeLevel?: number;
+    battleLevel?: number;
   };
-  originalSkill: ShipSkill | null;
-  optionalSkills: ShipSkill[];
+  originalSkill?: ShipSkill | null;
+  optionalSkills?: ShipSkill[];
 };
 
 export function isNumericListingCurrency(
@@ -97,6 +99,7 @@ export type ListingQuery = {
   includeExpired?: boolean;
   search?: string;
   sort?: ListingSort;
+  ticketsOnly?: boolean;
 };
 
 export type Listing = {

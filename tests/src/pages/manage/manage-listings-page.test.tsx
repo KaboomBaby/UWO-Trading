@@ -397,6 +397,44 @@ describe("manage listings page", { timeout: 10_000 }, () => {
     ).toBeInTheDocument();
   });
 
+  it("edits a ship ticket listing without demanding stats", async () => {
+    const user = userEvent.setup({ delay: null });
+    const ticketListing: Listing = {
+      ...expiredListing,
+      title: "Galleon Ticket",
+      shipDetails: { type: "battle", isTicket: true, ticketNumber: 407 },
+    };
+    repository.findByEditCode.mockResolvedValueOnce(ticketListing);
+    repository.update.mockResolvedValueOnce({
+      ...ticketListing,
+      shipDetails: { type: "battle", isTicket: true, ticketNumber: 512 },
+    });
+    renderManagePage();
+    await user.type(screen.getByLabelText("Edit code"), editCode);
+    await user.click(screen.getByRole("button", { name: "Find listing" }));
+    expect(await screen.findByText("Galleon Ticket")).toBeInTheDocument();
+
+    expect(screen.getByRole("button", { name: "Ship ticket" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.queryByLabelText("Grade")).not.toBeInTheDocument();
+    const ticketNumberField = screen.getByLabelText(/Ticket No\./);
+    expect(ticketNumberField).toHaveValue(407);
+
+    await user.clear(ticketNumberField);
+    await user.type(ticketNumberField, "512");
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+    expect(await screen.findByText("Changes saved.")).toBeInTheDocument();
+    expect(repository.update).toHaveBeenCalledWith(
+      editCode,
+      expect.objectContaining({
+        shipDetails: { type: "battle", isTicket: true, ticketNumber: 512 },
+      }),
+    );
+  });
+
   it("reflects repository errors from an attempted save", async () => {
     const user = userEvent.setup({ delay: null });
     repository.update.mockRejectedValueOnce(

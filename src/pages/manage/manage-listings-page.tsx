@@ -104,7 +104,6 @@ function formStateFromListing(listing: Listing): FormState {
 function validate(form: FormState): ManageFormErrors {
   const errors: ManageFormErrors = {};
   const title = form.title.trim();
-  const description = form.description.trim();
   const seller = form.seller.trim();
   const location = form.location.trim();
   const server = form.server.trim();
@@ -122,9 +121,6 @@ function validate(form: FormState): ManageFormErrors {
     } else if (form.currency === "CT" && !Number.isInteger(price)) {
       errors.price = "Captain Tickets must be a whole number.";
     }
-  }
-  if (description.length < 10) {
-    errors.description = "Description must be at least 10 characters.";
   }
   if (!seller) {
     errors.seller = "Seller is required.";
@@ -195,7 +191,7 @@ function ShipSkillsSummary({
     ...(shipDetails.originalSkill
       ? [{ ...shipDetails.originalSkill, isOriginal: true }]
       : []),
-    ...shipDetails.optionalSkills.map((skill) => ({
+    ...(shipDetails.optionalSkills ?? []).map((skill) => ({
       ...skill,
       isOriginal: false,
     })),

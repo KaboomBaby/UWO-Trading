@@ -219,8 +219,8 @@ describe("ListingCard", () => {
 
     const selectedSkills = [
       testShipDetailsWithSkills.originalSkill,
-      ...testShipDetailsWithSkills.optionalSkills,
-    ].filter((skill): skill is NonNullable<typeof skill> => skill !== null);
+      ...(testShipDetailsWithSkills.optionalSkills ?? []),
+    ].filter((skill): skill is NonNullable<typeof skill> => skill != null);
     expect(screen.getAllByRole("listitem")).toHaveLength(
       15 + selectedSkills.length,
     );
@@ -278,6 +278,69 @@ describe("ListingCard", () => {
     expect(screen.getByText("Row power")).toBeVisible();
     fireEvent.blur(chip);
     expect(screen.queryByText("Row power")).not.toBeInTheDocument();
+  });
+
+  it("renders a ticket card with the gold badge and no stat chips", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ListingCard
+          listing={{
+            ...listing,
+            shipDetails: {
+              type: "battle",
+              isTicket: true,
+              ticketNumber: 407,
+            },
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("SHIP TICKET")).toBeInTheDocument();
+    expect(
+      screen.getByText("Ship Exchange Ticket (No.407)"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("list", { name: "Ship specifications and skills" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("listitem", { name: /Row power/ }),
+    ).not.toBeInTheDocument();
+    const art = container.querySelector<HTMLImageElement>(
+      "img[src='/ship-art/battle.webp']",
+    );
+    expect(art).not.toBeNull();
+  });
+
+  it("renders only the stats a partial listing provides, never zero-filled", () => {
+    render(
+      <MemoryRouter>
+        <ListingCard
+          listing={{
+            ...listing,
+            shipDetails: {
+              type: "trade",
+              shipClass: "heavy",
+              performance: { rowPower: 40 },
+              hold: { cargo: 950 },
+            },
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("listitem", { name: "Row power: 40" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("listitem", { name: "Cargo: 950" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("listitem", { name: /Vertical sail/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("listitem", { name: /: 0$/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows a stat name tooltip after a touch long press", () => {

@@ -80,6 +80,7 @@ export function BrowsePage() {
   const collection = parseCollection(searchParams.get("collection"));
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<ListingSort>("newest");
+  const [ticketsOnly, setTicketsOnly] = useState(false);
   const [result, setResult] = useState<ListingResult | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
@@ -89,8 +90,9 @@ export function BrowsePage() {
       collection,
       search: search.trim() || undefined,
       sort,
+      ticketsOnly: ticketsOnly || undefined,
     }),
-    [category, collection, search, sort],
+    [category, collection, search, sort, ticketsOnly],
   );
   const currentResult =
     result?.query === query && result.reloadToken === reloadToken
@@ -153,6 +155,7 @@ export function BrowsePage() {
   const clearFilters = () => {
     setSearch("");
     setSort("newest");
+    setTicketsOnly(false);
     setSearchParams(new URLSearchParams());
     setReloadToken((token) => token + 1);
   };
@@ -161,7 +164,8 @@ export function BrowsePage() {
     category !== "all" ||
     collection === "legacy" ||
     search.trim().length > 0 ||
-    sort !== "newest";
+    sort !== "newest" ||
+    ticketsOnly;
   const resultLabel = listings.length === 1 ? "listing" : "listings";
 
   return (
@@ -244,6 +248,22 @@ export function BrowsePage() {
                 </button>
               ))}
             </div>
+            {category === "ships" ? (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => setTicketsOnly((value) => !value)}
+                  aria-pressed={ticketsOnly}
+                  className={
+                    ticketsOnly
+                      ? "rounded-full bg-amber-glow px-4 py-2 text-sm font-semibold text-ink"
+                      : "rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-white/40 hover:bg-white/10"
+                  }
+                >
+                  Tickets only
+                </button>
+              </div>
+            ) : null}
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row xl:items-end">

@@ -60,7 +60,7 @@ async function fillCommonFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Title"), "Trading Schooner");
   await user.selectOptions(screen.getByLabelText("Category"), "ships");
   await user.type(
-    screen.getByLabelText("Description"),
+    screen.getByLabelText(/Description/),
     "A swift schooner suitable for regional trade routes.",
   );
   await user.type(screen.getByLabelText("Seller"), "AmsterdamShipyard");
@@ -188,7 +188,7 @@ describe("post listing page", { timeout: 10_000 }, () => {
     renderPostPage();
 
     await user.type(screen.getByLabelText("Title"), "ab");
-    await user.type(screen.getByLabelText("Description"), "Too short");
+    await user.type(screen.getByLabelText(/Description/), "Too short");
     await user.click(screen.getByRole("button", { name: "Publish listing" }));
 
     expect(
@@ -197,8 +197,8 @@ describe("post listing page", { timeout: 10_000 }, () => {
     expect(screen.getByText("Category is required.")).toBeInTheDocument();
     expect(screen.getByText("Currency is required.")).toBeInTheDocument();
     expect(
-      screen.getByText("Description must be at least 10 characters."),
-    ).toBeInTheDocument();
+      screen.queryByText("Description must be at least 10 characters."),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("Seller is required.")).toBeInTheDocument();
     expect(screen.getByText("Location is required.")).toBeInTheDocument();
     expect(screen.getByText("Server is required.")).toBeInTheDocument();
@@ -261,16 +261,47 @@ describe("post listing page", { timeout: 10_000 }, () => {
     ).not.toBeInTheDocument();
   });
 
-  it("requires complete ship specifications before creating a Ships listing", async () => {
+  it("creates a Ships listing with blank stats and a blank description", async () => {
     const user = userEvent.setup({ delay: null });
     renderPostPage();
     await fillValidForm(user);
     await user.clear(screen.getByLabelText("Grade"));
+    await user.clear(screen.getByLabelText(/Description/));
 
     await user.click(screen.getByRole("button", { name: "Publish listing" }));
 
-    expect(screen.getByText("Grade is required.")).toBeInTheDocument();
-    expect(repository.create).not.toHaveBeenCalled();
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(repository.create).toHaveBeenCalledTimes(1);
+    const createdInput = repository.create.mock.calls[0]?.[0];
+    expect(createdInput?.description).toBe("");
+    expect(createdInput?.shipDetails).not.toHaveProperty("grade");
+    expect(createdInput?.shipDetails?.performance?.verticalSail).toBe(180);
+  });
+
+  it("creates a ship ticket listing with an optional Ticket No.", async () => {
+    const user = userEvent.setup({ delay: null });
+    renderPostPage();
+    await fillCommonFields(user);
+
+    await user.click(screen.getByRole("button", { name: "Ship ticket" }));
+    expect(screen.queryByLabelText("Grade")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Ship class")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Original skill")).not.toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("Ship type"), "battle");
+    await user.type(screen.getByLabelText(/Ticket No\./), "407");
+    await user.selectOptions(screen.getByLabelText("Currency"), "ducats");
+    await user.type(screen.getByLabelText("Price (Ducats)"), "32000000");
+    await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(repository.create).toHaveBeenCalledTimes(1);
+    const createdInput = repository.create.mock.calls[0]?.[0];
+    expect(createdInput?.shipDetails).toEqual({
+      type: "battle",
+      isTicket: true,
+      ticketNumber: 407,
+    });
   });
 
   it("offers one Original slot, five Optional slots, and round-trips chosen skills", async () => {

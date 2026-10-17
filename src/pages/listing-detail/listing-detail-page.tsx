@@ -17,6 +17,10 @@ import {
   type ListingCurrency,
   type ReportReason,
 } from "../../types/listing";
+import {
+  ShipTicketBadge,
+  ticketDisplayName,
+} from "../../components/listings/listing-card";
 import { ShipPanel } from "../../components/ships/ship-panel";
 import {
   ShipTypeArt,
@@ -1184,7 +1188,7 @@ export function ListingDetailPage() {
           <div className="relative min-h-64 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
             <div className="absolute inset-0">
               <ShipTypeArt
-                rowPower={shipDetails.performance.rowPower}
+                rowPower={shipDetails.performance?.rowPower ?? 0}
                 type={shipDetails.type}
               />
             </div>
@@ -1216,7 +1220,7 @@ export function ListingDetailPage() {
             id="listing-title"
             className="mt-4 text-3xl font-semibold text-white sm:text-4xl"
           >
-            {shipDetails
+            {shipDetails?.shipClass
               ? `${listing.title} (${formatShipClass(shipDetails.shipClass)})`
               : listing.title}
           </h1>
@@ -1225,7 +1229,25 @@ export function ListingDetailPage() {
           </p>
           {shipDetails ? (
             <div className="mt-6">
-              <ShipPanel details={shipDetails} />
+              {shipDetails.isTicket ? (
+                <section
+                  aria-label="Ship ticket"
+                  className="rounded-2xl border border-amber-glow/25 bg-ink/60 p-5 sm:p-6"
+                >
+                  <ShipTicketBadge />
+                  {ticketDisplayName(shipDetails) ? (
+                    <p className="mt-3 text-lg font-semibold text-white">
+                      {ticketDisplayName(shipDetails)}
+                    </p>
+                  ) : null}
+                  <p className="mt-2 leading-relaxed text-slate-300">
+                    An unopened ship ticket — a consumable that gives this ship
+                    when opened.
+                  </p>
+                </section>
+              ) : (
+                <ShipPanel details={shipDetails} />
+              )}
             </div>
           ) : null}
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -1258,14 +1280,16 @@ export function ListingDetailPage() {
               </p>
             </div>
           ) : null}
-          <div className="mt-6 border-t border-white/10 pt-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
-              Description
-            </h2>
-            <p className="mt-2 leading-relaxed text-slate-200">
-              {listing.description}
-            </p>
-          </div>
+          {listing.description.trim() ? (
+            <div className="mt-6 border-t border-white/10 pt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+                Description
+              </h2>
+              <p className="mt-2 leading-relaxed text-slate-200">
+                {listing.description}
+              </p>
+            </div>
+          ) : null}
         </div>
       </div>
 

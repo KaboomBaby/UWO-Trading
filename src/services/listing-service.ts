@@ -100,21 +100,16 @@ function isNonnegativeInteger(value: number) {
   return Number.isInteger(value) && value >= 0;
 }
 
-function validateShipPerformance(
-  details: ShipDetails,
+function validateOptionalStatGroup(
+  values: Array<number | undefined> | undefined,
+  message: string,
   errors: Record<string, string>,
 ) {
-  const entries = Object.entries(details.performance);
-  if (entries.length !== 6) {
-    errors.shipDetails = "Ship performance is incomplete.";
-    return;
-  }
-
-  for (const [field, value] of entries) {
-    if (!isNonnegativeInteger(value)) {
-      errors.shipDetails = `Ship performance ${field} must be a whole number of zero or more.`;
-      return;
-    }
+  if (errors.shipDetails || !values) return;
+  if (
+    values.some((value) => value !== undefined && !isNonnegativeInteger(value))
+  ) {
+    errors.shipDetails = message;
   }
 }
 
@@ -122,51 +117,59 @@ function validateShipDetails(
   details: ShipDetails,
   errors: Record<string, string>,
 ) {
-  if (
-    !["battle", "trade", "adventure"].includes(details.type) ||
-    !["light", "standard", "heavy"].includes(details.shipClass)
-  ) {
-    errors.shipDetails = "Choose a valid ship type and class.";
+  if (!["battle", "trade", "adventure"].includes(details.type)) {
+    errors.shipDetails = "Choose a valid ship type.";
     return;
   }
-  if (!isNonnegativeInteger(details.grade)) {
+  if (details.isTicket) {
+    if (
+      details.ticketNumber !== undefined &&
+      (!Number.isInteger(details.ticketNumber) || details.ticketNumber <= 0)
+    ) {
+      errors.shipDetails = "Ticket No. must be a positive whole number.";
+    }
+    return;
+  }
+  if (
+    !details.shipClass ||
+    !["light", "standard", "heavy"].includes(details.shipClass)
+  ) {
+    errors.shipDetails = "Choose a valid ship class.";
+    return;
+  }
+  if (details.grade !== undefined && !isNonnegativeInteger(details.grade)) {
     errors.shipDetails = "Ship grade must be a whole number of zero or more.";
     return;
   }
-  if (!details.role.trim()) {
-    errors.shipDetails = "Ship role is required.";
-    return;
-  }
 
-  validateShipPerformance(details, errors);
+  validateOptionalStatGroup(
+    details.performance ? Object.values(details.performance) : undefined,
+    "Ship performance values must be whole numbers of zero or more.",
+    errors,
+  );
+  validateOptionalStatGroup(
+    details.improvements !== undefined ? [details.improvements] : undefined,
+    "Ship improvements must be a whole number of zero or more.",
+    errors,
+  );
+  validateOptionalStatGroup(
+    details.durability !== undefined ? [details.durability] : undefined,
+    "Durability must be a whole number of zero or more.",
+    errors,
+  );
+  validateOptionalStatGroup(
+    details.hold ? Object.values(details.hold) : undefined,
+    "Ship hold values must be whole numbers of zero or more.",
+    errors,
+  );
+  validateOptionalStatGroup(
+    details.sailingRequirements
+      ? Object.values(details.sailingRequirements)
+      : undefined,
+    "Sailing requirements must be whole numbers of zero or more.",
+    errors,
+  );
   if (errors.shipDetails) return;
-
-  if (!isNonnegativeInteger(details.improvements)) {
-    errors.shipDetails =
-      "Ship improvements must be a whole number of zero or more.";
-    return;
-  }
-
-  if (!isNonnegativeInteger(details.durability)) {
-    errors.shipDetails = "Durability must be a whole number of zero or more.";
-    return;
-  }
-  if (
-    Object.values(details.hold).some((value) => !isNonnegativeInteger(value))
-  ) {
-    errors.shipDetails =
-      "Ship hold values must be whole numbers of zero or more.";
-    return;
-  }
-  if (
-    Object.values(details.sailingRequirements).some(
-      (value) => !isNonnegativeInteger(value),
-    )
-  ) {
-    errors.shipDetails =
-      "Sailing requirements must be whole numbers of zero or more.";
-    return;
-  }
   const optionalSkills = details.optionalSkills ?? [];
   if (optionalSkills.length > 5) {
     errors.shipDetails = "Choose at most five Optional ship skills.";
@@ -221,8 +224,6 @@ export function validateListingInput(input: CreateListingInput) {
     errors.currency =
       "Trade and negotiable listings cannot set a numeric price.";
   }
-  if (input.description.trim().length < 10)
-    errors.description = "Description must be at least 10 characters.";
   if (!input.seller.trim()) errors.seller = "Seller is required.";
   if (!input.location.trim()) errors.location = "Location is required.";
   if (!input.server.trim()) errors.server = "Server is required.";
@@ -480,6 +481,10 @@ export function createSupabaseListingRepository(
       const filter = query.search ? searchFilter(query.search) : null;
       if (filter) {
         request = request.or(filter);
+      }
+
+      if (query.ticketsOnly) {
+        request = request.eq("ship_details->>isTicket", "true");
       }
 
       if (query.sort === "price-asc") {
@@ -826,6 +831,7 @@ export function createLocalListingRepository(
           (category === "all" || listing.category === category) &&
           (collection === "all" ||
             (listing.collection ?? "current") === collection) &&
+          (!query.ticketsOnly || listing.shipDetails?.isTicket === true) &&
           matchesQuery(listing, query.search),
       );
 

@@ -481,6 +481,69 @@ describe("local listing repository", () => {
     ).toEqual({});
   });
 
+  it("accepts blank descriptions, partial stats, and ship tickets", () => {
+    expect(validateListingInput({ ...validInput, description: "" })).toEqual(
+      {},
+    );
+    expect(
+      validateListingInput({
+        ...validInput,
+        description: "short",
+        shipDetails: { type: "trade", shipClass: "heavy" },
+      }),
+    ).toEqual({});
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: {
+          type: "battle",
+          shipClass: "standard",
+          performance: { rowPower: 130 },
+          hold: { cargo: 950 },
+        },
+      }),
+    ).toEqual({});
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: { type: "battle", isTicket: true, ticketNumber: 407 },
+      }),
+    ).toEqual({});
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: { type: "adventure", isTicket: true },
+      }),
+    ).toEqual({});
+  });
+
+  it("rejects invalid ticket numbers and negative partial stats", () => {
+    for (const ticketNumber of [0, -3, 2.5]) {
+      expect(
+        validateListingInput({
+          ...validInput,
+          shipDetails: { type: "battle", isTicket: true, ticketNumber },
+        }).shipDetails,
+      ).toBe("Ticket No. must be a positive whole number.");
+    }
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: {
+          type: "trade",
+          shipClass: "heavy",
+          performance: { rowPower: -1 },
+        },
+      }).shipDetails,
+    ).toBe("Ship performance values must be whole numbers of zero or more.");
+    expect(
+      validateListingInput({
+        ...validInput,
+        shipDetails: { type: "trade" },
+      }).shipDetails,
+    ).toBe("Choose a valid ship class.");
+  });
+
   it("validates that improvements are nonnegative whole numbers", () => {
     expect(
       validateListingInput({

@@ -203,6 +203,56 @@ describe("listing detail page", () => {
     expect(screen.getAllByText("Original").length).toBeGreaterThanOrEqual(1);
   });
 
+  it("renders a ship ticket with its badge and explanation instead of the stat panel", async () => {
+    repository.get.mockResolvedValueOnce({
+      ...knownListing,
+      title: "Galleon Ticket",
+      shipDetails: { type: "battle", isTicket: true, ticketNumber: 407 },
+    });
+    renderApp("/listings/adventurer-frigate");
+
+    expect(
+      await screen.findByRole("heading", { name: "Galleon Ticket" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("SHIP TICKET")).toBeInTheDocument();
+    expect(
+      screen.getByText("Ship Exchange Ticket (No.407)"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "An unopened ship ticket — a consumable that gives this ship when opened.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Ship specifications"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Vertical sail")).not.toBeInTheDocument();
+  });
+
+  it("renders only the provided stats for a partial listing and hides a blank description", async () => {
+    repository.get.mockResolvedValueOnce({
+      ...knownListing,
+      description: "",
+      shipDetails: {
+        type: "trade",
+        shipClass: "heavy",
+        performance: { verticalSail: 180 },
+      },
+    });
+    renderApp("/listings/adventurer-frigate");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Adventurer Frigate (Heavy)",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Vertical sail")).toBeInTheDocument();
+    expect(screen.getByText("180")).toBeInTheDocument();
+    expect(screen.queryByText("Row power")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ship hold")).not.toBeInTheDocument();
+    expect(screen.queryByText("Description")).not.toBeInTheDocument();
+  });
+
   it("renders legacy rows while ignoring retired shipbuilding fields", async () => {
     const legacyShipDetails = {
       ...testShipDetailsWithSkills,
