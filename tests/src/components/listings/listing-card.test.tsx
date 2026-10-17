@@ -253,6 +253,64 @@ describe("ListingCard", () => {
     expect(screen.queryByText(firstSkill.name)).not.toBeInTheDocument();
   });
 
+  it("shows a name-only tooltip for stat chips on hover and focus", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ListingCard listing={{ ...listing, shipDetails: testShipDetails }} />
+      </MemoryRouter>,
+    );
+
+    const chip = screen.getByRole("listitem", { name: "Row power: 40" });
+    expect(screen.queryByText("Row power")).not.toBeInTheDocument();
+
+    await user.hover(chip);
+    const tooltip = screen.getByText("Row power");
+    expect(tooltip).toBeVisible();
+    expect(tooltip.textContent).toBe("Row power");
+    expect(tooltip).toHaveClass("bottom-[calc(100%+0.375rem)]");
+    expect(tooltip).not.toHaveClass("top-[calc(100%+0.375rem)]");
+
+    await user.unhover(chip);
+    expect(screen.queryByText("Row power")).not.toBeInTheDocument();
+
+    fireEvent.focus(chip);
+    expect(screen.getByText("Row power")).toBeVisible();
+    fireEvent.blur(chip);
+    expect(screen.queryByText("Row power")).not.toBeInTheDocument();
+  });
+
+  it("shows a stat name tooltip after a touch long press", () => {
+    vi.useFakeTimers();
+
+    try {
+      render(
+        <MemoryRouter>
+          <ListingCard listing={{ ...listing, shipDetails: testShipDetails }} />
+        </MemoryRouter>,
+      );
+
+      const chip = screen.getByRole("listitem", { name: "Cargo: 950" });
+      fireEvent.pointerDown(chip, { pointerType: "touch" });
+      act(() => {
+        vi.advanceTimersByTime(449);
+      });
+      expect(screen.queryByText("Cargo")).not.toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      const tooltip = screen.getByText("Cargo");
+      expect(tooltip).toBeVisible();
+      expect(tooltip.textContent).toBe("Cargo");
+
+      fireEvent.pointerUp(chip);
+      expect(screen.queryByText("Cargo")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("shows a name-only tooltip after a touch long press", () => {
     vi.useFakeTimers();
 

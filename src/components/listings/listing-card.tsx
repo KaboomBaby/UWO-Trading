@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { Link } from "react-router-dom";
@@ -84,7 +85,7 @@ function getCompactShipStats(details: ShipDetails): CompactShipStat[] {
   ];
 }
 
-function ShipSkillIcon({ skill }: { skill: ShipSkill }) {
+function useNameTooltip() {
   const [isTooltipVisible, setTooltipVisible] = useState(false);
   const longPressTimeoutRef = useRef<number | undefined>(undefined);
 
@@ -95,39 +96,71 @@ function ShipSkillIcon({ skill }: { skill: ShipSkill }) {
 
   useEffect(() => clearLongPressTimer, [clearLongPressTimer]);
 
-  function startLongPress(event: ReactPointerEvent<HTMLSpanElement>) {
-    if (event.pointerType === "mouse") return;
+  const show = useCallback(() => setTooltipVisible(true), []);
+  const hide = useCallback(() => setTooltipVisible(false), []);
 
-    event.preventDefault();
-    clearLongPressTimer();
-    longPressTimeoutRef.current = window.setTimeout(() => {
-      setTooltipVisible(true);
-    }, 450);
-  }
+  const startLongPress = useCallback(
+    (event: ReactPointerEvent<HTMLElement>) => {
+      if (event.pointerType === "mouse") return;
 
-  function endLongPress() {
+      event.preventDefault();
+      clearLongPressTimer();
+      longPressTimeoutRef.current = window.setTimeout(() => {
+        setTooltipVisible(true);
+      }, 450);
+    },
+    [clearLongPressTimer],
+  );
+
+  const endLongPress = useCallback(() => {
     clearLongPressTimer();
     setTooltipVisible(false);
-  }
+  }, [clearLongPressTimer]);
+
+  const showFromContextMenu = useCallback(
+    (event: ReactMouseEvent<HTMLElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      clearLongPressTimer();
+      setTooltipVisible(true);
+    },
+    [clearLongPressTimer],
+  );
+
+  return {
+    endLongPress,
+    hide,
+    isTooltipVisible,
+    show,
+    showFromContextMenu,
+    startLongPress,
+  };
+}
+
+function NameTooltip({ name }: { name: string }) {
+  return (
+    <span className="pointer-events-none absolute bottom-[calc(100%+0.375rem)] left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md border border-amber-glow/40 bg-ink px-2 py-1 text-[0.68rem] font-semibold text-white shadow-lg">
+      {name}
+    </span>
+  );
+}
+
+function ShipSkillIcon({ skill }: { skill: ShipSkill }) {
+  const tooltip = useNameTooltip();
 
   return (
     <span
       aria-label={skill.name}
       className="relative flex h-8 w-8 items-center justify-center rounded-md border border-white/15 bg-black/35"
-      onBlur={() => setTooltipVisible(false)}
-      onContextMenu={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        clearLongPressTimer();
-        setTooltipVisible(true);
-      }}
-      onFocus={() => setTooltipVisible(true)}
-      onPointerCancel={endLongPress}
-      onPointerDown={startLongPress}
-      onPointerLeave={endLongPress}
-      onPointerUp={endLongPress}
-      onMouseEnter={() => setTooltipVisible(true)}
-      onMouseLeave={() => setTooltipVisible(false)}
+      onBlur={tooltip.hide}
+      onContextMenu={tooltip.showFromContextMenu}
+      onFocus={tooltip.show}
+      onPointerCancel={tooltip.endLongPress}
+      onPointerDown={tooltip.startLongPress}
+      onPointerLeave={tooltip.endLongPress}
+      onPointerUp={tooltip.endLongPress}
+      onMouseEnter={tooltip.show}
+      onMouseLeave={tooltip.hide}
       role="img"
       tabIndex={0}
     >
@@ -138,12 +171,33 @@ function ShipSkillIcon({ skill }: { skill: ShipSkill }) {
         loading="lazy"
         src={shipSkillIconUrl(skill.iconId)}
       />
-      {isTooltipVisible ? (
-        <span className="pointer-events-none absolute bottom-[calc(100%+0.375rem)] left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md border border-amber-glow/40 bg-ink px-2 py-1 text-[0.68rem] font-semibold text-white shadow-lg">
-          {skill.name}
-        </span>
-      ) : null}
+      {tooltip.isTooltipVisible ? <NameTooltip name={skill.name} /> : null}
     </span>
+  );
+}
+
+function ShipStatChip({ stat }: { stat: CompactShipStat }) {
+  const tooltip = useNameTooltip();
+
+  return (
+    <li
+      aria-label={`${stat.label}: ${stat.value}`}
+      className="relative flex min-w-0 items-center justify-center gap-1 rounded-lg border border-white/10 bg-white/5 px-1.5 py-1"
+      onBlur={tooltip.hide}
+      onContextMenu={tooltip.showFromContextMenu}
+      onFocus={tooltip.show}
+      onMouseEnter={tooltip.show}
+      onMouseLeave={tooltip.hide}
+      onPointerCancel={tooltip.endLongPress}
+      onPointerDown={tooltip.startLongPress}
+      onPointerLeave={tooltip.endLongPress}
+      onPointerUp={tooltip.endLongPress}
+      tabIndex={0}
+    >
+      <ShipStatImage name={stat.name} />
+      <span className="font-semibold tabular-nums">{stat.value}</span>
+      {tooltip.isTooltipVisible ? <NameTooltip name={stat.label} /> : null}
+    </li>
   );
 }
 
@@ -159,14 +213,7 @@ function CompactShipSpecifications({ details }: { details: ShipDetails }) {
       className="grid grid-cols-3 gap-1.5 text-[0.7rem] text-slate-200 sm:grid-cols-4"
     >
       {stats.map((stat) => (
-        <li
-          aria-label={`${stat.label}: ${stat.value}`}
-          className="flex min-w-0 items-center justify-center gap-1 rounded-lg border border-white/10 bg-white/5 px-1.5 py-1"
-          key={stat.label}
-        >
-          <ShipStatImage name={stat.name} />
-          <span className="font-semibold tabular-nums">{stat.value}</span>
-        </li>
+        <ShipStatChip key={stat.label} stat={stat} />
       ))}
       {skills.map((skill) => (
         <li
