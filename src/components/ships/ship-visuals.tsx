@@ -143,7 +143,7 @@ const shipStatImageSources = {
   durability: "/ship-stat-icons/durability.png",
   improvements: "/ship-stat-icons/improvements.png",
   crew: "/ship-stat-icons/crew.png",
-  sailors: "/ship-stat-icons/crew.png",
+  sailors: "/ship-stat-icons/sailors-required.png",
   cannons: "/ship-stat-icons/cannons.png",
   cargo: "/ship-stat-icons/cargo.png",
   adventure: "/ship-stat-icons/req-adventure.png",

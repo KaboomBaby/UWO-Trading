@@ -177,7 +177,7 @@ describe("ListingCard", () => {
       {
         label: "Sailors required",
         value: "45",
-        source: "crew.png",
+        source: "sailors-required.png",
       },
       { label: "Adventure Lv", value: "42", source: "req-adventure.png" },
       { label: "Trade Lv", value: "61", source: "req-trade.png" },
