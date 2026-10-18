@@ -480,6 +480,7 @@ type ListingRow = {
   contact_note: string;
   image_emoji: string | null;
   ship_details: ShipDetails | null;
+  equipment_details: EquipmentDetails | null;
   created_at: string;
   expires_at: string;
   sold_at: string | null;
@@ -522,6 +523,7 @@ function mapListingRow(row: ListingRow): Listing {
     contactNote: row.contact_note,
     imageEmoji: row.image_emoji ?? "📦",
     shipDetails: row.ship_details ?? null,
+    equipmentDetails: row.equipment_details ?? null,
     createdAt: row.created_at,
     expiresAt: row.expires_at,
     soldAt: row.sold_at,
@@ -580,6 +582,7 @@ function listingRpcArguments(editCode: string, input: CreateListingInput) {
     image_url: null,
     image_emoji: input.imageEmoji ?? "📦",
     ship_details: input.shipDetails ?? null,
+    equipment_details: normalizeEquipmentDetails(input.equipmentDetails),
     collection: input.collection ?? "current",
   };
 }
@@ -597,6 +600,7 @@ function ownedListingRpcArguments(input: CreateListingInput) {
     contact_note: input.contactNote?.trim() ?? "",
     image_emoji: input.imageEmoji ?? "📦",
     ship_details: input.shipDetails ?? null,
+    equipment_details: normalizeEquipmentDetails(input.equipmentDetails),
     collection: input.collection ?? "current",
   };
 }
@@ -614,6 +618,7 @@ function listingUpdateArguments(input: UpdateListingInput) {
     contact_note: input.contactNote?.trim() ?? "",
     image_emoji: input.imageEmoji ?? "📦",
     ship_details: input.shipDetails ?? null,
+    equipment_details: normalizeEquipmentDetails(input.equipmentDetails),
     collection: input.collection ?? "current",
   };
 }

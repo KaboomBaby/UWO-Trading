@@ -20,6 +20,7 @@ import type {
   EquipmentDetails,
   CreateListingInput,
   Listing,
+  ListingCategory,
   ListingCurrency,
   Offer,
   ShipDetails,
@@ -80,7 +81,7 @@ type ListingRow = {
   id: string;
   owner_id: string | null;
   title: string;
-  category: "ships";
+  category: ListingCategory;
   price: number | null;
   currency: "ducats" | "UWC" | "CT" | "trade" | "negotiable";
   description: string;
@@ -90,6 +91,7 @@ type ListingRow = {
   contact_note: string;
   image_emoji: string | null;
   ship_details: ShipDetails | null;
+  equipment_details: EquipmentDetails | null;
   created_at: string;
   expires_at: string;
   sold_at: string | null;
@@ -304,6 +306,7 @@ const dbListing: ListingRow = {
   contact_note: "Mail me at the database harbor.",
   image_emoji: "🚢",
   ship_details: testShipDetails,
+  equipment_details: null,
   created_at: "2026-10-01T12:00:00.000Z",
   expires_at: "2026-10-15T12:00:00Z",
   sold_at: null,
@@ -324,6 +327,7 @@ const expectedListing = {
   contactNote: "Mail me at the database harbor.",
   imageEmoji: "🚢",
   shipDetails: testShipDetails,
+  equipmentDetails: null,
   createdAt: "2026-10-01T12:00:00.000Z",
   expiresAt: "2026-10-15T12:00:00Z",
   soldAt: null,
@@ -1105,6 +1109,46 @@ describe("Supabase listing repository", () => {
     });
     expect(mock.requests[0]?.singleMode).toBe("single");
     expect(mock.requests[0]?.rpc?.args).not.toHaveProperty("edit_code");
+  });
+
+  it("sends equipment details to create_owned_listing and maps them back", async () => {
+    const equipmentRow: ListingRow = {
+      ...dbListing,
+      id: "supabase-changpao",
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      ship_details: null,
+      equipment_details: testEquipmentDetails,
+    };
+    const mock = createMockSupabaseClient({
+      data: equipmentRow,
+      error: null,
+      status: 201,
+      statusText: "Created",
+    });
+    const repository = createSupabaseListingRepository(mock.client);
+
+    const created = await repository.create({
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      price: 45_000_000,
+      currency: "ducats",
+      description: "A fine changpao with strong bonuses.",
+      seller: "Niadra",
+      location: "Seville",
+      server: "Maris",
+      equipmentDetails: testEquipmentDetails,
+    });
+    expect(created.equipmentDetails).toEqual(testEquipmentDetails);
+    expect(created.shipDetails).toBeNull();
+    expect(mock.requests[0]?.rpc).toMatchObject({
+      functionName: "create_owned_listing",
+      args: {
+        category: "equipment",
+        ship_details: null,
+        equipment_details: testEquipmentDetails,
+      },
+    });
   });
 
   it("loads and mutates only listings owned by the account", async () => {
