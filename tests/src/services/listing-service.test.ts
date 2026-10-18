@@ -17,6 +17,7 @@ import {
 import { getSupabaseClient } from "../../../src/lib/supabase-client";
 import type {
   CreateOfferInput,
+  EquipmentDetails,
   CreateListingInput,
   Listing,
   ListingCurrency,
@@ -24,6 +25,10 @@ import type {
   ShipDetails,
 } from "../../../src/types/listing";
 import { testShipDetails } from "../fixtures/ship-details";
+import {
+  testEquipmentDetails,
+  testWeaponDetails,
+} from "../fixtures/equipment-details";
 import { OPTIONAL_SHIP_SKILLS } from "../../../src/data/ship-skills";
 
 vi.mock("../../../src/lib/supabase-client", () => ({
@@ -551,6 +556,214 @@ describe("local listing repository", () => {
         shipDetails: { ...testShipDetails, improvements: -1 },
       }).shipDetails,
     ).toBe("Ship improvements must be a whole number of zero or more.");
+  });
+
+  it("accepts equipment listings with full, partial, or no stats", () => {
+    const equipmentInput: CreateListingInput = {
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      price: 45_000_000,
+      currency: "ducats",
+      description: "A fine changpao with strong bonuses.",
+      seller: "Niadra",
+      location: "Seville",
+      server: "Maris",
+      equipmentDetails: testEquipmentDetails,
+    };
+    expect(validateListingInput(equipmentInput)).toEqual({});
+    expect(
+      validateListingInput({
+        ...equipmentInput,
+        equipmentDetails: testWeaponDetails,
+      }),
+    ).toEqual({});
+    expect(
+      validateListingInput({
+        ...equipmentInput,
+        equipmentDetails: { attackPower: 142 },
+      }),
+    ).toEqual({});
+    expect(
+      validateListingInput({ ...equipmentInput, equipmentDetails: null }),
+    ).toEqual({});
+    expect(
+      validateListingInput({ ...equipmentInput, equipmentDetails: {} }),
+    ).toEqual({});
+  });
+
+  it("rejects equipment details on non-equipment listings", () => {
+    expect(
+      validateListingInput({
+        ...validInput,
+        equipmentDetails: testEquipmentDetails,
+      }).equipmentDetails,
+    ).toBe("Equipment details are only allowed for Equipment listings.");
+  });
+
+  it("enforces equipment skill membership, the three-skill limit, and duplicates", () => {
+    const base: CreateListingInput = {
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      price: 45_000_000,
+      currency: "ducats",
+      description: "",
+      seller: "Niadra",
+      location: "Seville",
+      server: "Maris",
+      equipmentDetails: testEquipmentDetails,
+    };
+    const bonuses = testEquipmentDetails.skillBonuses ?? [];
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: {
+          skillBonuses: [
+            ...bonuses,
+            { name: "Cooking", iconId: "skill_cooking", value: 1 },
+          ],
+        },
+      }).equipmentDetails,
+    ).toBe("Choose at most three equipment skill bonuses.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: {
+          skillBonuses: [
+            { name: "Teleport", iconId: "skill_teleport", value: 3 },
+          ],
+        },
+      }).equipmentDetails,
+    ).toBe("Equipment skill bonuses must come from the game skill list.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: {
+          skillBonuses: [{ name: "Cooking", iconId: "skill_arms", value: 3 }],
+        },
+      }).equipmentDetails,
+    ).toBe("Equipment skill bonuses must come from the game skill list.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: {
+          skillBonuses: [
+            { name: "Arms", iconId: "skill_arms", value: 3 },
+            { name: "Arms", iconId: "skill_arms", value: 2 },
+          ],
+        },
+      }).equipmentDetails,
+    ).toBe("Choose each equipment skill only once.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: {
+          skillBonuses: [{ name: "Arms", iconId: "skill_arms", value: 0 }],
+        },
+      }).equipmentDetails,
+    ).toBe(
+      "Equipment skill bonus values must be whole numbers of one or more.",
+    );
+  });
+
+  it("rejects invalid equipment stats, wearer, effects, and extra lines", () => {
+    const base: CreateListingInput = {
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      price: 45_000_000,
+      currency: "ducats",
+      description: "",
+      seller: "Niadra",
+      location: "Seville",
+      server: "Maris",
+    };
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: { attackPower: -1 },
+      }).equipmentDetails,
+    ).toBe("Equipment stats must be whole numbers of zero or more.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: { durabilityCurrent: 10.5 },
+      }).equipmentDetails,
+    ).toBe("Equipment stats must be whole numbers of zero or more.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: {
+          wearer: "alien" as unknown as EquipmentDetails["wearer"],
+        },
+      }).equipmentDetails,
+    ).toBe("Choose a valid wearer marker.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: { effects: [{ name: "Land Speed Up", rank: 0 }] },
+      }).equipmentDetails,
+    ).toBe("Equipment Effect ranks must be whole numbers of one or more.");
+    expect(
+      validateListingInput({
+        ...base,
+        equipmentDetails: { extraLines: [{ label: "Layers", value: -1 }] },
+      }).equipmentDetails,
+    ).toBe("Extra line values must be whole numbers of zero or more.");
+  });
+
+  it("creates and updates a local equipment listing with stats intact", async () => {
+    const repository = createLocalListingRepository([]);
+    const created = await repository.create({
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      price: 45_000_000,
+      currency: "ducats",
+      description: "A fine changpao with strong bonuses.",
+      seller: "Niadra",
+      location: "Seville",
+      server: "Maris",
+      equipmentDetails: testEquipmentDetails,
+    });
+    expect(created.equipmentDetails).toEqual(testEquipmentDetails);
+    const createdEditCode = created.editCode;
+    if (!createdEditCode) throw new Error("Expected a local edit code");
+
+    const stored = await repository.get(created.id);
+    expect(stored?.equipmentDetails).toEqual(testEquipmentDetails);
+
+    const updated = await repository.update(createdEditCode, {
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      price: 45_000_000,
+      currency: "ducats",
+      description: "A fine changpao with strong bonuses.",
+      seller: "Niadra",
+      location: "Seville",
+      server: "Maris",
+      equipmentDetails: {
+        ...testEquipmentDetails,
+        durabilityCurrent: 97,
+        skillBonuses: [
+          { name: "Navigation", iconId: "skill_navigation", value: 2 },
+        ],
+      },
+    });
+    expect(updated.equipmentDetails?.durabilityCurrent).toBe(97);
+    expect(updated.equipmentDetails?.skillBonuses).toEqual([
+      { name: "Navigation", iconId: "skill_navigation", value: 2 },
+    ]);
+
+    const blank = await repository.create({
+      title: "Plain Boots",
+      category: "equipment",
+      price: 10_000,
+      currency: "ducats",
+      description: "",
+      seller: "Niadra",
+      location: "Seville",
+      server: "Maris",
+      equipmentDetails: { skillBonuses: [], effects: [], extraLines: [] },
+    });
+    expect(blank.equipmentDetails).toBeNull();
   });
 
   it("manages a local listing through its private edit code", async () => {

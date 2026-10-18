@@ -1,0 +1,486 @@
+{
+  "source": "Official Uncharted Waters Wiki skill categories (Adventure/Trade/Battle), verified 2026-10-18. Names follow the game where the wiki differs (Management Technique).",
+  "note": "96 skills that can appear as equipment bonuses. Pathology and Request Convoy are excluded by David's ruling: neither appears on gear. Icons are harvested separately (Fix Mission 5, Phase 5) and join by iconId.",
+  "skills": [
+    {
+      "iconId": "skill_sail_handling",
+      "name": "Sail Handling",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_surveying",
+      "name": "Surveying",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_fishing",
+      "name": "Fishing",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_survival",
+      "name": "Survival",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_eradication",
+      "name": "Eradication",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_rescue",
+      "name": "Rescue",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_wining_and_dining",
+      "name": "Wining and Dining",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_violin_performance",
+      "name": "Violin Performance",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_search",
+      "name": "Search",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_recognition",
+      "name": "Recognition",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_observe",
+      "name": "Observe",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_unlock",
+      "name": "Unlock",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_collection",
+      "name": "Collection",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_procurement",
+      "name": "Procurement",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_marching",
+      "name": "Marching",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_ecological_research",
+      "name": "Ecological Research",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_archaeology",
+      "name": "Archaeology",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_theology",
+      "name": "Theology",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_appraisal",
+      "name": "Appraisal",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_art",
+      "name": "Art",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_geography",
+      "name": "Geography",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_biology",
+      "name": "Biology",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_astronomy",
+      "name": "Astronomy",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_throwing",
+      "name": "Throwing",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_trap",
+      "name": "Trap",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_linguistics",
+      "name": "Linguistics",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_salvage",
+      "name": "Salvage",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_haul",
+      "name": "Haul",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_persuasion",
+      "name": "Persuasion",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_mine_detection",
+      "name": "Mine Detection",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_navigation",
+      "name": "Navigation",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_provisions",
+      "name": "Provisions",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_pet_training",
+      "name": "Pet Training",
+      "family": "adventure"
+    },
+    {
+      "iconId": "skill_accounts",
+      "name": "Accounts",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_sociability",
+      "name": "Sociability",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_body_language",
+      "name": "Body Language",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_frugality",
+      "name": "Frugality",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_caution",
+      "name": "Caution",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_escape",
+      "name": "Escape",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_cooking",
+      "name": "Cooking",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_storage",
+      "name": "Storage",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_sewing",
+      "name": "Sewing",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_casting",
+      "name": "Casting",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_handicrafts",
+      "name": "Handicrafts",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_alchemy",
+      "name": "Alchemy",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_food_trading",
+      "name": "Food Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_livestock_trading",
+      "name": "Livestock Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_seasoning_trading",
+      "name": "Seasoning Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_alcohol_trading",
+      "name": "Alcohol Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_luxuries_trading",
+      "name": "Luxuries Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_perfume_trading",
+      "name": "Perfume Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_spice_trading",
+      "name": "Spice Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_textile_trading",
+      "name": "Textile Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_fabric_trading",
+      "name": "Fabric Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_dye_trading",
+      "name": "Dye Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_sundries_trading",
+      "name": "Sundries Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_medicine_trading",
+      "name": "Medicine Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_mineral_trading",
+      "name": "Mineral Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_wares_trading",
+      "name": "Wares Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_metal_trading",
+      "name": "Metal Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_weapons_trading",
+      "name": "Weapons Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_firearms_trading",
+      "name": "Firearms Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_crafts_trading",
+      "name": "Crafts Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_art_trading",
+      "name": "Art Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_jewellry_trading",
+      "name": "Jewellry Trading",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_management_skill",
+      "name": "Management Technique",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_merchandise_knowledge",
+      "name": "Merchandise Knowledge",
+      "family": "trade"
+    },
+    {
+      "iconId": "skill_steering",
+      "name": "Steering",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_lookout",
+      "name": "Lookout",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_rowing",
+      "name": "Rowing",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_first_aid",
+      "name": "First Aid",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_gunnery",
+      "name": "Gunnery",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_evasion",
+      "name": "Evasion",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_accuracy",
+      "name": "Accuracy",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_ballistics",
+      "name": "Ballistics",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_reloading",
+      "name": "Reloading",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_penetration",
+      "name": "Penetration",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_detonics",
+      "name": "Detonics",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_swordplay",
+      "name": "Swordplay",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_aboardage",
+      "name": "Aboardage",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_plunder",
+      "name": "Plunder",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_guard",
+      "name": "Guard",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_assault",
+      "name": "Assault",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_gunfire",
+      "name": "Gunfire",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_tactics",
+      "name": "Tactics",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_repair",
+      "name": "Repair",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_leadership",
+      "name": "Leadership",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_fire_fighting",
+      "name": "Fire Fighting",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_surgery",
+      "name": "Surgery",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_sword_mastery",
+      "name": "Sword Mastery",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_sniping",
+      "name": "Sniping",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_bow_attack",
+      "name": "Bow Attack",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_shipbuilding",
+      "name": "Shipbuilding",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_request_reinforce",
+      "name": "Request Reinforce",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_mine_laying",
+      "name": "Mine Laying",
+      "family": "battle"
+    },
+    {
+      "iconId": "skill_arms",
+      "name": "Arms",
+      "family": "battle"
+    }
+  ]
+}

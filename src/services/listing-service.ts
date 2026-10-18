@@ -1,4 +1,5 @@
 import { mockListings } from "../data/mock-listings";
+import { getEquipmentSkill } from "../data/equipment-skills";
 import {
   OPTIONAL_SHIP_SKILLS,
   ORIGINAL_SHIP_SKILLS,
@@ -9,6 +10,7 @@ import type {
   CreateReportInput,
   CreatedListing,
   CreateListingInput,
+  EquipmentDetails,
   Listing,
   ListingCategory,
   ListingCollection,
@@ -208,6 +210,163 @@ function validateShipDetails(
   }
 }
 
+function validateEquipmentStatGroup(
+  values: Array<number | undefined>,
+  message: string,
+  errors: Record<string, string>,
+) {
+  if (errors.equipmentDetails) return;
+  if (
+    values.some((value) => value !== undefined && !isNonnegativeInteger(value))
+  ) {
+    errors.equipmentDetails = message;
+  }
+}
+
+function validateEquipmentDetails(
+  details: EquipmentDetails,
+  errors: Record<string, string>,
+) {
+  if (
+    details.wearer !== undefined &&
+    !["male", "female", "unisex"].includes(details.wearer)
+  ) {
+    errors.equipmentDetails = "Choose a valid wearer marker.";
+    return;
+  }
+
+  validateEquipmentStatGroup(
+    [
+      details.durabilityCurrent,
+      details.durabilityMax,
+      details.formality,
+      details.disguiseLevel,
+      details.attackPower,
+      details.defencePower,
+    ],
+    "Equipment stats must be whole numbers of zero or more.",
+    errors,
+  );
+  if (errors.equipmentDetails) return;
+
+  if (
+    details.weaponCategory !== undefined &&
+    (details.weaponCategory.trim().length === 0 ||
+      details.weaponCategory.trim().length > 60)
+  ) {
+    errors.equipmentDetails = "Weapon Category must be 1 to 60 characters.";
+    return;
+  }
+
+  const skillBonuses = details.skillBonuses ?? [];
+  if (skillBonuses.length > 3) {
+    errors.equipmentDetails = "Choose at most three equipment skill bonuses.";
+    return;
+  }
+  const iconIds = new Set<string>();
+  for (const bonus of skillBonuses) {
+    if (!bonus.name.trim() || !bonus.iconId.trim()) {
+      errors.equipmentDetails =
+        "Equipment skill bonuses need both a name and icon ID.";
+      return;
+    }
+    if (!Number.isInteger(bonus.value) || bonus.value < 1) {
+      errors.equipmentDetails =
+        "Equipment skill bonus values must be whole numbers of one or more.";
+      return;
+    }
+    const record = getEquipmentSkill(bonus.iconId);
+    if (!record || record.name !== bonus.name) {
+      errors.equipmentDetails =
+        "Equipment skill bonuses must come from the game skill list.";
+      return;
+    }
+    if (iconIds.has(bonus.iconId)) {
+      errors.equipmentDetails = "Choose each equipment skill only once.";
+      return;
+    }
+    iconIds.add(bonus.iconId);
+  }
+
+  const effects = details.effects ?? [];
+  if (effects.length > 3) {
+    errors.equipmentDetails = "Add at most three Equipment Effects.";
+    return;
+  }
+  for (const effect of effects) {
+    if (!effect.name.trim()) {
+      errors.equipmentDetails = "Equipment Effects need a name.";
+      return;
+    }
+    if (
+      effect.rank !== undefined &&
+      (!Number.isInteger(effect.rank) || effect.rank < 1)
+    ) {
+      errors.equipmentDetails =
+        "Equipment Effect ranks must be whole numbers of one or more.";
+      return;
+    }
+  }
+
+  const extraLines = details.extraLines ?? [];
+  if (extraLines.length > 5) {
+    errors.equipmentDetails = "Add at most five extra lines.";
+    return;
+  }
+  for (const line of extraLines) {
+    if (!line.label.trim()) {
+      errors.equipmentDetails = "Extra lines need a label.";
+      return;
+    }
+    if (line.value !== undefined && !isNonnegativeInteger(line.value)) {
+      errors.equipmentDetails =
+        "Extra line values must be whole numbers of zero or more.";
+      return;
+    }
+  }
+}
+
+export function normalizeEquipmentDetails(
+  details: EquipmentDetails | null | undefined,
+): EquipmentDetails | null {
+  if (!details) return null;
+  const normalized: EquipmentDetails = {};
+  if (details.wearer !== undefined) normalized.wearer = details.wearer;
+  if (details.durabilityCurrent !== undefined)
+    normalized.durabilityCurrent = details.durabilityCurrent;
+  if (details.durabilityMax !== undefined)
+    normalized.durabilityMax = details.durabilityMax;
+  if (details.formality !== undefined) normalized.formality = details.formality;
+  if (details.disguiseLevel !== undefined)
+    normalized.disguiseLevel = details.disguiseLevel;
+  if (details.attackPower !== undefined)
+    normalized.attackPower = details.attackPower;
+  if (details.defencePower !== undefined)
+    normalized.defencePower = details.defencePower;
+  const weaponCategory = details.weaponCategory?.trim();
+  if (weaponCategory) normalized.weaponCategory = weaponCategory;
+  if (details.skillBonuses && details.skillBonuses.length > 0) {
+    normalized.skillBonuses = details.skillBonuses.map((bonus) => ({
+      name: bonus.name.trim(),
+      iconId: bonus.iconId.trim(),
+      value: bonus.value,
+    }));
+  }
+  if (details.effects && details.effects.length > 0) {
+    normalized.effects = details.effects.map((effect) => ({
+      name: effect.name.trim(),
+      ...(effect.rank !== undefined ? { rank: effect.rank } : {}),
+    }));
+  }
+  if (details.extraLines && details.extraLines.length > 0) {
+    normalized.extraLines = details.extraLines.map((line) => ({
+      label: line.label.trim(),
+      ...(line.value !== undefined ? { value: line.value } : {}),
+    }));
+  }
+  return Object.keys(normalized).length > 0 ? normalized : null;
+}
+
 export function validateListingInput(input: CreateListingInput) {
   const errors: Record<string, string> = {};
   if (input.title.trim().length < 3)
@@ -235,6 +394,14 @@ export function validateListingInput(input: CreateListingInput) {
     }
   } else if (input.shipDetails) {
     errors.shipDetails = "Ship details are only allowed for Ships listings.";
+  }
+  if (input.category === "equipment") {
+    if (input.equipmentDetails) {
+      validateEquipmentDetails(input.equipmentDetails, errors);
+    }
+  } else if (input.equipmentDetails) {
+    errors.equipmentDetails =
+      "Equipment details are only allowed for Equipment listings.";
   }
   return errors;
 }
@@ -880,6 +1047,7 @@ export function createLocalListingRepository(
         currency: input.currency,
         imageEmoji: input.imageEmoji ?? "📦",
         shipDetails: input.shipDetails ?? null,
+        equipmentDetails: normalizeEquipmentDetails(input.equipmentDetails),
         server: input.server.trim(),
         contactNote: input.contactNote?.trim() ?? "",
         collection: input.collection ?? "current",
@@ -929,6 +1097,7 @@ export function createLocalListingRepository(
         contactNote: input.contactNote?.trim() ?? "",
         imageEmoji: input.imageEmoji ?? "📦",
         shipDetails: input.shipDetails ?? null,
+        equipmentDetails: normalizeEquipmentDetails(input.equipmentDetails),
         collection: input.collection ?? "current",
       };
       return { ...listings[index] };
@@ -996,6 +1165,7 @@ export function createLocalListingRepository(
         contactNote: input.contactNote?.trim() ?? "",
         imageEmoji: input.imageEmoji ?? "📦",
         shipDetails: input.shipDetails ?? null,
+        equipmentDetails: normalizeEquipmentDetails(input.equipmentDetails),
         collection: input.collection ?? "current",
       };
       return { ...listings[index] };

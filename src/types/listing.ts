@@ -71,6 +71,46 @@ export type ShipDetails = {
   optionalSkills?: ShipSkill[];
 };
 
+export const EQUIPMENT_WEARERS = ["male", "female", "unisex"] as const;
+export type EquipmentWearer = (typeof EQUIPMENT_WEARERS)[number];
+
+export const EQUIPMENT_SKILL_FAMILIES = [
+  "adventure",
+  "trade",
+  "battle",
+] as const;
+export type EquipmentSkillFamily = (typeof EQUIPMENT_SKILL_FAMILIES)[number];
+
+export type EquipmentSkillBonus = {
+  name: string;
+  iconId: string;
+  value: number;
+};
+
+export type EquipmentEffect = {
+  name: string;
+  rank?: number;
+};
+
+export type EquipmentExtraLine = {
+  label: string;
+  value?: number;
+};
+
+export type EquipmentDetails = {
+  wearer?: EquipmentWearer;
+  durabilityCurrent?: number;
+  durabilityMax?: number;
+  formality?: number;
+  disguiseLevel?: number;
+  attackPower?: number;
+  defencePower?: number;
+  weaponCategory?: string;
+  skillBonuses?: EquipmentSkillBonus[];
+  effects?: EquipmentEffect[];
+  extraLines?: EquipmentExtraLine[];
+};
+
 export function isNumericListingCurrency(
   currency: ListingCurrency,
 ): currency is NumericListingCurrency {
@@ -116,6 +156,7 @@ export type Listing = {
   contactNote: string;
   imageEmoji: string;
   shipDetails?: ShipDetails | null;
+  equipmentDetails?: EquipmentDetails | null;
   createdAt: string;
   expiresAt: string;
   soldAt?: string | null;
@@ -134,6 +175,7 @@ export type CreateListingInput = {
   contactNote?: string;
   imageEmoji?: string;
   shipDetails?: ShipDetails | null;
+  equipmentDetails?: EquipmentDetails | null;
   collection?: ListingCollection;
 };
 
