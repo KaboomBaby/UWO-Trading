@@ -7,6 +7,7 @@ import { ListingRepositoryProvider } from "../../../../src/lib/listing-repositor
 import { ListingDetailPage } from "../../../../src/pages/listing-detail/listing-detail-page";
 import type { Listing } from "../../../../src/types/listing";
 import { testShipDetailsWithSkills } from "../../fixtures/ship-details";
+import { testEquipmentDetails } from "../../fixtures/equipment-details";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -251,6 +252,66 @@ describe("listing detail page", () => {
     expect(screen.queryByText("Row power")).not.toBeInTheDocument();
     expect(screen.queryByText("Ship hold")).not.toBeInTheDocument();
     expect(screen.queryByText("Description")).not.toBeInTheDocument();
+  });
+
+  it("renders the equipment panel with the game's tooltip stats", async () => {
+    repository.get.mockResolvedValueOnce({
+      ...knownListing,
+      id: "celestial-purple-changpao",
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      shipDetails: null,
+      equipmentDetails: testEquipmentDetails,
+    });
+    renderApp("/listings/celestial-purple-changpao");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Celestial Purple Changpao",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Equipment specifications"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Worn by: ♂ Male")).toBeInTheDocument();
+    expect(screen.getByText("102/100")).toBeInTheDocument();
+    expect(screen.getByText("Formality")).toBeInTheDocument();
+    expect(screen.getByText("Attack Power")).toBeInTheDocument();
+    expect(screen.getByText("55")).toBeInTheDocument();
+    expect(screen.getByText("Defence Power")).toBeInTheDocument();
+    expect(screen.getByText("110")).toBeInTheDocument();
+    expect(screen.getByText("Navigation")).toBeInTheDocument();
+    expect(screen.getByText("Management Technique")).toBeInTheDocument();
+    expect(screen.getAllByText("+3")).toHaveLength(3);
+    expect(screen.getByText("Reduce Supply Consumption")).toBeInTheDocument();
+    expect(screen.getByText("Rank 8")).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Ship specifications"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders only the provided stats for a partial equipment listing", async () => {
+    repository.get.mockResolvedValueOnce({
+      ...knownListing,
+      id: "battle-hardened-horn-bow",
+      title: "Battle-Hardened Horn Bow",
+      category: "equipment",
+      shipDetails: null,
+      equipmentDetails: { attackPower: 142, weaponCategory: "Bow" },
+    });
+    renderApp("/listings/battle-hardened-horn-bow");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Battle-Hardened Horn Bow",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Weapon Category: Bow")).toBeInTheDocument();
+    expect(screen.getByText("Attack Power")).toBeInTheDocument();
+    expect(screen.getByText("142")).toBeInTheDocument();
+    expect(screen.queryByText("Durability")).not.toBeInTheDocument();
+    expect(screen.queryByText("Formality")).not.toBeInTheDocument();
+    expect(screen.queryByText("Skill bonuses")).not.toBeInTheDocument();
   });
 
   it("renders legacy rows while ignoring retired shipbuilding fields", async () => {

@@ -14,6 +14,7 @@ import { ListingCard } from "../../../../src/components/listings/listing-card";
 import { ShipArt } from "../../../../src/components/ships/ship-visuals";
 import type { Listing, ShipType } from "../../../../src/types/listing";
 import { testShipDetails } from "../../fixtures/ship-details";
+import { testEquipmentDetails } from "../../fixtures/equipment-details";
 import { testShipDetailsWithSkills } from "../../fixtures/ship-details";
 
 const listing: Listing = {
@@ -278,6 +279,36 @@ describe("ListingCard", () => {
     expect(screen.getByText("Row power")).toBeVisible();
     fireEvent.blur(chip);
     expect(screen.queryByText("Row power")).not.toBeInTheDocument();
+  });
+
+  it("renders equipment stats and skill bonuses as text chips", () => {
+    render(
+      <MemoryRouter>
+        <ListingCard
+          listing={{
+            ...listing,
+            id: "celestial-purple-changpao",
+            title: "Celestial Purple Changpao",
+            category: "equipment",
+            equipmentDetails: testEquipmentDetails,
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    const link = screen.getByRole("link", {
+      name: /celestial purple changpao/i,
+    });
+    expect(link).toHaveTextContent("Durability 102/100");
+    expect(link).toHaveTextContent("Formality 20");
+    expect(link).toHaveTextContent("Attack 55");
+    expect(link).toHaveTextContent("Defence 110");
+    expect(link).toHaveTextContent("Navigation +3");
+    expect(link).toHaveTextContent("Management Technique +3");
+    expect(link).toHaveTextContent("Arms +3");
+    expect(
+      screen.getByLabelText("Equipment specifications and skills"),
+    ).toBeInTheDocument();
   });
 
   it("renders a ticket card with the gold badge and no stat chips", () => {

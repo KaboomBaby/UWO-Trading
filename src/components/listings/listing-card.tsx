@@ -9,7 +9,12 @@ import {
 import { Link } from "react-router-dom";
 
 import { shipSkillIconUrl } from "../../data/ship-skills";
-import type { ShipDetails, ShipSkill } from "../../types/listing";
+import { formatDurability } from "../equipment/equipment-panel";
+import type {
+  EquipmentDetails,
+  ShipDetails,
+  ShipSkill,
+} from "../../types/listing";
 import type { Listing } from "../../types/listing";
 import { formatListingPrice } from "../../types/listing";
 import {
@@ -267,6 +272,56 @@ function CompactShipSpecifications({ details }: { details: ShipDetails }) {
   );
 }
 
+function CompactEquipmentSpecifications({
+  details,
+}: {
+  details: EquipmentDetails;
+}) {
+  const durability = formatDurability(details);
+  const stats: Array<{ label: string; value: string }> = [
+    ...(durability ? [{ label: "Durability", value: durability }] : []),
+    ...(details.formality !== undefined
+      ? [{ label: "Formality", value: String(details.formality) }]
+      : []),
+    ...(details.disguiseLevel !== undefined
+      ? [{ label: "Disguise", value: String(details.disguiseLevel) }]
+      : []),
+    ...(details.attackPower !== undefined
+      ? [{ label: "Attack", value: String(details.attackPower) }]
+      : []),
+    ...(details.defencePower !== undefined
+      ? [{ label: "Defence", value: String(details.defencePower) }]
+      : []),
+  ];
+  const skills = details.skillBonuses ?? [];
+
+  if (stats.length === 0 && skills.length === 0) return null;
+
+  return (
+    <ul
+      aria-label="Equipment specifications and skills"
+      className="flex flex-wrap gap-1.5 text-[0.7rem] text-slate-200"
+    >
+      {stats.map((stat) => (
+        <li
+          className="rounded-lg border border-white/10 bg-white/5 px-1.5 py-1 font-semibold tabular-nums"
+          key={stat.label}
+        >
+          {stat.label} {stat.value}
+        </li>
+      ))}
+      {skills.map((skill) => (
+        <li
+          className="rounded-lg border border-amber-glow/20 bg-amber-glow/10 px-1.5 py-1 font-semibold"
+          key={skill.iconId}
+        >
+          {skill.name} +{skill.value}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function ListingCard({ listing }: { listing: Listing }) {
   return (
     <Link
@@ -318,6 +373,9 @@ export function ListingCard({ listing }: { listing: Listing }) {
         </p>
         {listing.shipDetails ? (
           <CompactShipSpecifications details={listing.shipDetails} />
+        ) : null}
+        {listing.equipmentDetails ? (
+          <CompactEquipmentSpecifications details={listing.equipmentDetails} />
         ) : null}
         <dl className="mt-auto grid gap-2 text-sm text-slate-300">
           <div className="flex items-center gap-2">

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { ListingGrid } from "../../components/listings/listing-grid";
+import { EquipmentList } from "../../components/listings/equipment-list";
 import { useListingRepository } from "../../lib/listing-repository-context";
 import {
   LISTING_CATEGORIES,
@@ -328,7 +329,11 @@ export function BrowsePage() {
             </ul>
           </div>
         ) : listings.length > 0 ? (
-          <ListingGrid listings={listings} />
+          category === "equipment" ? (
+            <EquipmentList listings={listings} />
+          ) : (
+            <ListingGrid listings={listings} />
+          )
         ) : (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">
             <p className="text-5xl" aria-hidden="true">

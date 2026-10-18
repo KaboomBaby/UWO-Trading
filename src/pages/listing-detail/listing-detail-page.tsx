@@ -22,6 +22,7 @@ import {
   ticketDisplayName,
 } from "../../components/listings/listing-card";
 import { ShipPanel } from "../../components/ships/ship-panel";
+import { EquipmentPanel } from "../../components/equipment/equipment-panel";
 import {
   ShipTypeArt,
   formatShipClass,
@@ -1153,6 +1154,10 @@ export function ListingDetailPage() {
   const isExpired = isExpiredAt(listing.expiresAt, currentTime);
   const shipDetails =
     listing.category === "ships" ? (listing.shipDetails ?? null) : null;
+  const equipmentDetails =
+    listing.category === "equipment"
+      ? (listing.equipmentDetails ?? null)
+      : null;
 
   return (
     <section
@@ -1248,6 +1253,11 @@ export function ListingDetailPage() {
               ) : (
                 <ShipPanel details={shipDetails} />
               )}
+            </div>
+          ) : null}
+          {equipmentDetails ? (
+            <div className="mt-6">
+              <EquipmentPanel details={equipmentDetails} />
             </div>
           ) : null}
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">

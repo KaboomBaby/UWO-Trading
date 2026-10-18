@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ListingRepository } from "../../../../src/services/listing-service";
 import type { Listing } from "../../../../src/types/listing";
+import { testEquipmentDetails } from "../../fixtures/equipment-details";
 
 const { mockRepository } = vi.hoisted(() => ({
   mockRepository: {
@@ -202,6 +203,34 @@ describe("BrowsePage", () => {
     expect(
       screen.getByRole("link", { name: /adventurer frigate/i }),
     ).toHaveAttribute("href", "/listings/adventurer-frigate");
+  });
+
+  it("renders Equipment results as a simple searchable list of rows", async () => {
+    mockRepository.list.mockResolvedValue([
+      {
+        ...listing,
+        id: "celestial-purple-changpao",
+        title: "Celestial Purple Changpao",
+        category: "equipment",
+        equipmentDetails: testEquipmentDetails,
+      },
+    ]);
+    renderBrowse("/browse?category=equipment");
+
+    expect(
+      await screen.findByLabelText("Equipment listings"),
+    ).toBeInTheDocument();
+    const link = screen.getByRole("link", {
+      name: /celestial purple changpao/i,
+    });
+    expect(link).toHaveAttribute("href", "/listings/celestial-purple-changpao");
+    expect(link).toHaveTextContent("Durability 102/100");
+    expect(link).toHaveTextContent("Attack Power 55");
+    expect(link).toHaveTextContent("Navigation +3");
+    expect(link).toHaveTextContent("Reduce Supply Consumption Rank 8");
+    expect(mockRepository.list).toHaveBeenCalledWith(
+      expect.objectContaining({ category: "equipment" }),
+    );
   });
 
   it("enters a loading state and recovers when filters are reset after an error", async () => {
