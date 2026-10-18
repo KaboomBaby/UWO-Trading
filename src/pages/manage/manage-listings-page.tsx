@@ -15,6 +15,15 @@ import {
   type ShipFormState,
 } from "../../components/ships/ship-details-form";
 import {
+  EquipmentDetailsForm,
+  emptyEquipmentForm,
+  equipmentDetailsFromForm,
+  equipmentFormFromDetails,
+  validateEquipmentForm,
+  type EquipmentFormErrors,
+  type EquipmentFormState,
+} from "../../components/equipment/equipment-details-form";
+import {
   LISTING_CATEGORIES,
   LISTING_CURRENCIES,
   formatListingPrice,
@@ -41,10 +50,12 @@ type FormState = {
   emoji: string;
   collection: ListingCollection;
   ship: ShipFormState;
+  equipment: EquipmentFormState;
 };
 
 type ManageFormErrors = Partial<Record<keyof FormState, string>> &
-  ShipFormErrors;
+  ShipFormErrors &
+  EquipmentFormErrors;
 
 type PendingAction = "save" | "mark-sold" | "renew" | "delete";
 
@@ -98,6 +109,7 @@ function formStateFromListing(listing: Listing): FormState {
     emoji: listing.imageEmoji,
     collection: listing.collection ?? "current",
     ship: shipFormFromDetails(listing.shipDetails),
+    equipment: equipmentFormFromDetails(listing.equipmentDetails),
   };
 }
 
@@ -134,6 +146,9 @@ function validate(form: FormState): ManageFormErrors {
   if (form.category === "ships") {
     Object.assign(errors, validateShipForm(form.ship));
   }
+  if (form.category === "equipment") {
+    Object.assign(errors, validateEquipmentForm(form.equipment));
+  }
 
   return errors;
 }
@@ -156,6 +171,10 @@ function updateInputFromForm(form: FormState): UpdateListingInput {
     collection: form.collection,
     shipDetails:
       form.category === "ships" ? shipDetailsFromForm(form.ship) : null,
+    equipmentDetails:
+      form.category === "equipment"
+        ? equipmentDetailsFromForm(form.equipment)
+        : null,
   };
 }
 
@@ -438,11 +457,18 @@ export function ManageListingsPage() {
       ...form,
       category,
       ship: category === "ships" ? form.ship : { ...emptyShipForm },
+      equipment:
+        category === "equipment"
+          ? form.equipment
+          : structuredClone(emptyEquipmentForm),
     });
     setErrors((current) => ({
       ...current,
       ...Object.fromEntries(
         Object.keys(emptyShipForm).map((field) => [field, undefined]),
+      ),
+      ...Object.fromEntries(
+        Object.keys(emptyEquipmentForm).map((field) => [field, undefined]),
       ),
     }));
     setActionError(null);
@@ -456,6 +482,21 @@ export function ManageListingsPage() {
     if (!form) return;
 
     setForm({ ...form, ship: { ...form.ship, [field]: value } });
+    setErrors((current) => ({ ...current, [field]: undefined }));
+    setActionError(null);
+    setActionFeedback(null);
+  }
+
+  function updateEquipmentField<K extends keyof EquipmentFormState>(
+    field: K,
+    value: EquipmentFormState[K],
+  ) {
+    if (!form) return;
+
+    setForm({
+      ...form,
+      equipment: { ...form.equipment, [field]: value },
+    });
     setErrors((current) => ({ ...current, [field]: undefined }));
     setActionError(null);
     setActionFeedback(null);
@@ -1122,6 +1163,15 @@ export function ManageListingsPage() {
                       errors={errors}
                       form={form.ship}
                       onChange={updateShipField}
+                    />
+                  </div>
+                ) : null}
+                {form.category === "equipment" ? (
+                  <div className="sm:col-span-2">
+                    <EquipmentDetailsForm
+                      errors={errors}
+                      form={form.equipment}
+                      onChange={updateEquipmentField}
                     />
                   </div>
                 ) : null}

@@ -10,6 +10,7 @@ import {
   testShipDetails,
   testShipDetailsWithSkills,
 } from "../../fixtures/ship-details";
+import { testEquipmentDetails } from "../../fixtures/equipment-details";
 
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
@@ -248,6 +249,51 @@ describe("manage listings page", { timeout: 10_000 }, () => {
     );
   });
 
+  it("edits an equipment listing's stats and saves them", async () => {
+    const user = userEvent.setup({ delay: null });
+    const equipmentListing: Listing = {
+      ...expiredListing,
+      id: "celestial-purple-changpao",
+      title: "Celestial Purple Changpao",
+      category: "equipment",
+      shipDetails: null,
+      equipmentDetails: testEquipmentDetails,
+      ownerId: "player-account-1",
+    };
+    repository.listOwned.mockResolvedValue([equipmentListing]);
+    repository.updateOwned.mockResolvedValue({
+      ...equipmentListing,
+      equipmentDetails: { ...testEquipmentDetails, durabilityCurrent: 97 },
+    });
+    renderManagePage();
+
+    await user.click(
+      await screen.findByRole("button", { name: "Manage listing" }),
+    );
+    expect(screen.getByLabelText("Attack Power")).toHaveValue(55);
+    expect(screen.getByLabelText("Durability (current)")).toHaveValue(102);
+    expect(screen.getByLabelText("Worn by")).toHaveValue("male");
+
+    await user.clear(screen.getByLabelText("Durability (current)"));
+    await user.type(screen.getByLabelText("Durability (current)"), "97");
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+    expect(await screen.findByText("Changes saved.")).toBeInTheDocument();
+    expect(repository.updateOwned).toHaveBeenCalledWith(
+      equipmentListing.id,
+      "player-account-1",
+      expect.objectContaining({
+        equipmentDetails: expect.objectContaining({
+          durabilityCurrent: 97,
+          durabilityMax: 100,
+          attackPower: 55,
+          defencePower: 110,
+        }),
+        shipDetails: null,
+      }),
+    );
+  });
+
   it("accepts and declines owner-path offers", async () => {
     const user = userEvent.setup({ delay: null });
     const ownedListing = { ...expiredListing, ownerId: "player-account-1" };
@@ -390,6 +436,7 @@ describe("manage listings page", { timeout: 10_000 }, () => {
       contactNote: updatedListing.contactNote,
       imageEmoji: "⛵",
       collection: "legacy",
+      equipmentDetails: null,
       shipDetails: testShipDetails,
     });
     expect(

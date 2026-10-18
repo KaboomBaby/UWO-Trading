@@ -304,6 +304,83 @@ describe("post listing page", { timeout: 10_000 }, () => {
     });
   });
 
+  it("creates an Equipment listing with game-style stats", async () => {
+    const user = userEvent.setup({ delay: null });
+    renderPostPage();
+
+    await user.type(
+      screen.getByLabelText("Title"),
+      "Celestial Purple Changpao",
+    );
+    await user.selectOptions(screen.getByLabelText("Category"), "equipment");
+    expect(screen.getByLabelText("Attack Power")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Ship type")).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText("Seller"), "Niadra");
+    await user.type(screen.getByLabelText("Location"), "Seville");
+    await user.type(screen.getByLabelText("Server"), "Maris");
+
+    await user.selectOptions(screen.getByLabelText("Worn by"), "male");
+    await user.type(screen.getByLabelText("Durability (current)"), "102");
+    await user.type(screen.getByLabelText("Durability (max)"), "100");
+    await user.type(screen.getByLabelText("Formality"), "20");
+    await user.type(screen.getByLabelText("Attack Power"), "55");
+    await user.type(screen.getByLabelText("Defence Power"), "110");
+
+    await user.click(screen.getByRole("combobox", { name: "Skill bonus 1" }));
+    const skillList = screen.getByRole("listbox", { name: "Skill bonus 1" });
+    await user.click(
+      within(skillList).getByRole("button", { name: /Navigation/ }),
+    );
+    await user.type(screen.getByLabelText("Bonus value 1"), "3");
+
+    await user.type(
+      screen.getByLabelText("Effect name 1"),
+      "Reduce Supply Consumption",
+    );
+    await user.type(screen.getByLabelText(/Rank 1/), "8");
+
+    await user.selectOptions(screen.getByLabelText("Currency"), "ducats");
+    await user.type(screen.getByLabelText("Price (Ducats)"), "45000000");
+    await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(repository.create).toHaveBeenCalledTimes(1);
+    const createdInput = repository.create.mock.calls[0]?.[0];
+    expect(createdInput?.category).toBe("equipment");
+    expect(createdInput?.shipDetails).toBeNull();
+    expect(createdInput?.equipmentDetails).toEqual({
+      wearer: "male",
+      durabilityCurrent: 102,
+      durabilityMax: 100,
+      formality: 20,
+      attackPower: 55,
+      defencePower: 110,
+      skillBonuses: [
+        { name: "Navigation", iconId: "skill_navigation", value: 3 },
+      ],
+      effects: [{ name: "Reduce Supply Consumption", rank: 8 }],
+    });
+  });
+
+  it("creates an Equipment listing with no stats at all", async () => {
+    const user = userEvent.setup({ delay: null });
+    renderPostPage();
+
+    await user.type(screen.getByLabelText("Title"), "Plain Boots");
+    await user.selectOptions(screen.getByLabelText("Category"), "equipment");
+    await user.type(screen.getByLabelText("Seller"), "Niadra");
+    await user.type(screen.getByLabelText("Location"), "Seville");
+    await user.type(screen.getByLabelText("Server"), "Maris");
+    await user.selectOptions(screen.getByLabelText("Currency"), "ducats");
+    await user.type(screen.getByLabelText("Price (Ducats)"), "10000");
+    await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(repository.create).toHaveBeenCalledTimes(1);
+    const createdInput = repository.create.mock.calls[0]?.[0];
+    expect(createdInput?.equipmentDetails).toBeNull();
+  });
+
   it("offers one Original slot, five Optional slots, and round-trips chosen skills", async () => {
     const user = userEvent.setup({ delay: null });
     renderPostPage();
@@ -416,6 +493,7 @@ describe("post listing page", { timeout: 10_000 }, () => {
       location: "Amsterdam",
       server: "Maris",
       contactNote: "",
+      equipmentDetails: null,
       shipDetails: testShipDetails,
     });
 

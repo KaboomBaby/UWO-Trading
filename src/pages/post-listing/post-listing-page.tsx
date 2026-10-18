@@ -12,6 +12,14 @@ import {
   type ShipFormState,
 } from "../../components/ships/ship-details-form";
 import {
+  EquipmentDetailsForm,
+  emptyEquipmentForm,
+  equipmentDetailsFromForm,
+  validateEquipmentForm,
+  type EquipmentFormErrors,
+  type EquipmentFormState,
+} from "../../components/equipment/equipment-details-form";
+import {
   LISTING_CATEGORIES,
   LISTING_CURRENCIES,
   isNumericListingCurrency,
@@ -32,14 +40,22 @@ type FormState = {
   contactNote: string;
   emoji: string;
   ship: ShipFormState;
+  equipment: EquipmentFormState;
 };
 
 type ListingFormErrors = Partial<Record<keyof FormState, string>> &
-  ShipFormErrors;
+  ShipFormErrors &
+  EquipmentFormErrors;
 
 function clearShipErrors(): ListingFormErrors {
   return Object.fromEntries(
     Object.keys(emptyShipForm).map((field) => [field, undefined]),
+  ) as ListingFormErrors;
+}
+
+function clearEquipmentErrors(): ListingFormErrors {
+  return Object.fromEntries(
+    Object.keys(emptyEquipmentForm).map((field) => [field, undefined]),
   ) as ListingFormErrors;
 }
 
@@ -55,6 +71,7 @@ const emptyForm: FormState = {
   contactNote: "",
   emoji: "",
   ship: emptyShipForm,
+  equipment: emptyEquipmentForm,
 };
 
 type EditCodeCopyState = "idle" | "copied" | "error";
@@ -110,6 +127,9 @@ function validate(form: FormState): ListingFormErrors {
   }
   if (form.category === "ships") {
     Object.assign(errors, validateShipForm(form.ship));
+  }
+  if (form.category === "equipment") {
+    Object.assign(errors, validateEquipmentForm(form.equipment));
   }
 
   return errors;
@@ -196,10 +216,15 @@ export function PostListingPage() {
       ...current,
       category,
       ship: category === "ships" ? current.ship : { ...emptyShipForm },
+      equipment:
+        category === "equipment"
+          ? current.equipment
+          : structuredClone(emptyEquipmentForm),
     }));
     setErrors((current) => ({
       ...current,
       ...clearShipErrors(),
+      ...clearEquipmentErrors(),
       category: undefined,
     }));
   }
@@ -211,6 +236,17 @@ export function PostListingPage() {
     setForm((current) => ({
       ...current,
       ship: { ...current.ship, [field]: value },
+    }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
+  function updateEquipmentField<K extends keyof EquipmentFormState>(
+    field: K,
+    value: EquipmentFormState[K],
+  ) {
+    setForm((current) => ({
+      ...current,
+      equipment: { ...current.equipment, [field]: value },
     }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
@@ -243,6 +279,10 @@ export function PostListingPage() {
         contactNote: form.contactNote.trim(),
         shipDetails:
           form.category === "ships" ? shipDetailsFromForm(form.ship) : null,
+        equipmentDetails:
+          form.category === "equipment"
+            ? equipmentDetailsFromForm(form.equipment)
+            : null,
         ...(emoji ? { imageEmoji: emoji } : {}),
       });
       setCreatedListing(listing);
@@ -495,6 +535,14 @@ export function PostListingPage() {
               errors={errors}
               form={form.ship}
               onChange={updateShipField}
+            />
+          ) : null}
+
+          {form.category === "equipment" ? (
+            <EquipmentDetailsForm
+              errors={errors}
+              form={form.equipment}
+              onChange={updateEquipmentField}
             />
           ) : null}
 
