@@ -163,7 +163,7 @@ describe("manage listings page", { timeout: 10_000 }, () => {
     );
     expect(screen.getByText("Your account listings")).toBeInTheDocument();
     expect(screen.getByText("Legacy edit-code lookup")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Title")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Ship name")).not.toBeInTheDocument();
   });
 
   it("automatically lists owner listings and loads offers through owner paths", async () => {
@@ -374,7 +374,7 @@ describe("manage listings page", { timeout: 10_000 }, () => {
       "No listing was found for that edit code. Check the code and try again.",
     );
     expect(repository.findByEditCode).toHaveBeenCalledWith("not-a-real-code");
-    expect(screen.queryByLabelText("Title")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Ship name")).not.toBeInTheDocument();
   });
 
   it("keeps an expired listing editable and saves the full update payload", async () => {
@@ -397,8 +397,8 @@ describe("manage listings page", { timeout: 10_000 }, () => {
     await loadListing(user);
 
     expect(screen.getByText("Expired")).toBeInTheDocument();
-    await user.clear(screen.getByLabelText("Title"));
-    await user.type(screen.getByLabelText("Title"), updatedListing.title);
+    await user.clear(screen.getByLabelText("Ship name"));
+    await user.type(screen.getByLabelText("Ship name"), updatedListing.title);
     await user.selectOptions(screen.getByLabelText("Currency"), "UWC");
     await user.clear(screen.getByLabelText("Price (UWC)"));
     await user.type(screen.getByLabelText("Price (UWC)"), "51000000");
@@ -724,6 +724,6 @@ describe("manage listings page", { timeout: 10_000 }, () => {
     expect(
       await screen.findByRole("heading", { name: "Listing deleted" }),
     ).toBeInTheDocument();
-    expect(screen.queryByLabelText("Title")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Ship name")).not.toBeInTheDocument();
   });
 });

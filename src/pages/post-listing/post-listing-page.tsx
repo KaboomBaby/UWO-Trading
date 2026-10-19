@@ -97,33 +97,37 @@ function validate(form: FormState): ListingFormErrors {
   const numericCurrency =
     form.currency !== "" && isNumericListingCurrency(form.currency);
 
-  if (title.length < 3) {
+  if (form.category !== "equipment" && title.length < 3) {
     errors.title = "Title must be at least 3 characters.";
   }
   if (!form.category) {
     errors.category = "Category is required.";
   }
-  if (!form.currency) {
+  if (form.category !== "equipment" && !form.currency) {
     errors.currency = "Currency is required.";
   }
   if (numericCurrency) {
     const price = Number(form.price.trim());
     if (!form.price.trim()) {
-      errors.price = "Price is required.";
+      if (form.category !== "equipment") {
+        errors.price = "Price is required.";
+      }
     } else if (!Number.isFinite(price) || price <= 0) {
       errors.price = "Price must be a number greater than zero.";
     } else if (form.currency === "CT" && !Number.isInteger(price)) {
       errors.price = "Captain Tickets must be a whole number.";
     }
   }
-  if (!seller) {
-    errors.seller = "Seller is required.";
-  }
-  if (!location) {
-    errors.location = "Location is required.";
-  }
-  if (!server) {
-    errors.server = "Server is required.";
+  if (form.category !== "equipment") {
+    if (!seller) {
+      errors.seller = "Seller is required.";
+    }
+    if (!location) {
+      errors.location = "Location is required.";
+    }
+    if (!server) {
+      errors.server = "Server is required.";
+    }
   }
   if (form.category === "ships") {
     Object.assign(errors, validateShipForm(form.ship));
@@ -267,12 +271,26 @@ export function PostListingPage() {
     setIsSubmitting(true);
     try {
       const emoji = form.emoji.trim();
+      const isEquipment = form.category === "equipment";
+      const currency = (
+        isEquipment && !form.currency
+          ? form.price.trim()
+            ? "ducats"
+            : "negotiable"
+          : form.currency
+      ) as Listing["currency"];
+      const price =
+        numericCurrency || (isEquipment && Boolean(form.price.trim()))
+          ? form.price.trim()
+            ? Number(form.price.trim())
+            : null
+          : null;
       const listing = await repository.create({
         title: form.title.trim(),
         category: form.category as ListingCategory,
-        currency: form.currency as Listing["currency"],
-        price: numericCurrency ? Number(form.price.trim()) : null,
-        description: form.description.trim(),
+        currency,
+        price,
+        description: isEquipment ? "" : form.description.trim(),
         seller: form.seller.trim(),
         location: form.location.trim(),
         server: form.server.trim(),
@@ -479,27 +497,37 @@ export function PostListingPage() {
             </p>
           ) : null}
 
-          <div>
-            <label
-              className="text-sm font-semibold text-slate-200"
-              htmlFor="title"
-            >
-              Title
-            </label>
-            <input
-              aria-describedby={errors.title ? "title-error" : undefined}
-              aria-invalid={Boolean(errors.title)}
-              className={inputClassName}
-              id="title"
-              name="title"
-              onChange={(event) => updateField("title", event.target.value)}
-              placeholder="Adventurer Frigate"
-              required
-              type="text"
-              value={form.title}
-            />
-            <FieldError id="title-error" message={errors.title} />
-          </div>
+          {form.category ? (
+            <div>
+              <label
+                className="text-sm font-semibold text-slate-200"
+                htmlFor="title"
+              >
+                {form.category === "ships"
+                  ? "Ship name"
+                  : form.category === "equipment"
+                    ? "Item name"
+                    : "Name"}
+              </label>
+              <input
+                aria-describedby={errors.title ? "title-error" : undefined}
+                aria-invalid={Boolean(errors.title)}
+                className={inputClassName}
+                id="title"
+                name="title"
+                onChange={(event) => updateField("title", event.target.value)}
+                placeholder={
+                  form.category === "equipment"
+                    ? "Celestial Purple Changpao"
+                    : "Adventurer Frigate"
+                }
+                required={form.category !== "equipment"}
+                type="text"
+                value={form.title}
+              />
+              <FieldError id="title-error" message={errors.title} />
+            </div>
+          ) : null}
 
           <div>
             <label
@@ -602,31 +630,33 @@ export function PostListingPage() {
             </div>
           ) : null}
 
-          <div>
-            <label
-              className="text-sm font-semibold text-slate-200"
-              htmlFor="description"
-            >
-              Description{" "}
-              <span className="font-normal text-slate-400">(optional)</span>
-            </label>
-            <textarea
-              aria-describedby={
-                errors.description ? "description-error" : undefined
-              }
-              aria-invalid={Boolean(errors.description)}
-              className={`${inputClassName} min-h-32 resize-y`}
-              id="description"
-              name="description"
-              onChange={(event) =>
-                updateField("description", event.target.value)
-              }
-              placeholder="Describe the ship, cargo, or service."
-              rows={5}
-              value={form.description}
-            />
-            <FieldError id="description-error" message={errors.description} />
-          </div>
+          {form.category !== "equipment" ? (
+            <div>
+              <label
+                className="text-sm font-semibold text-slate-200"
+                htmlFor="description"
+              >
+                Description{" "}
+                <span className="font-normal text-slate-400">(optional)</span>
+              </label>
+              <textarea
+                aria-describedby={
+                  errors.description ? "description-error" : undefined
+                }
+                aria-invalid={Boolean(errors.description)}
+                className={`${inputClassName} min-h-32 resize-y`}
+                id="description"
+                name="description"
+                onChange={(event) =>
+                  updateField("description", event.target.value)
+                }
+                placeholder="Describe the ship, cargo, or service."
+                rows={5}
+                value={form.description}
+              />
+              <FieldError id="description-error" message={errors.description} />
+            </div>
+          ) : null}
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
               <label

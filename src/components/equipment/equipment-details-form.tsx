@@ -21,11 +21,6 @@ export type EquipmentEffectRow = {
   rank: string;
 };
 
-export type EquipmentExtraLineRow = {
-  label: string;
-  value: string;
-};
-
 export type EquipmentFormState = {
   wearer: EquipmentWearer | "";
   durabilityCurrent: string;
@@ -37,16 +32,10 @@ export type EquipmentFormState = {
   weaponCategory: string;
   skillBonuses: EquipmentSkillSlot[];
   effects: EquipmentEffectRow[];
-  extraLines: EquipmentExtraLineRow[];
 };
 
 const emptySkillSlot = (): EquipmentSkillSlot => ({ iconId: "", value: "" });
 const emptyEffectRow = (): EquipmentEffectRow => ({ name: "", rank: "" });
-const emptyExtraLineRow = (): EquipmentExtraLineRow => ({
-  label: "",
-  value: "",
-});
-
 export const emptyEquipmentForm: EquipmentFormState = {
   wearer: "",
   durabilityCurrent: "",
@@ -58,7 +47,6 @@ export const emptyEquipmentForm: EquipmentFormState = {
   weaponCategory: "",
   skillBonuses: [emptySkillSlot(), emptySkillSlot(), emptySkillSlot()],
   effects: [emptyEffectRow()],
-  extraLines: [emptyExtraLineRow()],
 };
 
 export type EquipmentFormErrors = Partial<
@@ -105,7 +93,7 @@ function NumberField({
   label: string;
   field: Exclude<
     keyof EquipmentFormState,
-    "wearer" | "weaponCategory" | "skillBonuses" | "effects" | "extraLines"
+    "wearer" | "weaponCategory" | "skillBonuses" | "effects"
   >;
   form: EquipmentFormState;
   errors: EquipmentFormErrors;
@@ -357,20 +345,6 @@ export function validateEquipmentForm(
     errors.effects = "Equipment Effects need a name.";
   }
 
-  if (
-    form.extraLines.some((row) => {
-      if (!row.value.trim()) return false;
-      const value = Number(row.value.trim());
-      return !Number.isInteger(value) || value < 0;
-    })
-  ) {
-    errors.extraLines =
-      "Extra line values must be whole numbers of zero or more.";
-  }
-  if (form.extraLines.some((row) => row.value.trim() && !row.label.trim())) {
-    errors.extraLines = "Extra lines need a label.";
-  }
-
   return errors;
 }
 
@@ -430,17 +404,6 @@ export function equipmentDetailsFromForm(
     });
   if (effects.length > 0) details.effects = effects;
 
-  const extraLines = form.extraLines
-    .filter((row) => row.label.trim())
-    .map((row) => {
-      const value = numberOrUndefined(row.value);
-      return {
-        label: row.label.trim(),
-        ...(value !== undefined ? { value } : {}),
-      };
-    });
-  if (extraLines.length > 0) details.extraLines = extraLines;
-
   return Object.keys(details).length > 0 ? details : null;
 }
 
@@ -465,13 +428,6 @@ export function equipmentFormFromDetails(
           rank: stat(effect.rank),
         }))
       : [emptyEffectRow()];
-  const extraLines =
-    details.extraLines && details.extraLines.length > 0
-      ? details.extraLines.map((line) => ({
-          label: line.label,
-          value: stat(line.value),
-        }))
-      : [emptyExtraLineRow()];
 
   return {
     wearer: details.wearer ?? "",
@@ -484,7 +440,6 @@ export function equipmentFormFromDetails(
     weaponCategory: details.weaponCategory ?? "",
     skillBonuses,
     effects,
-    extraLines,
   };
 }
 
@@ -511,12 +466,6 @@ export function EquipmentDetailsForm({
     const next = [...form.effects];
     next[index] = row;
     onChange("effects", next);
-  }
-
-  function updateExtraLineRow(index: number, row: EquipmentExtraLineRow) {
-    const next = [...form.extraLines];
-    next[index] = row;
-    onChange("extraLines", next);
   }
 
   return (
@@ -768,99 +717,6 @@ export function EquipmentDetailsForm({
         {errors.effects ? (
           <p className="mt-2 text-sm text-red-200" role="alert">
             {errors.effects}
-          </p>
-        ) : null}
-      </fieldset>
-
-      <fieldset className="mt-6">
-        <legend className="text-sm font-semibold uppercase tracking-wide text-amber-glow">
-          Extra lines
-        </legend>
-        <p className="mt-2 text-sm text-slate-400">
-          For unusual tooltip lines that have no field above, like
-          &ldquo;Processing layers&rdquo;.
-        </p>
-        <div className="mt-3 grid gap-4">
-          {form.extraLines.map((row, index) => (
-            <div className="flex flex-wrap items-end gap-3" key={index}>
-              <div className="min-w-56 flex-1">
-                <label
-                  className="text-sm font-semibold text-slate-200"
-                  htmlFor={`extra-line-label-${index + 1}`}
-                >
-                  Extra line label {index + 1}
-                </label>
-                <input
-                  className={inputClassName}
-                  id={`extra-line-label-${index + 1}`}
-                  name={`extraLineLabel${index + 1}`}
-                  onChange={(event) =>
-                    updateExtraLineRow(index, {
-                      ...row,
-                      label: event.target.value,
-                    })
-                  }
-                  placeholder="Processing layers"
-                  type="text"
-                  value={row.label}
-                />
-              </div>
-              <div className="w-32">
-                <label
-                  className="text-sm font-semibold text-slate-200"
-                  htmlFor={`extra-line-value-${index + 1}`}
-                >
-                  Value {index + 1}{" "}
-                  <span className="font-normal text-slate-400">(optional)</span>
-                </label>
-                <input
-                  className={inputClassName}
-                  id={`extra-line-value-${index + 1}`}
-                  inputMode="numeric"
-                  min="0"
-                  name={`extraLineValue${index + 1}`}
-                  onChange={(event) =>
-                    updateExtraLineRow(index, {
-                      ...row,
-                      value: event.target.value,
-                    })
-                  }
-                  step="1"
-                  type="number"
-                  value={row.value}
-                />
-              </div>
-              {form.extraLines.length > 1 ? (
-                <button
-                  className="rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-                  onClick={() =>
-                    onChange(
-                      "extraLines",
-                      form.extraLines.filter((_, i) => i !== index),
-                    )
-                  }
-                  type="button"
-                >
-                  Remove extra line {index + 1}
-                </button>
-              ) : null}
-            </div>
-          ))}
-        </div>
-        {form.extraLines.length < 5 ? (
-          <button
-            className="mt-3 rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-            onClick={() =>
-              onChange("extraLines", [...form.extraLines, emptyExtraLineRow()])
-            }
-            type="button"
-          >
-            Add an extra line
-          </button>
-        ) : null}
-        {errors.extraLines ? (
-          <p className="mt-2 text-sm text-red-200" role="alert">
-            {errors.extraLines}
           </p>
         ) : null}
       </fieldset>

@@ -595,6 +595,23 @@ describe("local listing repository", () => {
     ).toEqual({});
   });
 
+  it("accepts an equipment listing with every general field blank", () => {
+    const errors = validateListingInput({
+      ...validInput,
+      category: "equipment",
+      title: "",
+      currency: "negotiable",
+      price: null,
+      description: "",
+      seller: "",
+      location: "",
+      server: "",
+      shipDetails: null,
+      equipmentDetails: null,
+    });
+    expect(errors).toEqual({});
+  });
+
   it("rejects equipment details on non-equipment listings", () => {
     expect(
       validateListingInput({

@@ -369,11 +369,13 @@ export function normalizeEquipmentDetails(
 
 export function validateListingInput(input: CreateListingInput) {
   const errors: Record<string, string> = {};
-  if (input.title.trim().length < 3)
+  if (input.category !== "equipment" && input.title.trim().length < 3)
     errors.title = "Title must be at least 3 characters.";
   if (isNumericListingCurrency(input.currency)) {
     if (input.price === null) {
-      errors.price = "Price is required for this currency.";
+      if (input.category !== "equipment") {
+        errors.price = "Price is required for this currency.";
+      }
     } else if (!Number.isFinite(input.price) || input.price <= 0) {
       errors.price = "Price must be greater than zero.";
     } else if (input.currency === "CT" && !Number.isInteger(input.price)) {
@@ -383,9 +385,11 @@ export function validateListingInput(input: CreateListingInput) {
     errors.currency =
       "Trade and negotiable listings cannot set a numeric price.";
   }
-  if (!input.seller.trim()) errors.seller = "Seller is required.";
-  if (!input.location.trim()) errors.location = "Location is required.";
-  if (!input.server.trim()) errors.server = "Server is required.";
+  if (input.category !== "equipment") {
+    if (!input.seller.trim()) errors.seller = "Seller is required.";
+    if (!input.location.trim()) errors.location = "Location is required.";
+    if (!input.server.trim()) errors.server = "Server is required.";
+  }
   if (input.category === "ships") {
     if (!input.shipDetails) {
       errors.shipDetails = "Ship details are required for Ships listings.";

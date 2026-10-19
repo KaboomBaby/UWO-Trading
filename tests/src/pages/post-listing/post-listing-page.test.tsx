@@ -57,8 +57,8 @@ function renderPostPage() {
 }
 
 async function fillCommonFields(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText("Title"), "Trading Schooner");
   await user.selectOptions(screen.getByLabelText("Category"), "ships");
+  await user.type(screen.getByLabelText("Ship name"), "Trading Schooner");
   await user.type(
     screen.getByLabelText(/Description/),
     "A swift schooner suitable for regional trade routes.",
@@ -187,14 +187,14 @@ describe("post listing page", { timeout: 10_000 }, () => {
     const user = userEvent.setup({ delay: null });
     renderPostPage();
 
-    await user.type(screen.getByLabelText("Title"), "ab");
+    await user.selectOptions(screen.getByLabelText("Category"), "resources");
+    await user.type(screen.getByLabelText("Name"), "ab");
     await user.type(screen.getByLabelText(/Description/), "Too short");
     await user.click(screen.getByRole("button", { name: "Publish listing" }));
 
     expect(
       screen.getByText("Title must be at least 3 characters."),
     ).toBeInTheDocument();
-    expect(screen.getByText("Category is required.")).toBeInTheDocument();
     expect(screen.getByText("Currency is required.")).toBeInTheDocument();
     expect(
       screen.queryByText("Description must be at least 10 characters."),
@@ -308,11 +308,12 @@ describe("post listing page", { timeout: 10_000 }, () => {
     const user = userEvent.setup({ delay: null });
     renderPostPage();
 
+    await user.selectOptions(screen.getByLabelText("Category"), "equipment");
+    expect(screen.queryByLabelText(/Description/)).not.toBeInTheDocument();
     await user.type(
-      screen.getByLabelText("Title"),
+      screen.getByLabelText("Item name"),
       "Celestial Purple Changpao",
     );
-    await user.selectOptions(screen.getByLabelText("Category"), "equipment");
     expect(screen.getByLabelText("Attack Power")).toBeInTheDocument();
     expect(screen.queryByLabelText("Ship type")).not.toBeInTheDocument();
     await user.type(screen.getByLabelText("Seller"), "Niadra");
@@ -362,12 +363,37 @@ describe("post listing page", { timeout: 10_000 }, () => {
     });
   });
 
+  it("posts an Equipment listing with every other field blank", async () => {
+    const user = userEvent.setup({ delay: null });
+    renderPostPage();
+
+    await user.selectOptions(screen.getByLabelText("Category"), "equipment");
+    expect(screen.queryByLabelText(/Description/)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Publish listing" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(repository.create).toHaveBeenCalledTimes(1);
+    const createdInput = repository.create.mock.calls[0]?.[0];
+    expect(createdInput).toMatchObject({
+      title: "",
+      category: "equipment",
+      currency: "negotiable",
+      price: null,
+      description: "",
+      seller: "",
+      location: "",
+      server: "",
+      shipDetails: null,
+      equipmentDetails: null,
+    });
+  });
+
   it("creates an Equipment listing with no stats at all", async () => {
     const user = userEvent.setup({ delay: null });
     renderPostPage();
 
-    await user.type(screen.getByLabelText("Title"), "Plain Boots");
     await user.selectOptions(screen.getByLabelText("Category"), "equipment");
+    await user.type(screen.getByLabelText("Item name"), "Plain Boots");
     await user.type(screen.getByLabelText("Seller"), "Niadra");
     await user.type(screen.getByLabelText("Location"), "Seville");
     await user.type(screen.getByLabelText("Server"), "Maris");
