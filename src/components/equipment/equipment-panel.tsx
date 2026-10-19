@@ -65,10 +65,19 @@ export function equipmentSummaryParts(details: EquipmentDetails): string[] {
   return parts;
 }
 
-function StatCell({ label, value }: { label: string; value: string | number }) {
+function StatCell({
+  icon,
+  label,
+  value,
+}: {
+  icon: string;
+  label: string;
+  value: string | number;
+}) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <img alt="" className="h-6 w-6 object-contain" src={icon} />
         {label}
       </p>
       <p className="mt-2 text-lg font-semibold text-white">{value}</p>
@@ -78,15 +87,39 @@ function StatCell({ label, value }: { label: string; value: string | number }) {
 
 export function EquipmentPanel({ details }: { details: EquipmentDetails }) {
   const durability = formatDurability(details);
-  const stats: Array<{ label: string; value?: string | number }> = [
-    { label: "Durability", value: durability ?? undefined },
-    { label: "Formality", value: details.formality },
-    { label: "Disguise Level", value: details.disguiseLevel },
-    { label: "Attack Power", value: details.attackPower },
-    { label: "Defence Power", value: details.defencePower },
+  const stats: Array<{
+    icon: string;
+    label: string;
+    value?: string | number;
+  }> = [
+    {
+      icon: "/equipment-stat-icons/durability.png",
+      label: "Durability",
+      value: durability ?? undefined,
+    },
+    {
+      icon: "/equipment-stat-icons/formality.png",
+      label: "Formality",
+      value: details.formality,
+    },
+    {
+      icon: "/equipment-stat-icons/disguise.png",
+      label: "Disguise Level",
+      value: details.disguiseLevel,
+    },
+    {
+      icon: "/equipment-stat-icons/attack.png",
+      label: "Attack Power",
+      value: details.attackPower,
+    },
+    {
+      icon: "/equipment-stat-icons/defence.png",
+      label: "Defence Power",
+      value: details.defencePower,
+    },
   ];
   const presentStats = stats.filter(
-    (stat): stat is { label: string; value: string | number } =>
+    (stat): stat is { icon: string; label: string; value: string | number } =>
       stat.value !== undefined,
   );
   const skillBonuses = details.skillBonuses ?? [];
@@ -124,7 +157,12 @@ export function EquipmentPanel({ details }: { details: EquipmentDetails }) {
       {presentStats.length > 0 ? (
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           {presentStats.map((stat) => (
-            <StatCell key={stat.label} label={stat.label} value={stat.value} />
+            <StatCell
+              icon={stat.icon}
+              key={stat.label}
+              label={stat.label}
+              value={stat.value}
+            />
           ))}
         </div>
       ) : null}

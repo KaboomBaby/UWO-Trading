@@ -233,9 +233,20 @@ describe("BrowsePage", () => {
       name: /celestial purple changpao/i,
     });
     expect(link).toHaveAttribute("href", "/listings/celestial-purple-changpao");
-    expect(link).toHaveTextContent("Durability 102/100");
-    expect(link).toHaveTextContent("Attack Power 55");
-    expect(link).toHaveTextContent("Navigation +3");
+    const durabilityChip = within(link).getByLabelText("Durability: 102/100");
+    expect(
+      durabilityChip.querySelector("img"),
+    ).toHaveAttribute("src", "/equipment-stat-icons/durability.png");
+    expect(durabilityChip).toHaveTextContent("102/100");
+    expect(
+      within(link).getByLabelText("Attack Power: 55"),
+    ).toBeInTheDocument();
+    const navigationChip = within(link).getByLabelText("Navigation: +3");
+    expect(navigationChip.querySelector("img")).toHaveAttribute(
+      "src",
+      "/equipment-skill-icons/skill_navigation.png",
+    );
+    expect(navigationChip).toHaveTextContent("+3");
     expect(link).toHaveTextContent("Reduce Supply Consumption Rank 8");
     expect(mockRepository.list).toHaveBeenCalledWith(
       expect.objectContaining({ category: "equipment" }),
