@@ -329,8 +329,20 @@ describe("post listing page", { timeout: 10_000 }, () => {
 
     await user.click(screen.getByRole("combobox", { name: "Skill bonus 1" }));
     const skillList = screen.getByRole("listbox", { name: "Skill bonus 1" });
-    await user.click(
-      within(skillList).getByRole("button", { name: /Navigation/ }),
+    const navigationOption = within(skillList).getByRole("button", {
+      name: /Navigation/,
+    });
+    expect(navigationOption.querySelector("img")).toHaveAttribute(
+      "src",
+      "/equipment-skill-icons/skill_navigation.png",
+    );
+    await user.click(navigationOption);
+    const skillSlot = screen.getByRole("combobox", {
+      name: "Skill bonus 1",
+    }).parentElement;
+    expect(skillSlot?.querySelector("img")).toHaveAttribute(
+      "src",
+      "/equipment-skill-icons/skill_navigation.png",
     );
     await user.type(screen.getByLabelText("Bonus value 1"), "3");
 

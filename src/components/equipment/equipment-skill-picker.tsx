@@ -4,6 +4,7 @@ import {
   EQUIPMENT_SKILLS,
   type EquipmentSkillRecord,
 } from "../../data/equipment-skills";
+import { EquipmentSkillIcon } from "./equipment-skill-icon";
 
 const inputClassName =
   "mt-2 w-full rounded-lg border border-white/15 bg-ink px-3 py-2 text-white placeholder:text-slate-500 focus:border-amber-glow focus:outline-none focus:ring-2 focus:ring-amber-glow/30";
@@ -42,6 +43,7 @@ function EquipmentSkillOption({
         onClick={onSelect}
         type="button"
       >
+        <EquipmentSkillIcon iconId={skill.iconId} />
         <span>{skill.name}</span>
         <span className="ml-auto text-xs text-slate-400">
           {isDisabled ? "Already chosen" : familyLabels[skill.family]}
@@ -129,6 +131,10 @@ export function EquipmentSkillPicker({
       />
       {selectedSkill ? (
         <div className="mt-3 flex items-center gap-3">
+          <EquipmentSkillIcon
+            className="h-10 w-10 rounded-md border border-white/15 bg-black/30 object-contain"
+            iconId={selectedSkill.iconId}
+          />
           <span className="text-sm font-medium text-white">
             {selectedSkill.name}
           </span>

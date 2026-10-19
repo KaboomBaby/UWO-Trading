@@ -22,6 +22,10 @@ export function getEquipmentSkill(iconId: string) {
   return skillByIconId.get(iconId);
 }
 
+export function equipmentSkillIconUrl(iconId: string) {
+  return `/equipment-skill-icons/${iconId}.png`;
+}
+
 export function getEquipmentSkillsByFamily(family: EquipmentSkillFamily) {
   return EQUIPMENT_SKILLS.filter((skill) => skill.family === family);
 }

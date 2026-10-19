@@ -1,4 +1,5 @@
 import { getEquipmentSkill } from "../../data/equipment-skills";
+import { EquipmentSkillIcon } from "./equipment-skill-icon";
 import type { EquipmentDetails, EquipmentWearer } from "../../types/listing";
 
 export function formatWearer(wearer: EquipmentWearer): string {
@@ -141,6 +142,10 @@ export function EquipmentPanel({ details }: { details: EquipmentDetails }) {
                   className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-3"
                   key={bonus.iconId}
                 >
+                  <EquipmentSkillIcon
+                    className="h-10 w-10 rounded-md border border-white/15 bg-black/30 object-contain"
+                    iconId={bonus.iconId}
+                  />
                   <div>
                     <p className="font-semibold text-white">{bonus.name}</p>
                     {record ? (
