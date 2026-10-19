@@ -1,10 +1,5 @@
-import { useMemo, useState } from "react";
-
-import {
-  EQUIPMENT_SKILLS,
-  getEquipmentSkill,
-  type EquipmentSkillRecord,
-} from "../../data/equipment-skills";
+import { getEquipmentSkill } from "../../data/equipment-skills";
+import { EquipmentSkillPicker } from "./equipment-skill-picker";
 import {
   EQUIPMENT_WEARERS,
   type EquipmentDetails,
@@ -61,12 +56,6 @@ type EquipmentFormChange = <K extends keyof EquipmentFormState>(
 const inputClassName =
   "mt-2 w-full rounded-lg border border-white/15 bg-ink px-3 py-2 text-white placeholder:text-slate-500 focus:border-amber-glow focus:outline-none focus:ring-2 focus:ring-amber-glow/30";
 
-const familyLabels: Record<EquipmentSkillRecord["family"], string> = {
-  adventure: "Adventure",
-  trade: "Trade",
-  battle: "Battle",
-};
-
 const wearerLabels: Record<EquipmentWearer, string> = {
   male: "♂ Male",
   female: "♀ Female",
@@ -119,165 +108,6 @@ function NumberField({
         value={form[field]}
       />
       <FieldError id={errorId} message={errors[field]} />
-    </div>
-  );
-}
-
-function EquipmentSkillOption({
-  isActive,
-  isDisabled,
-  onHover,
-  onSelect,
-  skill,
-}: {
-  isActive: boolean;
-  isDisabled: boolean;
-  onHover: () => void;
-  onSelect: () => void;
-  skill: EquipmentSkillRecord;
-}) {
-  return (
-    <li
-      aria-disabled={isDisabled}
-      aria-selected={isActive}
-      className={`${isActive ? "bg-amber-glow/20" : ""} ${isDisabled ? "opacity-45" : ""}`}
-      id={`${skill.iconId}-option`}
-      onMouseEnter={onHover}
-      role="option"
-    >
-      <button
-        className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-slate-100 disabled:cursor-not-allowed"
-        disabled={isDisabled}
-        onClick={onSelect}
-        type="button"
-      >
-        <span>{skill.name}</span>
-        <span className="ml-auto text-xs text-slate-400">
-          {isDisabled ? "Already chosen" : familyLabels[skill.family]}
-        </span>
-      </button>
-    </li>
-  );
-}
-
-function EquipmentSkillPicker({
-  disabledIconIds,
-  id,
-  label,
-  selectedSkill,
-  onChange,
-}: {
-  disabledIconIds: string[];
-  id: string;
-  label: string;
-  selectedSkill: EquipmentSkillRecord | undefined;
-  onChange: (iconId: string) => void;
-}) {
-  const [query, setQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const listId = `${id}-options`;
-  const filteredSkills = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    if (!needle) return EQUIPMENT_SKILLS;
-    return EQUIPMENT_SKILLS.filter((skill) =>
-      skill.name.toLowerCase().includes(needle),
-    );
-  }, [query]);
-
-  function selectSkill(iconId: string) {
-    onChange(iconId);
-    setQuery("");
-    setIsOpen(false);
-    setActiveIndex(0);
-  }
-
-  return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-      <label className="text-sm font-semibold text-slate-200" htmlFor={id}>
-        {label}
-      </label>
-      <input
-        aria-controls={listId}
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-        autoComplete="off"
-        className={inputClassName}
-        id={id}
-        onBlur={() => window.setTimeout(() => setIsOpen(false), 100)}
-        onChange={(event) => {
-          setQuery(event.target.value);
-          setActiveIndex(0);
-          setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowDown") {
-            event.preventDefault();
-            setIsOpen(true);
-            setActiveIndex((index) =>
-              Math.min(index + 1, filteredSkills.length - 1),
-            );
-          } else if (event.key === "ArrowUp") {
-            event.preventDefault();
-            setActiveIndex((index) => Math.max(index - 1, 0));
-          } else if (event.key === "Enter" && isOpen) {
-            event.preventDefault();
-            const skill = filteredSkills[activeIndex];
-            if (skill && !disabledIconIds.includes(skill.iconId)) {
-              selectSkill(skill.iconId);
-            }
-          } else if (event.key === "Escape") {
-            setIsOpen(false);
-          }
-        }}
-        placeholder={selectedSkill ? selectedSkill.name : `Search ${label}`}
-        role="combobox"
-        type="text"
-        value={query}
-      />
-      {selectedSkill ? (
-        <div className="mt-3 flex items-center gap-3">
-          <span className="text-sm font-medium text-white">
-            {selectedSkill.name}
-          </span>
-          <span className="text-xs text-slate-400">
-            {familyLabels[selectedSkill.family]}
-          </span>
-          <button
-            className="ml-auto rounded-lg border border-white/20 px-2 py-1 text-xs font-semibold text-white transition hover:bg-white/10"
-            onClick={() => selectSkill("")}
-            type="button"
-          >
-            Clear
-          </button>
-        </div>
-      ) : null}
-      {isOpen ? (
-        <ul
-          aria-label={label}
-          className="mt-2 max-h-56 overflow-y-auto rounded-lg border border-white/10 bg-ink"
-          id={listId}
-          role="listbox"
-        >
-          {filteredSkills.length === 0 ? (
-            <li className="px-4 py-3 text-sm text-slate-400">
-              No matching skills.
-            </li>
-          ) : (
-            filteredSkills.map((skill, index) => (
-              <EquipmentSkillOption
-                isActive={index === activeIndex}
-                isDisabled={disabledIconIds.includes(skill.iconId)}
-                key={skill.iconId}
-                onHover={() => setActiveIndex(index)}
-                onSelect={() => selectSkill(skill.iconId)}
-                skill={skill}
-              />
-            ))
-          )}
-        </ul>
-      ) : null}
     </div>
   );
 }

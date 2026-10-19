@@ -3,6 +3,8 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import { ListingGrid } from "../../components/listings/listing-grid";
 import { EquipmentList } from "../../components/listings/equipment-list";
+import { EquipmentSkillPicker } from "../../components/equipment/equipment-skill-picker";
+import { getEquipmentSkill } from "../../data/equipment-skills";
 import { useListingRepository } from "../../lib/listing-repository-context";
 import {
   LISTING_CATEGORIES,
@@ -74,6 +76,32 @@ function createBrowseParams(
   return params;
 }
 
+type EquipmentStatKey =
+  "durability" | "formality" | "disguiseLevel" | "attackPower" | "defencePower";
+
+const EQUIPMENT_STAT_OPTIONS: Array<{
+  value: EquipmentStatKey;
+  label: string;
+}> = [
+  { value: "attackPower", label: "Attack Power" },
+  { value: "defencePower", label: "Defence Power" },
+  { value: "durability", label: "Durability" },
+  { value: "formality", label: "Formality" },
+  { value: "disguiseLevel", label: "Disguise Level" },
+];
+
+function equipmentStatValue(
+  listing: Listing,
+  key: EquipmentStatKey,
+): number | null {
+  const details = listing.equipmentDetails;
+  if (!details) return null;
+  if (key === "durability") {
+    return details.durabilityCurrent ?? details.durabilityMax ?? null;
+  }
+  return details[key] ?? null;
+}
+
 export function BrowsePage() {
   const repository = useListingRepository();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -82,6 +110,11 @@ export function BrowsePage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<ListingSort>("newest");
   const [ticketsOnly, setTicketsOnly] = useState(false);
+  const [skillFilter, setSkillFilter] = useState<string[]>(["", "", ""]);
+  const [statSort, setStatSort] = useState<{
+    key: EquipmentStatKey;
+    direction: "asc" | "desc";
+  } | null>(null);
   const [result, setResult] = useState<ListingResult | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
@@ -101,6 +134,35 @@ export function BrowsePage() {
       : null;
   const listings =
     currentResult?.status === "success" ? currentResult.listings : [];
+  const visibleListings = useMemo(() => {
+    if (category !== "equipment") return listings;
+    let out = listings;
+    const wanted = skillFilter.filter(Boolean);
+    if (wanted.length > 0) {
+      out = out.filter((listing) => {
+        const owned = new Set(
+          (listing.equipmentDetails?.skillBonuses ?? []).map(
+            (bonus) => bonus.iconId,
+          ),
+        );
+        return wanted.every((iconId) => owned.has(iconId));
+      });
+    }
+    if (statSort) {
+      const factor = statSort.direction === "asc" ? 1 : -1;
+      out = [...out].sort((a, b) => {
+        const va = equipmentStatValue(a, statSort.key);
+        const vb = equipmentStatValue(b, statSort.key);
+        if (va === null && vb === null) return 0;
+        if (va === null) return 1;
+        if (vb === null) return -1;
+        return (va - vb) * factor;
+      });
+    }
+    return out;
+  }, [category, listings, skillFilter, statSort]);
+  const displayedListings =
+    category === "equipment" ? visibleListings : listings;
   const isLoading = !currentResult;
   const error = currentResult?.status === "error";
 
@@ -139,6 +201,8 @@ export function BrowsePage() {
 
   const selectCategory = useCallback(
     (nextCategory: BrowseCategory) => {
+      setSkillFilter(["", "", ""]);
+      setStatSort(null);
       setSearchParams(createBrowseParams(nextCategory, collection));
     },
     [collection, setSearchParams],
@@ -157,6 +221,8 @@ export function BrowsePage() {
     setSearch("");
     setSort("newest");
     setTicketsOnly(false);
+    setSkillFilter(["", "", ""]);
+    setStatSort(null);
     setSearchParams(new URLSearchParams());
     setReloadToken((token) => token + 1);
   };
@@ -166,8 +232,10 @@ export function BrowsePage() {
     collection === "legacy" ||
     search.trim().length > 0 ||
     sort !== "newest" ||
-    ticketsOnly;
-  const resultLabel = listings.length === 1 ? "listing" : "listings";
+    ticketsOnly ||
+    skillFilter.some(Boolean) ||
+    statSort !== null;
+  const resultLabel = displayedListings.length === 1 ? "listing" : "listings";
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6">
@@ -187,7 +255,7 @@ export function BrowsePage() {
             ? "Unable to load listings"
             : isLoading
               ? "Loading listings…"
-              : `${listings.length} ${resultLabel}`}
+              : `${displayedListings.length} ${resultLabel}`}
         </p>
       </div>
 
@@ -281,8 +349,21 @@ export function BrowsePage() {
             <label className="flex flex-col gap-2 text-sm font-medium text-slate-200">
               Sort by
               <select
-                value={sort}
-                onChange={(event) => setSort(event.target.value as ListingSort)}
+                value={statSort ? `stat:${statSort.key}` : sort}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (value.startsWith("stat:")) {
+                    const key = value.slice(5) as EquipmentStatKey;
+                    setStatSort({
+                      key,
+                      direction:
+                        statSort?.key === key ? statSort.direction : "desc",
+                    });
+                  } else {
+                    setStatSort(null);
+                    setSort(value as ListingSort);
+                  }
+                }}
                 className="rounded-xl border border-white/15 bg-ink/70 px-4 py-2.5 text-base text-white focus:border-amber-glow focus:outline-none"
               >
                 {SORT_OPTIONS.map((option) => (
@@ -290,10 +371,78 @@ export function BrowsePage() {
                     {option.label}
                   </option>
                 ))}
+                {category === "equipment"
+                  ? EQUIPMENT_STAT_OPTIONS.map((option) => (
+                      <option key={option.value} value={`stat:${option.value}`}>
+                        {option.label}
+                      </option>
+                    ))
+                  : null}
               </select>
             </label>
+            {statSort ? (
+              <button
+                aria-label={
+                  statSort.direction === "desc"
+                    ? "Highest first. Switch to lowest first."
+                    : "Lowest first. Switch to highest first."
+                }
+                className="rounded-xl border border-amber-glow/50 bg-amber-glow/10 px-4 py-2.5 text-sm font-semibold text-amber-glow transition hover:bg-amber-glow/20"
+                onClick={() =>
+                  setStatSort((current) =>
+                    current
+                      ? {
+                          ...current,
+                          direction:
+                            current.direction === "desc" ? "asc" : "desc",
+                        }
+                      : current,
+                  )
+                }
+                type="button"
+              >
+                {statSort.direction === "desc"
+                  ? "Highest first ↓"
+                  : "Lowest first ↑"}
+              </button>
+            ) : null}
           </div>
         </div>
+
+        {category === "equipment" ? (
+          <div className="mt-5 border-t border-white/10 pt-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
+              Find by skill{" "}
+              <span className="font-normal normal-case text-slate-400">
+                (up to 3, optional — listings must have every skill picked)
+              </span>
+            </h2>
+            <div className="mt-3 grid gap-3 lg:grid-cols-3">
+              {[0, 1, 2].map((slot) => (
+                <EquipmentSkillPicker
+                  disabledIconIds={skillFilter.filter(
+                    (iconId, index) => index !== slot && Boolean(iconId),
+                  )}
+                  id={`browse-skill-${slot + 1}`}
+                  key={slot}
+                  label={`Skill ${slot + 1}`}
+                  onChange={(iconId) =>
+                    setSkillFilter((previous) => {
+                      const next = [...previous];
+                      next[slot] = iconId;
+                      return next;
+                    })
+                  }
+                  selectedSkill={
+                    skillFilter[slot]
+                      ? getEquipmentSkill(skillFilter[slot])
+                      : undefined
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-8">
@@ -328,11 +477,11 @@ export function BrowsePage() {
               ))}
             </ul>
           </div>
-        ) : listings.length > 0 ? (
+        ) : displayedListings.length > 0 ? (
           category === "equipment" ? (
-            <EquipmentList listings={listings} />
+            <EquipmentList listings={displayedListings} />
           ) : (
-            <ListingGrid listings={listings} />
+            <ListingGrid listings={displayedListings} />
           )
         ) : (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">

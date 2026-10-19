@@ -1,11 +1,20 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ListingRepository } from "../../../../src/services/listing-service";
 import type { Listing } from "../../../../src/types/listing";
-import { testEquipmentDetails } from "../../fixtures/equipment-details";
+import {
+  testEquipmentDetails,
+  testWeaponDetails,
+} from "../../fixtures/equipment-details";
 
 const { mockRepository } = vi.hoisted(() => ({
   mockRepository: {
@@ -231,6 +240,103 @@ describe("BrowsePage", () => {
     expect(mockRepository.list).toHaveBeenCalledWith(
       expect.objectContaining({ category: "equipment" }),
     );
+  });
+
+  it("filters Equipment listings by picked skills", async () => {
+    const user = userEvent.setup({ delay: null });
+    mockRepository.list.mockResolvedValue([
+      {
+        ...listing,
+        id: "celestial-purple-changpao",
+        title: "Celestial Purple Changpao",
+        category: "equipment",
+        equipmentDetails: testEquipmentDetails,
+      },
+      {
+        ...listing,
+        id: "sba",
+        title: "SBA",
+        category: "equipment",
+        equipmentDetails: {
+          attackPower: 10,
+          skillBonuses: [
+            { name: "Fishing", iconId: "skill_fishing", value: 2 },
+          ],
+        },
+      },
+    ]);
+    renderBrowse("/browse?category=equipment");
+
+    expect(
+      await screen.findByLabelText("Equipment listings"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /sba/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("combobox", { name: "Skill 1" }));
+    const skillList = screen.getByRole("listbox", { name: "Skill 1" });
+    await user.click(
+      within(skillList).getByRole("button", { name: /Navigation/ }),
+    );
+
+    expect(
+      screen.getByRole("link", { name: /celestial purple changpao/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /sba/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("orders Equipment listings by a picked stat and flips the order", async () => {
+    const user = userEvent.setup({ delay: null });
+    mockRepository.list.mockResolvedValue([
+      {
+        ...listing,
+        id: "celestial-purple-changpao",
+        title: "Celestial Purple Changpao",
+        category: "equipment",
+        equipmentDetails: testEquipmentDetails,
+      },
+      {
+        ...listing,
+        id: "battle-hardened-horn-bow",
+        title: "Battle-Hardened Horn Bow",
+        category: "equipment",
+        equipmentDetails: testWeaponDetails,
+      },
+    ]);
+    renderBrowse("/browse?category=equipment");
+
+    const region = await screen.findByLabelText("Equipment listings");
+    const hrefs = () =>
+      within(region)
+        .getAllByRole("link")
+        .map((link) => link.getAttribute("href"));
+    expect(hrefs()).toEqual([
+      "/listings/celestial-purple-changpao",
+      "/listings/battle-hardened-horn-bow",
+    ]);
+
+    await user.selectOptions(
+      screen.getByLabelText("Sort by"),
+      "stat:attackPower",
+    );
+    await waitFor(() =>
+      expect(hrefs()).toEqual([
+        "/listings/battle-hardened-horn-bow",
+        "/listings/celestial-purple-changpao",
+      ]),
+    );
+
+    await user.click(screen.getByRole("button", { name: /highest first/i }));
+    await waitFor(() =>
+      expect(hrefs()).toEqual([
+        "/listings/celestial-purple-changpao",
+        "/listings/battle-hardened-horn-bow",
+      ]),
+    );
+    expect(
+      screen.getByRole("button", { name: /lowest first/i }),
+    ).toBeInTheDocument();
   });
 
   it("enters a loading state and recovers when filters are reset after an error", async () => {
